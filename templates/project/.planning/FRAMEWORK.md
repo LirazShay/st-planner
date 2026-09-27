@@ -51,6 +51,20 @@ Avoid embedding large parsers, multi-line programs, or complex data transformati
 
 This is a repository-engineering guideline, not a requirement to add scripts where plain commands are already clear.
 
+## 0.3 Programmatic text-edit safety
+
+When an agent edits repository text programmatically, treat the transformation itself as code that can corrupt content.
+
+For JavaScript string replacement:
+- if inserted text may contain `$`, do not pass it blindly as a replacement string to `String.replace`/`replaceAll`; use a replacer function or another method that preserves the text literally;
+- when a transformation is complex, prefer rebuilding from a known-good baseline rather than chaining fragile ad-hoc replacements;
+- require the expected source text to exist and, when appropriate, to be unique before replacing it;
+- after the edit, reread the rendered file or inspect the complete diff before PR/merge.
+
+Do not trust "the update call succeeded" as proof that the resulting text is correct.
+
+This is editing safety guidance, not a requirement to introduce a new transformation tool.
+
 ## 1. Strategy + Tactic
 
 Every node contains:
