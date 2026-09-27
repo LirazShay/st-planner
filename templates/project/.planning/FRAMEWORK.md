@@ -187,7 +187,26 @@ Local Necessity/Sufficiency checks can still miss a whole concern if that concer
 
 Before Final Planning Review, perform one **outside-in coverage audit** from `GOAL.md`.
 
-Do not create a separate coverage file. Use these challenge questions:
+Default: **do not create a separate coverage artifact**. Use the challenge questions below.
+
+### Optional high-complexity coverage mode
+
+Enable a separate coverage ledger only when there is concrete evidence the normal outside-in audit is insufficient, such as:
+- a very large source brief;
+- a major legacy migration;
+- hundreds of independent obligations;
+- an explicit requirement for exhaustive anti-forgetting traceability.
+
+Do not enable it merely because the project is important or the tree is large.
+
+When this opt-in mode is used:
+- coverage IDs must be unique;
+- every coverage obligation maps exactly once to its durable owner/S&T protection;
+- the ledger must not become a second STATUS/progress tracker;
+- add a small target-project validator that fails on duplicate IDs, missing mappings, or unexpected extras;
+- keep the validator target-specific unless repeated use proves a generic framework tool is justified.
+
+Use these challenge questions:
 
 1. **Goal traceability** — For every meaningful clause in the desired outcome and every hard constraint, where is it protected by the TREE, a material assumption, a decision, or success evidence?
 2. **Root gap test** — Assume every planned leaf succeeds exactly as written. Can the desired outcome still fail for a reason the plan should have handled?
