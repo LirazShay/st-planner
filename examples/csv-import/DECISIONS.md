@@ -1,47 +1,52 @@
-# Decisions
+# Decisions and Open Questions
 
 ### D-001 — Handling unknown CSV columns
 
-**Status:** decided
+**Status:** resolved
 
-**Related S&T node:** 0.1.1
+**Related S&T node(s):** 0.1.1
 
 **Question:**  
 Should unknown columns be ignored or rejected in V1?
+
+**Why it matters:**  
+Silent ignoring can make the user believe submitted data was imported when the system discarded it, which conflicts with predictable interpretation.
 
 **Options considered:**
 - Ignore unknown columns.
 - Reject files containing unknown columns.
 
-**Decision:**  
-Reject unknown columns in this example.
+**Resolution:**  
+Reject files containing unknown columns in this example.
 
-**Why:**  
-The example goal emphasizes predictable interpretation. Silent ignoring creates a plausible case where the user believes submitted data was imported when the system discarded it.
+**Resolution basis / rationale:**  
+The goal emphasizes predictable interpretation, so silent data loss is not acceptable.
 
-**What would reopen this decision:**  
+**What would reopen this:**  
 A product requirement for forward-compatible files or explicitly ignorable extension columns.
-
 
 ### D-002 — Duplicate-customer policy
 
 **Status:** open
 
-**Related S&T node:** 0.2.1
+**Related S&T node(s):** 0.2.1, 0.3
 
 **Question:**  
-When an import candidate matches an existing customer according to the domain's identity rules, should V1 reject it, update/merge it, or treat the case another way?
+When an import candidate matches an existing customer according to the domain's identity rules, should V1 reject it, update/merge it, or apply another explicit rule?
+
+**Why it matters:**  
+The answer changes both candidate admissibility and persistence semantics.
 
 **Options considered:**
 - Reject the candidate as a duplicate.
 - Update/merge the existing customer.
 - Another explicit domain rule supplied by the product owner.
 
-**Decision:**  
-Open. The planning state does not contain enough information to choose responsibly.
+**Resolution:**  
+Open.
 
-**Why:**  
-This policy materially changes which candidate rows are admissible and may also affect the persistence semantics in branch 0.3. A fresh planning session must expose the unknown rather than invent a convenient rule.
+**Resolution basis / rationale:**  
+The persisted project state does not contain enough information to choose responsibly.
 
-**What would close this decision:**  
-An explicit product/domain decision defining duplicate-customer behavior for CSV import.
+**What would reopen this:**  
+Not applicable while open. Once resolved, reopen if the product/domain duplicate policy changes.
