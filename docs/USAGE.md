@@ -35,15 +35,16 @@ The new session should not require a transcript of the previous chat.
 
 ## When implementation may start
 
-Implementation begins only when the relevant execution horizon passes the quality gates and:
+Implementation begins only when the relevant execution horizon passes the quality gates and the exact approved executable leaves appear in:
 
 ```yaml
-implementation_allowed: true
+implementation_scope:
+  - "node-id"
 ```
 
-appears in `.planning/STATUS.yaml`.
+inside `.planning/STATUS.yaml`.
 
-This permission can apply to the currently approved horizon even if distant future branches are intentionally not decomposed yet.
+An empty list means implementation is blocked. A non-empty list permits only those node IDs. This can release a near-term horizon even while distant branches remain intentionally undecomposed.
 
 ## What the user should expect from GPT
 
