@@ -1,3 +1,4 @@
+<!-- st-planner:rules:v1 -->
 # S&T Framework Rules
 
 ## One-command planning trigger
