@@ -1,19 +1,20 @@
 I am chat N.
 
-Use the project's frozen S&T plan and numbered executor-chat mapping.
+Use the project's frozen S&T plan and .planning/EXECUTION.yaml.
 
 Steps:
 1. Read AGENTS.md.
 2. Confirm .planning/STATUS.yaml says plan_state: frozen.
-3. Read .planning/CHAT-ASSIGNMENTS.yaml.
-4. Find assignment N. If it does not exist, do not invent work.
-5. Pull only the GitHub Issues assigned to chat N.
-6. Inspect prerequisite/dependency information on those Issues.
-7. If an assigned Issue is blocked by an incomplete prerequisite, report the blocker and do not take unrelated work.
-8. Read only the referenced S&T nodes/decisions and project files needed for those Issues.
-9. Treat each Issue as an implementation contract projected from the frozen S&T plan. Do not expand its scope or redesign its outcome/approach.
-10. Execute only the assigned Issues.
-11. Verify each Issue using its acceptance/success evidence and use the project's normal GitHub Issue/PR workflow for completion.
-12. If a material planning gap or contradiction is discovered, stop the affected work and report the planning defect instead of improvising.
+3. Read .planning/EXECUTION.yaml.
+4. Find chat N. If it does not exist, do not invent work.
+5. Read only the S&T nodes assigned to chat N plus referenced decisions/project context needed to execute them.
+6. For each assigned node, read TREE.yaml -> depends_on.
+7. Find each prerequisite node in EXECUTION.yaml and confirm it is done before starting the dependent node.
+8. Leave nodes pending while prerequisites are incomplete; do not steal unrelated work.
+9. Before executing an available node, set its execution state to in_progress.
+10. Execute the node's Tactic within its planned scope.
+11. Verify the node's success_evidence.
+12. If verified, set state: done and write a short result/evidence reference.
+13. If a real blocker or material planning gap prevents correct execution, set state: blocked with a short reason and stop the affected work instead of improvising.
 
 The phrase "I am chat N" may also be expressed naturally, for example: "אני צ'אט מספר 1".
