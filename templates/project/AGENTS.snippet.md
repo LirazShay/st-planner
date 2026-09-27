@@ -14,7 +14,7 @@ On that trigger, automatically:
 4. Use the repository's own context-loading rules and inspect only the workstream/component and files needed to understand current reality.
 5. Update `GOAL.md`.
 6. Build the complete S&T tree in `TREE.yaml`, recording material unresolved questions/choices in `DECISIONS.md`.
-7. Review/correct the plan as required by the framework, including necessity, sufficiency, KISS, implementation readiness, whole-plan completeness, and durable-contract vs live-status hygiene.
+7. Review/correct the plan as required by the framework, including necessity, sufficiency, KISS, implementation readiness, whole-plan completeness, durable-contract vs live-status hygiene, and stale decision/investigation cleanup.
 8. Record meaningful reviews in `REVIEWS.md` and keep `.planning/STATUS.yaml` current.
 9. Do **not** implement target-project work while planning.
 10. Continue planning until the complete intended plan passes Final Planning Review.
@@ -43,7 +43,7 @@ For meaningful work:
 5. Validate required children as necessary individually and sufficient together.
 6. Keep material open questions in `.planning/DECISIONS.md`.
 7. Continue until the complete intended S&T is implementation-ready.
-8. Run Final Planning Review before freezing. As part of it, check the durable target-project specs/README actually used by the plan and remove/move duplicated live progress into the correct status/review owner; then record the reviewed baseline evidence and prove no material GOAL/TREE/DECISIONS drift before treating that baseline as frozen. Recheck after merge/rebase/integration when the frozen ref changes.
+8. Run Final Planning Review before freezing. As part of it, check the durable target-project specs/README actually used by the plan, remove/move duplicated live progress into the correct status/review owner, and revalidate every live open decision/investigation marker so stale resolved questions do not survive into the frozen baseline; then record the reviewed baseline evidence and prove no material GOAL/TREE/DECISIONS drift before treating that baseline as frozen. Recheck after merge/rebase/integration when the frozen ref changes.
 9. Do not implement while `.planning/STATUS.yaml -> plan_state: active`.
 10. Do not implement merely because `.planning/STATUS.yaml -> plan_state: frozen`; execution also requires `.planning/STATUS.yaml -> implementation_authorized: true`.
 11. After explicit implementation authorization, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
