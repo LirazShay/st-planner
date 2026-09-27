@@ -461,7 +461,33 @@ Complete and freeze the whole intended plan first; compile implementation-ready 
 
 ---
 
-# 17. Review protocol
+# 17. Whole-plan completeness beyond local sufficiency
+
+Local sufficiency is necessary but not always enough for AI planning.
+
+A planner can build a perfectly coherent subtree around an incomplete framing of the problem. If a material concern never entered the root tactic or its children, local sufficiency checks may never challenge it.
+
+Therefore the final review adds an **outside-in coverage audit**:
+
+1. Return to the desired outcome and hard constraints in GOAL.
+2. Trace each meaningful clause to the planning logic that protects it.
+3. Assume every leaf succeeds; ask what could still make the desired outcome fail that the project should have handled.
+4. Challenge materially relevant actors, interfaces/boundaries, external dependencies, and failure paths.
+5. Walk a few representative end-to-end scenarios.
+6. Check that non-goals did not leak into required work.
+
+This is a review technique, not another data model.
+
+Do not create a generic checklist of every possible software concern (security, scale, UI, operations, etc.) unless the goal/current reality makes that concern material. Otherwise the framework would encourage speculative scope.
+
+Persist only what the audit changes:
+- missing required work → TREE;
+- unresolved material question → DECISIONS;
+- review finding/correction → REVIEWS.
+
+---
+
+# 18. Review protocol
 
 Run authoring and review as separate mental passes.
 
@@ -507,7 +533,7 @@ For each step:
 
 ---
 
-# 18. Planning state for GPT
+# 19. Planning state for GPT
 
 The recommended target-project state is:
 
@@ -535,7 +561,7 @@ Do not create one file per node unless project scale proves it necessary.
 
 ---
 
-# 19. Planning versus execution
+# 20. Planning versus execution
 
 The S&T model is the rationale.
 
@@ -554,7 +580,7 @@ Execution can also falsify assumptions. When that happens, update the plan rathe
 
 ---
 
-# 20. Adaptive planning depth
+# 21. Adaptive planning depth
 
 V1 has **no QUICK/DEEP mode**.
 
@@ -580,7 +606,7 @@ This removes configuration while preserving rigor.
 
 ---
 
-# 21. A compact node schema
+# 22. A compact node schema
 
 Node IDs are YAML map keys; do not duplicate an `id` field inside each node. V1 also has no `kind` field.
 
@@ -643,7 +669,7 @@ Keep stable current-reality facts in GOAL, material unresolved questions/alterna
 
 ---
 
-# 22. Reading an S&T plan to a fresh reviewer
+# 23. Reading an S&T plan to a fresh reviewer
 
 When presenting a completed tree to someone who did not build it, use the source method's logic:
 
@@ -657,7 +683,7 @@ This order deliberately explains **why the lower steps exist before asking the l
 
 ---
 
-# 23. Definition of "good enough"
+# 24. Definition of "good enough"
 
 A perfect tree is not the goal. A decision-quality and execution-quality tree is.
 
