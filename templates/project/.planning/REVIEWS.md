@@ -1,10 +1,12 @@
 # Planning Reviews
 
-Keep review results concise and traceable.
+This file is audit history. It records what was checked, what failed, and what was corrected.
+
+It is **not** the source of truth for open questions or current state. If a review discovers a material unresolved question, create/reference a D-ID in DECISIONS.md.
 
 ## Template
 
-### Review — YYYY-MM-DD — Node/Scope
+### R-001 — YYYY-MM-DD — Node/Scope
 
 **Result:** pass | changes-required
 
@@ -16,13 +18,14 @@ Keep review results concise and traceable.
 - assumption honesty
 - KISS
 - executability
+- tree-state consistency
 - fresh-session continuity
 
-**Defects found:**
+**Findings:**
 - None / TBD
 
 **Corrections made:**
 - None / TBD
 
-**Open questions:**
-- None / TBD
+**Opened/referenced decisions:**
+- None / D-XXX
