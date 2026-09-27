@@ -169,30 +169,49 @@ Prefer one planning conversation. Repository state exists so continuation is pos
 
 ## 13. Execution handoff
 
-After freeze, compile implementation-ready leaves into ordinary GitHub Issues/tasks.
+After freeze, do not translate the S&T tree into another task system.
 
-Default to **one leaf → one Issue**. Group leaves only when they are one coherent responsibility with compatible prerequisites and jointly verifiable evidence. If a leaf needs material splitting, reopen planning rather than designing during Issue creation.
+Create/populate `EXECUTION.yaml`.
 
-Each Issue must preserve:
-- source S&T node ID(s);
-- Strategy-derived outcome;
-- Tactic-derived planned approach;
-- only relevant decisions/constraints;
-- prerequisites translated from `depends_on`;
-- success evidence.
+Every implementation-ready leaf appears exactly once under one numbered chat:
 
-Create Issues in two passes: first create them and obtain Issue numbers, then translate node-level dependencies into Issue prerequisites.
+```yaml
+chats:
+  "1":
+    nodes:
+      "1.2.1":
+        state: pending
+        result: null
+```
 
-Then map those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`.
+The executor reads Strategy, Tactic, assumptions, `depends_on`, and `success_evidence` directly from TREE.
 
-The map is intentionally tiny:
-- Issue numbers;
-- referenced S&T node IDs.
+### Allocation
 
-Execution dependencies come from the frozen S&T leaves and are copied into the generated GitHub Issues. Chat-to-chat blocking is derived from those Issue dependencies after grouping; it is not a second manually maintained dependency model.
+Choose the number of chats from the real amount of work.
 
-The task details and execution dependency status remain in GitHub.
+Group nodes by:
+- shared implementation context;
+- dependency compatibility;
+- manageable chat workload;
+- reasonable balance.
 
-A chat that says "I am chat N" / "אני צ'אט מספר N" reads that assignment, checks prerequisites, pulls only its Issues, and executes only that scope.
+Do not use a fixed leaf count.
 
-Do not create a new execution state machine.
+If one leaf is too large for a practical executor chat, planning stopped too early: reopen and decompose it.
+
+### State
+
+Use only:
+- pending
+- in_progress
+- done
+- blocked
+
+Set `done` only after success evidence is verified.
+
+Dependencies remain only in TREE. A chat checks prerequisite node states in EXECUTION.
+
+A chat that says "I am chat N" / "אני צ'אט מספר N" loads exactly its assigned nodes and works only within that scope.
+
+Do not build an execution engine, scheduler, or duplicated task database.
