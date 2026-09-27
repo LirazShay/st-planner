@@ -60,7 +60,7 @@ Copy `templates/project/.planning/` into a target repository:
 
 Also merge `templates/project/AGENTS.snippet.md` into the project's `AGENTS.md`.
 
-Start planning with `templates/START-PROMPT.md`.
+After installation, start planning with a natural S&T Planner request; no special starter prompt is required.
 
 ## When planning is complete
 
