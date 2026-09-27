@@ -49,7 +49,7 @@ Stop when leaves are detailed enough that execution does not require another mat
 - `TREE.yaml` — S&T logic and node planning status.
 - `DECISIONS.md` — material unresolved questions and decisions.
 - `REVIEWS.md` — review history.
-- `STATUS.yaml` — current planning pointer only.
+- `.planning/STATUS.yaml` — current planning pointer plus plan freeze and implementation-authorization state.
 
 Do not duplicate the same state in multiple files.
 
