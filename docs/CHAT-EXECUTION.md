@@ -16,16 +16,18 @@ or:
 
 The executor then:
 
-1. reads repository `AGENTS.md`;
-2. confirms `.planning/STATUS.yaml -> plan_state: frozen`;
-3. confirms `.planning/STATUS.yaml -> implementation_authorized: true`;
-4. reads `.planning/EXECUTION.yaml`;
-5. finds chat N;
-6. reads only the assigned S&T nodes from `TREE.yaml` plus referenced decisions/context;
-7. checks each node's `depends_on` prerequisites;
-8. finds those prerequisite node states in `EXECUTION.yaml`;
-9. executes only assigned nodes whose prerequisites are `done`;
-10. updates execution state as work proceeds.
+1. reads repository `AGENTS.md` and its routing/source-of-truth rules;
+2. reads `.planning/EXECUTOR_HANDOFF.md`;
+3. confirms `.planning/STATUS.yaml -> plan_state: frozen`;
+4. confirms `.planning/STATUS.yaml -> implementation_authorized: true`;
+5. reads `.planning/EXECUTION.yaml`;
+6. finds chat N;
+7. reads only the assigned S&T nodes from `TREE.yaml`;
+8. checks each node's `depends_on` prerequisites;
+9. finds those prerequisite node states in `EXECUTION.yaml`;
+10. follows EXECUTOR_HANDOFF context routing to load only materially required decisions/specs/code/tests;
+11. executes only assigned nodes whose prerequisites are `done`;
+12. updates execution state as work proceeds.
 
 If chat N does not exist, do not invent work.
 
@@ -94,7 +96,7 @@ If the executor finds a material missing/contradictory planning decision:
 3. write a short factual blocker in `result`;
 4. set `STATUS.yaml -> plan_state: active`;
 5. set `STATUS.yaml -> implementation_authorized: false`;
-6. do not continue other execution until planning is re-frozen, required handoff checks pass again, and authorization is explicitly restored.
+6. do not continue other execution until planning is re-frozen, the mandatory fresh-chat handoff verification passes again and is recorded, and authorization is explicitly restored.
 
 A planner then reopens the smallest affected S&T area.
 
