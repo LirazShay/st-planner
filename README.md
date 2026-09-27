@@ -6,6 +6,8 @@ A small reusable framework that helps GPT plan complex work with Strategy & Tact
 
 The target repository does **not** need S&T Planner installed beforehand.
 
+For automatic setup, the agent needs read access to this public source repository and write access to the target repository. The bootstrap follows the target repository's own branch/PR rules.
+
 Open a chat that is working on the target repository and say:
 
 > **תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה לבנות/לשנות>**
@@ -28,7 +30,9 @@ After planning is frozen, allocated, handoff-checked, and explicitly authorized,
 
 ### Already installed?
 
-If the target repository already has S&T Planner state, the bootstrap must not overwrite live planning files. It simply uses the existing installation unless you explicitly ask to upgrade it.
+Bootstrap is idempotent. If the target already has a recognizable S&T Planner installation, ordinary reuse does not overwrite `.planning/` files and does not append a second S&T rules block to `AGENTS.md`.
+
+If the target already uses `.planning/` for something else, S&T Planner preserves it. It installs alongside unrelated files only when none of the eleven S&T destination filenames conflict; otherwise bootstrap stops rather than overwriting target data.
 
 ## What it does
 
