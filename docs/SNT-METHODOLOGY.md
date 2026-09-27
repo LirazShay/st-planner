@@ -561,7 +561,7 @@ The recommended target-project state is:
 ├── README.md
 ├── GOAL.md
 ├── TREE.yaml
-├── .planning/STATUS.yaml
+├── STATUS.yaml
 ├── DECISIONS.md
 ├── REVIEWS.md
 ├── EXECUTION.yaml
@@ -636,7 +636,7 @@ Do not recreate each leaf as a second task description.
 A numbered executor chat should:
 
 1. read target `AGENTS.md` and `.planning/EXECUTOR_HANDOFF.md`;
-2. confirm the plan is frozen;
+2. confirm `.planning/STATUS.yaml -> plan_state: frozen`;
 3. confirm `.planning/STATUS.yaml -> implementation_authorized: true`;
 4. read its assigned leaf IDs from `EXECUTION.yaml`;
 5. load those exact nodes from `TREE.yaml`;
@@ -756,7 +756,7 @@ The schema may evolve, but additions must justify their cost.
 - A parent with children records why those children are sufficient together.
 - A non-root child records why it is necessary for its parent.
 
-Keep stable current-reality facts in GOAL, material unresolved questions/alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS rather than growing TREE into a general-purpose database.
+Keep stable current-reality facts in GOAL, material unresolved questions/alternatives in DECISIONS, review history in REVIEWS, and resume state in `.planning/STATUS.yaml` rather than growing TREE into a general-purpose database.
 
 ---
 
