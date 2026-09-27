@@ -5,20 +5,14 @@ root: "0"
 nodes:
   "0":
     status: draft
+
     strategy: "TBD"
     tactic: "TBD"
 
-    parallel_assumptions:
-      - "TBD"
-
+    parallel_assumptions: []
     necessary_assumptions: []
-
     sufficiency_assumptions: []
 
-    evidence:
-      - "TBD"
+    success_evidence: []
 
     children: []
-
-notes:
-  special_cases: []
