@@ -18,8 +18,10 @@ On that trigger, automatically:
 8. Record meaningful reviews in `REVIEWS.md` and keep `STATUS.yaml` current.
 9. Do **not** implement target-project work while planning.
 10. Continue planning until the complete intended plan passes Final Planning Review.
-11. Set `plan_state: frozen`.
+11. Set `plan_state: frozen` while keeping `implementation_authorized: false`.
 12. Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to numbered executor chats.
+13. Complete the required post-freeze handoff checks.
+14. Only then set `implementation_authorized: true`. Freeze alone never authorizes implementation.
 
 Unless the user explicitly asks to stop earlier or work one stage per message, complete this planning workflow autonomously in the same planning conversation.
 
@@ -38,12 +40,14 @@ For meaningful work:
 7. Continue until the complete intended S&T is implementation-ready.
 8. Run Final Planning Review before freezing.
 9. Do not implement while `plan_state: active`.
-10. After freeze, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
-11. Allocate every implementation-ready leaf exactly once in `.planning/EXECUTION.yaml`.
-12. Do not copy task descriptions into EXECUTION; node IDs point to TREE.
-13. If the user says "I am chat N" / "אני צ'אט מספר N", load chat N from EXECUTION, read only its assigned S&T nodes/context, check TREE dependencies against EXECUTION states, and execute only available assigned nodes.
-14. Mark a node `done` only after its `success_evidence` is verified.
-15. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `plan_state: active`, and stop starting new execution work.
-16. Reopen only the smallest affected S&T area; preserve `done` work only when it remains valid under the corrected plan.
-17. After focused review, repair only affected EXECUTION entries and freeze again. Git history is sufficient version history.
-18. Prefer one planning chat; use repository state for durability and optional continuation.
+10. Do not implement merely because `plan_state: frozen`; execution also requires `implementation_authorized: true`.
+11. After freeze, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
+12. Allocate every implementation-ready leaf exactly once in `.planning/EXECUTION.yaml`.
+13. Complete required handoff checks, then explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
+14. Do not copy task descriptions into EXECUTION; node IDs point to TREE.
+15. If the user says "I am chat N" / "אני צ'אט מספר N", first require both `plan_state: frozen` and `implementation_authorized: true`; then load chat N from EXECUTION, read only its assigned S&T nodes/context, check TREE dependencies against EXECUTION states, and execute only available assigned nodes.
+16. Mark a node `done` only after its `success_evidence` is verified.
+17. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `plan_state: active` and `implementation_authorized: false`, and stop starting new execution work.
+18. Reopen only the smallest affected S&T area; preserve `done` work only when it remains valid under the corrected plan.
+19. After focused review, repair only affected EXECUTION entries and freeze again; re-authorization is explicit, never implied by re-freeze. Git history is sufficient version history.
+20. Prefer one planning chat; use repository state for durability and optional continuation.
