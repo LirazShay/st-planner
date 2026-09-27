@@ -161,8 +161,9 @@ Keep one source of truth for each kind of state:
 - `GOAL.md` owns the stable boundary: desired outcome, established current reality, constraints, and non-goals.
 - `TREE.yaml` owns S&T structure, node planning status, and success evidence.
 - `DECISIONS.md` owns every material unresolved question and its resolution, whether resolved by a choice, research, or an external fact.
-- `REVIEWS.md` owns audit history only: checks, findings, and corrections. Reviews reference D-IDs instead of owning open questions.
-- `STATUS.yaml` is only the resume pointer: mode, current node, blockers, next action, implementation scope, and latest relevant review.
+- `REVIEWS.md` owns planning audit history only: checks, findings, and corrections. Reviews reference D-IDs instead of owning open questions.
+- `EXECUTION.md` owns observed execution/verification outcomes: what was done, evidence against success criteria, new facts, and whether replanning is required.
+- `STATUS.yaml` is only the resume pointer: mode, current node, blockers, next action, implementation scope, latest relevant review, and latest relevant execution outcome.
 
 Each TREE node uses the minimal V1 schema:
 
@@ -202,3 +203,22 @@ Only approved, executable leaves may enter `implementation_scope`.
 Do not add a second permission boolean; it creates contradictory states without adding information.
 
 GitHub Issues or other task trackers are execution output. They are not the source of the S&T rationale.
+
+
+## 14. Execute, verify, learn
+
+The framework continues after planning.
+
+For every released leaf:
+
+1. execute only within that node's scope;
+2. retain the S&T node ID in the execution/task reference;
+3. verify the result against `TREE.yaml -> success_evidence`;
+4. write an E-entry in `EXECUTION.md` as `verified`, `failed`, or `partial`;
+5. record any new fact or falsified assumption;
+6. if plan impact is `review-required`, reopen the smallest affected S&T branch;
+7. remove verified/completed work from the current implementation scope and release the next safe horizon when appropriate.
+
+Do not mark a Strategy achieved merely because its Tactic was attempted.
+
+External Issues/PRs/tools may track operational task state. EXECUTION.md exists only to persist the evidence and learning that matter to the framework.
