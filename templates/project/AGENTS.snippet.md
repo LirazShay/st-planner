@@ -1,5 +1,30 @@
 # S&T Framework Rules
 
+## One-command planning trigger
+
+When the user asks to plan using **S&T Planner** (including natural variants such as "ST Planner", "S T Planner", or "תתכנן לי בשיטת S&T Planner לפי הריפו"), treat that request as the complete planning command.
+
+The user does **not** need to explain the framework workflow, name planning files, choose a number of stages, or paste a special starter prompt.
+
+On that trigger, automatically:
+
+1. Read the repository's existing `AGENTS.md` / routing / source-of-truth rules.
+2. Read `.planning/README.md`, `.planning/FRAMEWORK.md`, and `.planning/STATUS.yaml`.
+3. Determine the requested planning goal from the user's request and current repository context. Do not invent a different goal.
+4. Use the repository's own context-loading rules and inspect only the workstream/component and files needed to understand current reality.
+5. Update `GOAL.md`.
+6. Build the complete S&T tree in `TREE.yaml`, recording material unresolved questions/choices in `DECISIONS.md`.
+7. Review/correct the plan as required by the framework, including necessity, sufficiency, KISS, implementation readiness, and whole-plan completeness.
+8. Record meaningful reviews in `REVIEWS.md` and keep `STATUS.yaml` current.
+9. Do **not** implement target-project work while planning.
+10. Continue planning until the complete intended plan passes Final Planning Review.
+11. Set `plan_state: frozen`.
+12. Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to numbered executor chats.
+
+Unless the user explicitly asks to stop earlier or work one stage per message, complete this planning workflow autonomously in the same planning conversation.
+
+If the user's request does not contain enough information to identify what should be planned and the repository has no single unambiguous active target, ask only for the missing goal—not for framework instructions.
+
 This project uses the S&T Planner framework.
 
 For meaningful work:
