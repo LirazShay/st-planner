@@ -108,15 +108,17 @@ After meaningful planning work, update the durable state before ending the work 
 
 ## 9. Status discipline
 
-`STATUS.yaml` must make it possible for a fresh AI session to answer:
+`STATUS.yaml` is a resume pointer, not a second copy of the tree. It must make it possible for a fresh AI session to answer:
 - What mode are we in?
-- What has been approved?
-- What is the current node or review?
+- What is the current node?
 - What blocks progress?
 - What is the next planning action?
-- Is implementation currently allowed?
+- Which exact nodes, if any, may be implemented?
+- What is the latest relevant review?
 
-Do not rely on prose buried in chat history.
+Read node approval from `TREE.yaml`; read decisions from `DECISIONS.md`; read review history from `REVIEWS.md`.
+
+Do not duplicate those states in STATUS or rely on prose buried in chat history.
 
 ## 10. Review roles
 
