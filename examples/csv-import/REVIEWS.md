@@ -79,6 +79,8 @@ Duplicate-customer behavior is a material part of admissibility, but the persist
 **Correction:**  
 Created open decision D-002 and marked node 0.2.1 blocked instead of fabricating a rule.
 
+Under the later clarified local-status semantics, node 0.2 itself is approved: its own Strategy/Tactic and immediate three-child decomposition passed necessity and sufficiency review. The blocker belongs only to 0.2.1 and does not cascade upward.
+
 **Framework defect found during handoff:**  
 A bare boolean `implementation_allowed: true` can be misread as global permission when only a subset is approved.
 
