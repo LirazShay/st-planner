@@ -61,7 +61,7 @@ While building:
 
 Correct defects immediately.
 
-Branch approval means the branch logic is sound; it does **not** permit implementation before the overall plan is frozen.
+Branch approval means the branch logic is sound; it does **not** permit implementation. Neither local approval nor freeze alone authorizes execution.
 
 ## 6. Outside-in completeness audit
 
@@ -97,7 +97,10 @@ Record the result in `REVIEWS.md`.
 
 If Final Planning Review passes:
 - set `STATUS.yaml -> plan_state: frozen`;
+- keep `STATUS.yaml -> implementation_authorized: false`;
 - stop changing the baseline except for a documented later planning correction.
+
+Freeze closes the planning baseline. It does not start implementation.
 
 ## 9. Handoff to execution
 
@@ -105,10 +108,15 @@ Do not create a second task system.
 
 After the plan is frozen:
 
-1. collect every implementation-ready leaf;
-2. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
-3. initialize each node as `pending`;
-4. leave Strategy/Tactic/success evidence in TREE rather than copying them into EXECUTION.
+1. keep `implementation_authorized: false`;
+2. collect every implementation-ready leaf;
+3. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
+4. initialize each node as `pending`;
+5. leave Strategy/Tactic/success evidence in TREE rather than copying them into EXECUTION;
+6. complete the required post-freeze handoff checks;
+7. explicitly set `implementation_authorized: true`.
+
+No executor may start before step 7.
 
 ### Chat allocation
 
@@ -155,13 +163,15 @@ If execution exposes a material defect in the frozen plan:
 
 1. the executor marks the affected node `blocked` with a short factual reason;
 2. set `STATUS.yaml -> plan_state: active`;
-3. identify the smallest affected S&T area;
-4. correct that area and review upward until the impact is contained;
-5. inspect affected dependencies and any completed work that relied on the changed outcome;
-6. keep already-`done` nodes only when their Strategy/evidence/outcome remain valid under the revised plan;
-7. reset invalidated completed nodes to `pending` or remove obsolete nodes;
-8. update only affected EXECUTION allocation;
-9. re-freeze after the corrected plan passes the required focused review.
+3. set `STATUS.yaml -> implementation_authorized: false`;
+4. identify the smallest affected S&T area;
+5. correct that area and review upward until the impact is contained;
+6. inspect affected dependencies and any completed work that relied on the changed outcome;
+7. keep already-`done` nodes only when their Strategy/evidence/outcome remain valid under the revised plan;
+8. reset invalidated completed nodes to `pending` or remove obsolete nodes;
+9. update only affected EXECUTION allocation;
+10. re-freeze after the corrected plan passes the required focused review, still unauthorized;
+11. re-run required handoff checks and explicitly re-authorize implementation before execution resumes.
 
 Do not restart planning from the root unless the defect actually changes the root framing.
 
