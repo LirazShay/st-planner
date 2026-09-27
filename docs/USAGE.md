@@ -1,4 +1,4 @@
-# Using S&T Planner in Another Project
+# Using the S&T Framework in Another Project
 
 ## Minimal setup
 
@@ -25,11 +25,11 @@ Example:
 
 GPT should update `.planning/GOAL.md` before deep decomposition.
 
-## Continue in a new chat
+## Connect or continue in any new chat
 
 Use:
 
-> Continue this project's S&T planning from the repository state. Follow AGENTS.md and .planning/README.md. Read STATUS.yaml first and perform only the next required planning work.
+> Connect to this project's S&T framework. Follow AGENTS.md and .planning/README.md, resume from STATUS, and continue the recorded next lifecycle action. Plan, execute, verify, or replan as the state requires. Do not rely on previous chat history.
 
 The new session should not require a transcript of the previous chat.
 
@@ -48,7 +48,7 @@ An empty list means implementation is blocked. A non-empty list permits only tho
 
 ## What the user should expect from GPT
 
-During planning, GPT should:
+Across the full lifecycle, GPT should:
 
 - clarify the outcome rather than guess hidden requirements;
 - avoid arbitrary numbered phase counts;
@@ -58,7 +58,11 @@ During planning, GPT should:
 - expose assumptions and unknowns;
 - challenge over-engineering;
 - stop at executable leaves;
-- keep repository state current.
+- keep repository state current;
+- execute only released scope;
+- verify outcomes against Strategy success evidence;
+- record observed execution results;
+- replan when reality invalidates assumptions.
 
 ## What GPT should not do
 
@@ -70,7 +74,7 @@ During planning, GPT should:
 
 ## V1 operating model
 
-S&T Planner V1 is intentionally a **Git-based protocol**, not an application.
+S&T Framework V1 is intentionally a **portable Git/file-based framework**, not yet a dedicated application or plugin.
 
 Its value is tested by one question:
 
