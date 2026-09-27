@@ -21,16 +21,13 @@ The agent:
 5. merges the S&T rules into the target `AGENTS.md` while preserving existing rules;
 6. continues immediately in the same chat to understand the requested goal and relevant repository context;
 7. builds, reviews, and persists the complete S&T plan;
-8. after Final Planning Review, records the reviewed baseline evidence in `.planning/REVIEWS.md`;
-9. proves no material GOAL/TREE/DECISIONS drift from that reviewed baseline; when Git refs are available it uses `.planning/verify-freeze-baseline.mjs`;
-10. freezes only the reviewed no-drift baseline, with implementation still unauthorized;
-11. after any merge/rebase/integration that changes the frozen ref, repeats no-drift verification before allocation;
-12. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
-13. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
-14. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
-15. records the verification in `.planning/REVIEWS.md`;
-16. fixes/rechecks any failed handoff case;
-17. explicitly authorizes implementation only after freeze no-drift, allocation validation, and fresh-chat gates pass.
+8. freezes only after Final Planning Review passes, with implementation still unauthorized;
+9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
+10. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
+11. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
+12. records the verification in `.planning/REVIEWS.md`;
+13. fixes/rechecks any failed handoff case;
+14. explicitly authorizes implementation only after both gates pass.
 
 The user does not manually copy files or explain the S&T workflow.
 
@@ -65,13 +62,12 @@ Keep it simple:
 1. block the affected node with a short factual reason;
 2. set planning active again and revoke implementation authorization;
 3. reopen only the smallest affected S&T area;
-4. correct/review it and record the corrected reviewed baseline;
-5. pass freeze no-drift verification again and freeze only that corrected baseline;
-6. repair only affected EXECUTION entries;
-7. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
-8. rerun and record the mandatory fresh-chat handoff verification;
-9. explicitly re-authorize only after freeze no-drift, allocation validation, and fresh-chat gates pass;
-10. preserve valid completed work.
+4. correct/review/freeze it;
+5. repair only affected EXECUTION entries;
+6. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
+7. rerun and record the mandatory fresh-chat handoff verification;
+8. explicitly re-authorize only after both gates pass;
+9. preserve valid completed work.
 
 ## Authoritative external entry point
 
