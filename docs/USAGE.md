@@ -2,6 +2,8 @@
 
 The normal workflow starts from the **target repository**. S&T Planner does not need to be installed there beforehand.
 
+Automatic bootstrap assumes the agent can read the public S&T Planner repository and write to the target repository. Target branch/PR/verification rules still apply to bootstrap changes.
+
 ## Start
 
 Open a chat that is working on the target repository and say:
@@ -17,17 +19,17 @@ The agent:
 1. reads the target repository's existing AGENTS/routing/source-of-truth rules;
 2. fetches `LirazShay/st-planner/BOOTSTRAP.md`;
 3. follows the bootstrap contract;
-4. copies the S&T planning template files into target `.planning/`;
-5. merges the S&T rules into the target `AGENTS.md` while preserving existing rules;
-6. continues immediately in the same chat to understand the requested goal and relevant repository context;
-7. builds, reviews, and persists the complete S&T plan;
-8. freezes only after Final Planning Review passes, with implementation still unauthorized;
-9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
-10. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
-11. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
-12. records the verification in `.planning/REVIEWS.md`;
-13. fixes/rechecks any failed handoff case;
-14. explicitly authorizes implementation only after both gates pass.
+4. classifies any existing `.planning/` before writing so unrelated target data is never mistaken for an installed S&T Planner;
+5. copies the eleven S&T planning/framework files only for a permitted fresh install, using one source commit for the whole bundle;
+6. merges the S&T rules into target `AGENTS.md` once while preserving existing rules;
+7. verifies the installed bundle and then continues immediately in the same chat;
+8. builds, reviews, and persists the complete S&T plan;
+9. records the reviewed baseline and proves no material GOAL/TREE/DECISIONS drift before freeze;
+10. freezes only that verified baseline, with implementation still unauthorized;
+11. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
+12. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
+13. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
+14. records the verification in `.planning/REVIEWS.md`, fixes/rechecks failures, and explicitly authorizes implementation only after all gates pass.
 
 The user does not manually copy files or explain the S&T workflow.
 
@@ -37,9 +39,11 @@ S&T Planner owns only `.planning/STATUS.yaml`. If the target repository also con
 
 ## Existing installation
 
-If the target repository already contains S&T Planner project state, do not overwrite the live planning state from templates.
+If the target repository already contains a recognizable S&T Planner installation, ordinary reuse is idempotent: do not overwrite installed `.planning/` files and do not append another S&T rules block to `AGENTS.md`.
 
-Use the existing installation unless the user explicitly requests an upgrade/reinstall.
+If `.planning/` belongs to another system, preserve it. Fresh S&T installation may share the directory only when none of the eleven S&T destination filenames conflict; otherwise report the exact conflict instead of overwriting target data.
+
+Use an existing S&T installation as-is unless the user explicitly requests an upgrade/reinstall.
 
 ## Planning continuation
 
@@ -62,11 +66,11 @@ Keep it simple:
 1. block the affected node with a short factual reason;
 2. set planning active again and revoke implementation authorization;
 3. reopen only the smallest affected S&T area;
-4. correct/review/freeze it;
-5. repair only affected EXECUTION entries;
+4. correct/review it, record the corrected reviewed baseline, and pass freeze no-drift verification again;
+5. freeze the verified corrected baseline and repair only affected EXECUTION entries;
 6. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
 7. rerun and record the mandatory fresh-chat handoff verification;
-8. explicitly re-authorize only after both gates pass;
+8. explicitly re-authorize only after all gates pass;
 9. preserve valid completed work.
 
 ## Authoritative external entry point
