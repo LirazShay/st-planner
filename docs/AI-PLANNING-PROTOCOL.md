@@ -16,14 +16,14 @@ If uncertain, start QUICK and deepen only where uncertainty appears.
 
 Before creating tasks, write or update `.planning/GOAL.md`.
 
-Capture only information that can change the plan:
+Capture only the stable planning boundary:
 
 - desired outcome;
-- current reality;
+- established current reality;
 - constraints;
-- non-goals;
-- success evidence;
-- material unknowns.
+- non-goals.
+
+If a material unresolved question appears, create an `open` D-entry in `.planning/DECISIONS.md` rather than placing it in GOAL.
 
 Do not solve the problem yet.
 
@@ -40,7 +40,7 @@ Create one root node in `.planning/TREE.yaml`:
 - Parallel assumptions: why this tactic can achieve the strategy.
 - Success evidence: how the strategy will be recognized as achieved.
 
-If no tactic can yet be chosen responsibly, record the decision as open instead of guessing.
+If no tactic can yet be chosen responsibly, record the material unresolved question in DECISIONS instead of guessing. Root success evidence belongs in TREE, not GOAL.
 
 ## 3. Decompose one parent at a time
 
@@ -87,7 +87,7 @@ Run the review gates in `QUALITY-GATES.md`.
 
 A review must try to break the plan, not merely approve what was just written.
 
-If a defect is found, correct the smallest affected part of the tree and review upward until the logic is sound again.
+If a defect is found, correct the smallest affected part of the tree and review upward until the logic is sound again. If the review exposes a material unresolved question, create/reference a D-ID in DECISIONS; do not keep the live question only inside review prose.
 
 ## 6. Run KISS review
 
