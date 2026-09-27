@@ -162,6 +162,14 @@ Do not implement while:
 implementation_allowed: false
 ```
 
-When the next execution horizon passes the logical, KISS, and executability reviews, set it to true and record what scope is approved.
+When the next execution horizon passes the logical, KISS, and executability reviews, set it to true **and explicitly list the approved node IDs in `implementation_scope`**.
+
+A fresh session must interpret permission as:
+
+- `implementation_allowed: false` → no implementation.
+- `implementation_allowed: true` → implementation is allowed **only** for nodes listed in `implementation_scope`.
+- Everything outside that scope remains blocked.
+
+Never treat the boolean alone as global permission.
 
 GitHub Issues or other task trackers are execution output. They are not the source of the S&T rationale.
