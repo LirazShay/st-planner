@@ -90,8 +90,6 @@ After correction, re-freeze alone is not enough: the required fresh-chat handoff
 
 ## Mandatory fresh-chat verification before authorization
 
-Before handoff verification begins, `.planning/REVIEWS.md` must already contain a passing Final Planning Review with freeze no-drift evidence for the material baseline. If an intervening merge/rebase/integration changed the frozen ref, that resulting ref must also have passed the no-drift check.
-
 After allocation, first require a clean mechanical allocation validation:
 
 ```text
