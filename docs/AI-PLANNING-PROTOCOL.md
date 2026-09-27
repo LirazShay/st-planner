@@ -101,30 +101,49 @@ If Final Planning Review passes:
 
 ## 9. Handoff to execution
 
-Compile GitHub Issues/tasks from implementation-ready leaves using `docs/ISSUE-COMPILATION.md`.
+Do not create a second task system.
 
-Default to one leaf → one Issue.
+After the plan is frozen:
 
-Group leaves only when they form one coherent executor responsibility and preserve traceability. If one leaf needs material splitting, reopen planning instead of silently decomposing during Issue creation.
+1. collect every implementation-ready leaf;
+2. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
+3. initialize each node as `pending`;
+4. leave Strategy/Tactic/success evidence in TREE rather than copying them into EXECUTION.
 
-Every Issue keeps its exact S&T node ID(s), Strategy-derived outcome, Tactic-derived planned approach, required context, prerequisites, and success evidence.
+### Chat allocation
 
-Create Issues in two passes so `depends_on` S&T node IDs can be translated into the generated Issue numbers without inventing a persistent mapping database.
+Choose the number of chats from the actual amount and shape of work.
 
-Then group the Issues into coherent numbered executor-chat assignments in `.planning/CHAT-ASSIGNMENTS.yaml`.
+Priorities:
 
-The grouping should:
-- keep related responsibility together;
-- avoid putting a dependent Issue into a chat that would have to run before its prerequisite;
-- allow parallel chats where dependencies permit;
-- avoid forcing executor chats to make new material planning decisions.
+1. coherent context/responsibility;
+2. valid dependency flow;
+3. manageable amount of work per chat;
+4. reasonable load balance.
 
-The assignment map contains only:
-- Issue numbers;
-- source S&T node IDs.
+There is no fixed number of leaves per chat.
 
-A chat determines whether it can start by inspecting the dependencies of its assigned GitHub Issues. Do not manually maintain a second dependency graph at chat level.
+If a single leaf is too large for a practical executor chat, reopen planning and decompose it.
 
-Task details, dependency status, and execution status remain in GitHub.
+### Execution dependencies
 
-The planning framework does not become an execution engine.
+Execution prerequisites remain only in `TREE.yaml -> depends_on`.
+
+An executor checks the prerequisite node's state in `EXECUTION.yaml`.
+
+Do not create a separate chat dependency graph.
+
+### Execution state
+
+Use only:
+
+- `pending`
+- `in_progress`
+- `done`
+- `blocked`
+
+A node becomes `done` only after its S&T `success_evidence` is verified.
+
+The short `result` field may reference a commit, test, artifact, or concise verification outcome.
+
+The framework does not become a scheduler or task-management application.
