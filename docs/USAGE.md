@@ -1,83 +1,66 @@
-# Using the S&T Framework in Another Project
+# Using S&T Planner in Another Project
 
-## Minimal setup
+## Setup
 
-Copy these files from `templates/project/` into the target repository:
+Copy:
 
 ```
-AGENTS.snippet.md   -> merge into the target repository's AGENTS.md
-.planning/          -> copy as-is
+templates/project/.planning/  -> target/.planning/
+templates/project/AGENTS.snippet.md -> merge into target AGENTS.md
 ```
 
-Do not replace an existing `AGENTS.md`; merge the S&T rules into it.
+Then start with `templates/START-PROMPT.md`.
 
-## Start the first planning session
+## Default workflow
 
-Give GPT the project repository and this instruction:
+Use **one planning chat** if practical.
 
-> Use the S&T Planner protocol in this repository. Read AGENTS.md and .planning/README.md first. Do not implement yet. Start by establishing the stable goal boundary: desired outcome, established current reality, constraints, and non-goals. Put material unresolved questions in DECISIONS.md and success evidence on S&T nodes in TREE.yaml. Persist the planning state in .planning/.
+The chat:
+1. defines the goal;
+2. builds the S&T;
+3. repeatedly reviews/corrects it;
+4. performs a Final Planning Review;
+5. freezes the plan.
 
-Then describe the project normally.
+The repository state is updated during the work so nothing important depends on the transcript.
 
-Example:
+## Continuing in another chat
 
-> I want this service to support importing customer CSV files safely and reliably.
+Only when useful, start a new chat with:
 
-GPT should update `.planning/GOAL.md` before deep decomposition.
+> Continue the S&T planning for this project. Read AGENTS.md and .planning/README.md, resume from STATUS.yaml, and continue the recorded planning action. Do not implement the target project.
 
-## Connect or continue in any new chat
+This is optional continuation, not the default workflow.
 
-Use:
+## After planning
 
-> Connect to this project's S&T framework. Follow AGENTS.md and .planning/README.md, resume from STATUS, and continue the recorded next lifecycle action. Plan, execute, verify, or replan as the state requires. Do not rely on previous chat history.
+Once `plan_state: frozen`, create GitHub Issues/tasks from implementation-ready leaves.
 
-The new session should not require a transcript of the previous chat.
+Each execution task should contain:
+- S&T node ID;
+- responsibility/outcome;
+- scope;
+- dependencies;
+- relevant decisions/constraints;
+- acceptance evidence.
 
-## When implementation may start
+An executor chat can then work from the Issue plus referenced planning context.
 
-Implementation begins only when the relevant execution horizon passes the quality gates and the exact approved executable leaves appear in:
+## If implementation exposes a planning defect
 
-```yaml
-implementation_scope:
-  - "node-id"
-```
+Do not build a second planning bureaucracy.
 
-inside `.planning/STATUS.yaml`.
+Simply:
+1. stop the affected implementation;
+2. record the concrete problem on the task;
+3. reopen the affected S&T area;
+4. correct/review/freeze again;
+5. update affected tasks.
 
-An empty list means implementation is blocked. A non-empty list permits only those node IDs. This can release a near-term horizon even while distant branches remain intentionally undecomposed.
+## V1 principle
 
-## What the user should expect from GPT
+The framework improves **planning quality**.
 
-Across the full lifecycle, GPT should:
+Git/GitHub provides persistence and ordinary execution tracking.
 
-- clarify the outcome rather than guess hidden requirements;
-- avoid arbitrary numbered phase counts;
-- build Strategy/Tactic pairs;
-- explain why required children are necessary;
-- check whether siblings are sufficient together;
-- expose assumptions and unknowns;
-- challenge over-engineering;
-- stop at executable leaves;
-- keep repository state current;
-- execute only released scope;
-- verify outcomes against Strategy success evidence;
-- record observed execution results;
-- replan when reality invalidates assumptions.
-
-## What GPT should not do
-
-- Begin coding just because the desired technology seems obvious.
-- Convert every brainstormed idea into a required S&T node.
-- Create dozens of GitHub Issues while the planning logic is still changing.
-- Depend on the previous conversation to know where it stopped.
-- add complexity for advanced S&T edge cases before a real project requires it.
-
-## V1 operating model
-
-S&T Framework V1 is intentionally a **portable Git/file-based framework**, not yet a dedicated application or plugin.
-
-Its value is tested by one question:
-
-> Does GPT produce and preserve better plans in real projects when it follows these files?
-
-If yes, automation can be added later.
+Keep those responsibilities separate and simple.
