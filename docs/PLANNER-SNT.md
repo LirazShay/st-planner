@@ -17,6 +17,7 @@ Provide a small portable S&T planning framework stored with the project, with ex
 **Success evidence**
 - A GPT can start from a goal and build a complete reviewed S&T tree.
 - A fresh GPT can resume planning from repository state when necessary.
+- A fresh executor can prove, before authorization, that it can recover its assignment, dependencies, next context, and blockers from repository state only.
 - Final leaves are detailed enough to become implementation tasks without new material design decisions.
 - The framework remains small enough to use routinely.
 
@@ -40,7 +41,7 @@ Provide a small portable S&T planning framework stored with the project, with ex
 
 ### 0.5 — The final plan can be executed without duplicating the work model
 
-**Tactic:** assign frozen implementation-ready leaf IDs directly to numbered executor chats in one minimal execution file, keep execution unauthorized during handoff, then explicitly authorize it after the required checks pass.
+**Tactic:** assign frozen implementation-ready leaf IDs directly to numbered executor chats in one minimal execution file, provide a portable EXECUTOR_HANDOFF bootstrap, keep execution unauthorized while representative fresh-chat simulations run, and authorize only after the repository-only gate passes.
 
 ## Sufficiency
 
