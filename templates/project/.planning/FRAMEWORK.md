@@ -204,6 +204,7 @@ Use management files only:
 
 - `TREE.yaml` — work definition, rationale, dependencies, success evidence.
 - `EXECUTION.yaml` — chat allocation, execution state, short result.
+- `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap and mandatory post-allocation verification contract; no task descriptions.
 
 Create/populate `EXECUTION.yaml` while `STATUS.yaml -> implementation_authorized: false`.
 
@@ -246,9 +247,31 @@ Set `done` only after success evidence is verified.
 
 Dependencies remain only in TREE. A chat checks prerequisite node states in EXECUTION.
 
-After the required post-freeze handoff checks pass, explicitly set `STATUS.yaml -> implementation_authorized: true`.
+### Mandatory fresh-chat handoff gate
 
-A chat that says "I am chat N" / "אני צ'אט מספר N" may load and execute its assigned nodes only when both `plan_state: frozen` and `implementation_authorized: true`.
+Before setting `STATUS.yaml -> implementation_authorized: true`, follow `EXECUTOR_HANDOFF.md` and simulate a brand-new executor from repository state only.
+
+The verification must cover representative:
+- first available executor;
+- dependency-blocked early executor;
+- mid-plan executor with multiple dependencies;
+- final closure executor.
+
+For every case verify that repository state alone reveals:
+- authorization;
+- assigned nodes;
+- prerequisite states;
+- first available node or that none is available;
+- exact next contract/project context to load;
+- factual blocking reason when unavailable.
+
+Use actual allocation cases where possible. If a small plan lacks a literal example, simulate the condition against the closest real assignment without mutating durable execution state.
+
+Record the result in `REVIEWS.md`. Any failure keeps `implementation_authorized: false`; correct the smallest handoff/allocation/routing defect and rerun the failed verification.
+
+Only after this gate passes, explicitly set `STATUS.yaml -> implementation_authorized: true`.
+
+A chat that says "I am chat N" / "אני צ'אט מספר N" reads `EXECUTOR_HANDOFF.md` and may execute its assigned nodes only when both `plan_state: frozen` and `implementation_authorized: true`.
 
 Do not build an execution engine, scheduler, or duplicated task database.
 
@@ -305,6 +328,6 @@ After the corrected planning area passes review:
 3. keep unaffected chat allocations and valid `done` nodes unchanged where practical;
 4. re-check dependencies and chat coherence only for affected work;
 5. set `plan_state: frozen` again while keeping `implementation_authorized: false`;
-6. complete the required handoff checks again and explicitly restore `implementation_authorized: true` before execution resumes.
+6. rerun the mandatory repository-only fresh-chat handoff verification from `EXECUTOR_HANDOFF.md`, record the pass in `REVIEWS.md`, and only then explicitly restore `implementation_authorized: true`.
 
 No plan-version registry is required. Git history already records prior file versions.
