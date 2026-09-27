@@ -20,6 +20,7 @@ It is **not** the source of truth for open questions or current state. If a revi
 - executability
 - tree-state consistency
 - durable contract vs live status hygiene
+- stale decision / investigation cleanup
 - planning fresh-session continuity
 
 **Findings:**
@@ -36,6 +37,12 @@ It is **not** the source of truth for open questions or current state. If a revi
 - live progress duplicated in durable contracts: None / findings
 - moved/removed stale live-status text: None / paths
 - target status/review owner used instead: None / path
+
+**Stale decision / investigation cleanup (Final Planning Review):**
+- open D-entries revalidated: None / IDs
+- stale resolved/superseded entries corrected: None / IDs
+- stale live `INVESTIGATE`/`TBD`/`OPEN` markers removed or reclassified: None / paths
+- genuine unresolved blockers remaining: None / D-IDs + nodes
 
 ## Final Planning Review freeze-baseline evidence
 
