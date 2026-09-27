@@ -181,9 +181,10 @@ If execution exposes a material defect in the frozen plan:
 7. keep already-`done` nodes only when their Strategy/evidence/outcome remain valid under the revised plan;
 8. reset invalidated completed nodes to `pending` or remove obsolete nodes;
 9. update only affected EXECUTION allocation;
-10. re-freeze after the corrected plan passes the required focused review, still unauthorized;
-11. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable) and fix every failure;
-12. rerun and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, then explicitly re-authorize implementation before execution resumes.
+10. after the corrected plan passes focused review, record the corrected reviewed baseline and pass freeze no-drift verification again;
+11. re-freeze only that verified corrected baseline, still unauthorized;
+12. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable) and fix every failure;
+13. rerun and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, then explicitly re-authorize implementation before execution resumes.
 
 Do not restart planning from the root unless the defect actually changes the root framing.
 
