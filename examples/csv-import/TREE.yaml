@@ -85,16 +85,82 @@ nodes:
     children: []
 
   "0.2":
-    status: draft
+    status: blocked
     strategy: "Invalid or unsafe candidate data cannot reach customer persistence"
-    tactic: "TBD during next planning step"
+    tactic: "Apply an explicit admissibility policy to every candidate and enforce a persistence gate that accepts only candidates that pass it"
 
-    parallel_assumptions: []
+    parallel_assumptions:
+      - "The existing customer-domain validation can be reused as part of the admissibility policy"
+      - "Validation must be enforced at the persistence boundary; merely reporting validation errors would not protect the data"
+
     necessary_assumptions:
       - "Without a validation barrier, malformed or domain-invalid data could create invalid customer records"
-    sufficiency_assumptions: []
+
+    sufficiency_assumptions:
+      - "If admissibility is explicitly defined, every candidate is checked against it, and persistence accepts only passing candidates, invalid or unsafe candidate data cannot reach customer persistence"
+
     evidence:
       - "Invalid candidate data produces no customer write"
+      - "A bypass test cannot persist a candidate that has not passed the admissibility gate"
+
+    children:
+      - "0.2.1"
+      - "0.2.2"
+      - "0.2.3"
+
+  "0.2.1":
+    status: blocked
+    strategy: "The import has an unambiguous definition of admissible customer data"
+    tactic: "Define the import admissibility policy by combining existing customer-domain validation with explicit import-specific rules"
+
+    parallel_assumptions:
+      - "Existing domain validation should remain authoritative rather than being reimplemented for CSV import"
+      - "Import-specific rules are needed only where the import introduces concerns not already expressed by the customer domain"
+
+    necessary_assumptions:
+      - "Without a defined admissibility policy, validation cannot consistently distinguish accepted from rejected candidate data"
+
+    sufficiency_assumptions: []
+
+    evidence:
+      - "A reviewer can classify representative candidate rows as admissible or inadmissible from the policy alone"
+
+    children: []
+
+  "0.2.2":
+    status: draft
+    strategy: "Every candidate receives an admissibility result before persistence"
+    tactic: "Evaluate each structured candidate against the approved admissibility policy and retain its validation outcome"
+
+    parallel_assumptions:
+      - "Candidate-level evaluation is required because a structurally valid CSV row can still violate customer-domain or import-specific rules"
+
+    necessary_assumptions:
+      - "A written policy alone does not determine whether a specific candidate passes or fails"
+
+    sufficiency_assumptions: []
+
+    evidence:
+      - "Tests show every candidate has a deterministic pass/fail result and validation errors where applicable"
+
+    children: []
+
+  "0.2.3":
+    status: draft
+    strategy: "A candidate that failed admissibility cannot be written as a customer"
+    tactic: "Enforce a persistence gate that accepts only candidates with a passing admissibility result"
+
+    parallel_assumptions:
+      - "Validation that can be bypassed or ignored is insufficient to protect customer persistence"
+
+    necessary_assumptions:
+      - "Even correctly evaluated candidates could still be persisted if the write path does not enforce the validation result"
+
+    sufficiency_assumptions: []
+
+    evidence:
+      - "Persistence-boundary tests prove rejected or unevaluated candidates cannot create customer records"
+
     children: []
 
   "0.3":
