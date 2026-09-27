@@ -89,6 +89,7 @@ If execution later discovers a real planning defect, return that defect to plann
 
 ## Main documentation
 
+- `docs/SNT-GOLDRATT-GUIDE.html` — מדריך HTML חזותי בעברית למאמר המקורי ולמיפוי שלו ל-S&T Planner
 - `docs/SNT-METHODOLOGY.md` — expanded S&T method
 - `docs/AI-PLANNING-PROTOCOL.md` — how GPT plans
 - `docs/QUALITY-GATES.md` — how GPT critiques the plan
