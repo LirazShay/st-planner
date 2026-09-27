@@ -454,10 +454,10 @@ KISS review. Delete planning artifacts that provide no control, rationale, hando
 ## 16.8 Premature issues
 
 Failure:
-Opening dozens of GitHub Issues before the plan stabilizes.
+Opening dozens of GitHub Issues while the intended S&T plan is still incomplete.
 
 Fix:
-Freeze the relevant tree first; compile executable leaves afterward.
+Complete and freeze the whole intended plan first; compile implementation-ready leaves afterward.
 
 ---
 
@@ -582,32 +582,44 @@ This removes configuration while preserving rigor.
 
 # 21. A compact node schema
 
+Node IDs are YAML map keys; do not duplicate an `id` field inside each node. V1 also has no `kind` field.
+
 ```yaml
-id: "1.2"
-kind: required
+nodes:
+  "1.2":
+    status: approved
 
-strategy: "A fresh AI session can recover planning state"
+    strategy: "A fresh AI session can recover planning state"
 
-tactic: "Persist the minimal planning state in version-controlled project files"
+    tactic: "Persist the minimal planning state in version-controlled project files"
 
-parallel_assumptions:
-  - "The target project already has a Git repository"
-  - "Plain text files are sufficient for the initial state model"
+    parallel_assumptions:
+      - "The target project already has a Git repository"
+      - "Plain text files are sufficient for the initial state model"
 
-necessary_assumptions:
-  - "Without persistent state, a new session cannot reliably reconstruct prior planning decisions"
+    necessary_assumptions:
+      - "Without persistent state, a new session cannot reliably reconstruct prior planning decisions"
 
-sufficiency_assumptions: []
+    sufficiency_assumptions:
+      - "If the required child capabilities all exist, the persisted state is sufficient for session recovery"
 
-success_evidence:
-  - "A fresh session reads only repository state and identifies the correct next action"
+    success_evidence:
+      - "A fresh session reads only repository state and identifies the correct next action"
 
-children:
-  - "1.2.1"
-  - "1.2.2"
-
-status: approved
+    children:
+      - "1.2.1"
+      - "1.2.2"
 ```
+
+### Relationship placement
+
+The lists are intentionally stored this way:
+
+- Parallel assumptions live on the node because they justify that node's **Tactic → Strategy** claim.
+- Necessary assumptions live on the child because they justify the **child → parent** necessity claim.
+- Sufficiency assumptions live on the parent because they justify the **children as a group → parent** sufficiency claim.
+
+Do not add a separate edge structure in V1. The parent relationship is derived from `children`.
 
 The schema may evolve, but additions must justify their cost.
 
@@ -627,7 +639,7 @@ The schema may evolve, but additions must justify their cost.
 - A parent with children records why those children are sufficient together.
 - A non-root child records why it is necessary for its parent.
 
-Keep facts/unknowns in GOAL, alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS rather than growing TREE into a general-purpose database.
+Keep stable current-reality facts in GOAL, material unresolved questions/alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS rather than growing TREE into a general-purpose database.
 
 ---
 
@@ -656,8 +668,9 @@ The plan is good enough when:
 - sibling groups survive sufficiency challenges;
 - tactics are feasible under explicit assumptions;
 - important alternatives are decided or intentionally left open;
-- executable leaves exist for the next horizon;
-- a fresh session can continue without private chat context;
+- all intended execution leaves are implementation-ready;
+- the complete intended tree has passed Final Planning Review;
+- a fresh session can continue without private chat context if needed;
 - additional decomposition would not materially improve execution.
 
-That is the point at which planning should stop and work should begin.
+That is the point at which the plan can be frozen and execution tasks can be generated.
