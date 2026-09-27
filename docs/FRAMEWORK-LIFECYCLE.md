@@ -11,6 +11,10 @@ REVIEW / CORRECT
   ↺
 FINAL WHOLE-PLAN REVIEW
   ↓
+RECORD REVIEWED BASELINE
+  ↓
+VERIFY FREEZE NO-DRIFT
+  ↓
 FREEZE
   ↓
 ALLOCATE S&T LEAVES TO NUMBERED CHATS
@@ -75,12 +79,20 @@ If defects exist, return to the tree and correct them.
 
 All lifecycle fields below belong to **`.planning/STATUS.yaml`**, never to an unrelated target-project status file.
 
-After the final review passes:
+After the final review passes, first record the reviewed baseline in `REVIEWS.md` and prove no material drift. With Git refs, prefer:
+
+```text
+node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>
+```
+
+If the checked baseline drifted, keep planning active and review the changed baseline again. Only the verified reviewed baseline may then become:
 
 ```yaml
 plan_state: frozen
 implementation_authorized: false
 ```
+
+If merge/rebase/integration later creates a different frozen ref, verify that result too before execution handoff.
 
 Until then:
 
