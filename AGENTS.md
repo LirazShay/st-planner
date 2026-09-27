@@ -6,7 +6,7 @@ This repository builds a reusable S&T planning framework for GPT.
 
 If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review **and freeze no-drift verification**, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after that gate passes.
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after that gate passes.
 
 Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
 
@@ -77,19 +77,15 @@ Planning is complete only when the **whole intended plan**:
 - has no unresolved material decision that execution would have to invent;
 - passes necessity and sufficiency checks;
 - passes KISS and structural review;
-- passes a Final Planning Review;
-- has recorded reviewed-baseline evidence and passed freeze no-drift verification.
+- passes a Final Planning Review.
 
-For Git workflows, prefer `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` before freeze, and if merge/rebase/integration creates a later frozen ref, verify again with `--frozen-ref <ref>`. If a stable Git ref is unavailable, record equivalent evidence in REVIEWS. Any material GOAL/TREE/DECISIONS drift invalidates the Final Planning Review and requires a new review.
-
-Then freeze the verified reviewed baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
+Then freeze the plan while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 ## Execution handoff
 
 After freeze:
 
 - keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff verification passes;
-- before allocation, confirm the frozen baseline still matches the recorded Final Review baseline; rerun freeze verification after any intervening merge/rebase/integration;
 - create/populate `.planning/EXECUTION.yaml`;
 - assign every implementation-ready leaf to exactly one numbered chat;
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
@@ -124,7 +120,7 @@ If execution exposes a material planning defect:
 - stop starting new execution work;
 - reopen only the smallest affected S&T area;
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
-- after focused re-review, record the corrected reviewed baseline and pass freeze no-drift verification again before setting `.planning/STATUS.yaml -> plan_state: frozen`;
+- after focused re-review, repair only affected EXECUTION assignments/states and set `.planning/STATUS.yaml -> plan_state: frozen` again;
 - run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode is used);
 - rerun and record the mandatory fresh-chat verification;
 - do not resume execution until that gate passes and `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
