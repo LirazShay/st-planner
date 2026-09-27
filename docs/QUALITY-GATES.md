@@ -67,6 +67,8 @@ For each final leaf:
 
 ## Gate 9 — Final whole-plan review
 
+**The whole intended plan must be complete before execution begins.**
+
 Before freezing:
 - inspect the complete intended tree, not only individual branches;
 - confirm no necessary branch is missing;
