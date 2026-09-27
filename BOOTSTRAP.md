@@ -39,8 +39,9 @@ When invoked from another repository:
    - `templates/project/.planning/EXECUTION.yaml`
    - `templates/project/.planning/EXECUTOR_HANDOFF.md`
    - `templates/project/.planning/validate-allocation.mjs`
+   - `templates/project/.planning/verify-freeze-baseline.mjs`
    - `templates/project/AGENTS.snippet.md`
-4. If the target repository does **not** already contain `.planning/`, copy the ten planning/framework files above into target `.planning/` using the same filenames.
+4. If the target repository does **not** already contain `.planning/`, copy the eleven planning/framework files above into target `.planning/` using the same filenames.
 5. Merge `templates/project/AGENTS.snippet.md` into the target repository's existing `AGENTS.md`. Preserve the target repository's existing instructions. If no `AGENTS.md` exists, create one containing the snippet.
 6. If the target repository already contains an S&T Planner `.planning/`, do not overwrite live planning state. Use the installed state as-is unless the user explicitly asks to upgrade/reinstall the framework.
 7. Treat `.planning/STATUS.yaml` as the only S&T Planner-owned lifecycle/status file. If the target repository also has `STATUS.yaml`, phase/state files, or workstream status, preserve them unless the target's own instructions explicitly require a coordinated integration update.
@@ -51,7 +52,10 @@ When invoked from another repository:
    - build/update `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, and `.planning/STATUS.yaml`;
    - do not implement target-project work while planning;
    - continue until the complete intended plan passes Final Planning Review;
-   - freeze the plan with implementation still unauthorized;
+   - record the reviewed baseline evidence in REVIEWS;
+   - verify no material GOAL/TREE/DECISIONS drift from that reviewed baseline;
+   - freeze only that reviewed baseline with implementation still unauthorized;
+   - if merge/rebase/integration changes the frozen ref afterward, repeat no-drift verification before handoff;
    - populate EXECUTION with numbered executor-chat assignments;
    - run `node .planning/validate-allocation.mjs --initial` and fix any allocation failure;
    - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification;
@@ -63,7 +67,7 @@ When invoked from another repository:
 
 Bootstrap installs framework files only when `.planning/` is absent.
 
-An existing S&T planning state is project data. Never replace `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, `.planning/STATUS.yaml`, `.planning/EXECUTION.yaml`, or `.planning/EXECUTOR_HANDOFF.md` from the source templates during ordinary reuse. Treat `validate-allocation.mjs` as framework tooling; do not overwrite an installed copy unless the user explicitly requests an S&T Planner upgrade.
+An existing S&T planning state is project data. Never replace `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, `.planning/STATUS.yaml`, `.planning/EXECUTION.yaml`, or `.planning/EXECUTOR_HANDOFF.md` from the source templates during ordinary reuse. Treat `validate-allocation.mjs` and `verify-freeze-baseline.mjs` as framework tooling; do not overwrite installed copies unless the user explicitly requests an S&T Planner upgrade.
 
 ## Normal execution after planning
 
