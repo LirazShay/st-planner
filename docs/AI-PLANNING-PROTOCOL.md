@@ -122,7 +122,8 @@ A fresh session must be able to determine:
 - open blockers;
 - next action;
 - exact implementation scope;
-- latest relevant review.
+- latest relevant review;
+- latest relevant execution outcome.
 
 Approval itself is read from node status in `TREE.yaml`; do not duplicate it in STATUS.
 
