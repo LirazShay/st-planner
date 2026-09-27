@@ -147,3 +147,22 @@ A node becomes `done` only after its S&T `success_evidence` is verified.
 The short `result` field may reference a commit, test, artifact, or concise verification outcome.
 
 The framework does not become a scheduler or task-management application.
+
+
+## 10. Replan only when execution proves it necessary
+
+If execution exposes a material defect in the frozen plan:
+
+1. the executor marks the affected node `blocked` with a short factual reason;
+2. set `STATUS.yaml -> plan_state: active`;
+3. identify the smallest affected S&T area;
+4. correct that area and review upward until the impact is contained;
+5. inspect affected dependencies and any completed work that relied on the changed outcome;
+6. keep already-`done` nodes only when their Strategy/evidence/outcome remain valid under the revised plan;
+7. reset invalidated completed nodes to `pending` or remove obsolete nodes;
+8. update only affected EXECUTION allocation;
+9. re-freeze after the corrected plan passes the required focused review.
+
+Do not restart planning from the root unless the defect actually changes the root framing.
+
+Do not create plan versions or a separate replan ledger in V1; Git history plus REVIEWS provide the audit trail.
