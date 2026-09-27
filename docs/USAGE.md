@@ -23,10 +23,11 @@ The agent:
 7. builds, reviews, and persists the complete S&T plan;
 8. freezes only after Final Planning Review passes, with implementation still unauthorized;
 9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
-10. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
-11. records the verification in `.planning/REVIEWS.md`;
-12. fixes/rechecks any failed handoff case;
-13. explicitly authorizes implementation only after the gate passes.
+10. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
+11. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
+12. records the verification in `.planning/REVIEWS.md`;
+13. fixes/rechecks any failed handoff case;
+14. explicitly authorizes implementation only after both gates pass.
 
 The user does not manually copy files or explain the S&T workflow.
 
@@ -59,9 +60,10 @@ Keep it simple:
 3. reopen only the smallest affected S&T area;
 4. correct/review/freeze it;
 5. repair only affected EXECUTION entries;
-6. rerun and record the mandatory fresh-chat handoff verification;
-7. explicitly re-authorize only after it passes;
-8. preserve valid completed work.
+6. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
+7. rerun and record the mandatory fresh-chat handoff verification;
+8. explicitly re-authorize only after both gates pass;
+9. preserve valid completed work.
 
 ## Authoritative external entry point
 
