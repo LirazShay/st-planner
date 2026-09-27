@@ -189,7 +189,7 @@ Freeze means the planning baseline is closed for ordinary editing. It does **not
 - `TREE.yaml` — S&T plan.
 - `DECISIONS.md` — material questions/decisions.
 - `REVIEWS.md` — review history.
-- `STATUS.yaml` — where planning currently stands.
+- `.planning/STATUS.yaml` — the S&T Planner-owned planning pointer and lifecycle/authorization state.
 
 Prefer one planning conversation. Repository state exists so continuation is possible when needed.
 
@@ -207,7 +207,7 @@ Use management files only:
 - `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap and mandatory post-allocation verification contract; no task descriptions.
 - `validate-allocation.mjs` — mechanical allocation validator; no planning state or task content.
 
-Create/populate `EXECUTION.yaml` while `STATUS.yaml -> implementation_authorized: false`.
+Create/populate `EXECUTION.yaml` while `.planning/STATUS.yaml -> implementation_authorized: false`.
 
 Every implementation-ready leaf appears exactly once under one numbered chat:
 
@@ -271,7 +271,7 @@ Any validator failure keeps `implementation_authorized: false`.
 
 ### Mandatory fresh-chat handoff gate
 
-Before setting `STATUS.yaml -> implementation_authorized: true`, follow `EXECUTOR_HANDOFF.md` and simulate a brand-new executor from repository state only.
+Before setting `.planning/STATUS.yaml -> implementation_authorized: true`, follow `EXECUTOR_HANDOFF.md` and simulate a brand-new executor from repository state only.
 
 The verification must cover representative:
 - first available executor;
@@ -291,7 +291,7 @@ Use actual allocation cases where possible. If a small plan lacks a literal exam
 
 Record the result in `REVIEWS.md`. Any failure keeps `implementation_authorized: false`; correct the smallest handoff/allocation/routing defect and rerun the failed verification.
 
-Only after this gate passes, explicitly set `STATUS.yaml -> implementation_authorized: true`.
+Only after this gate passes, explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 A chat that says "I am chat N" / "אני צ'אט מספר N" reads `EXECUTOR_HANDOFF.md` and may execute its assigned nodes only when both `plan_state: frozen` and `implementation_authorized: true`.
 
@@ -311,9 +311,9 @@ When an executor discovers a material planning defect:
 1. stop the affected node;
 2. set that node in `EXECUTION.yaml` to `blocked`;
 3. put a short concrete reason in `result`;
-4. change `STATUS.yaml -> plan_state` back to `active`;
-5. set `STATUS.yaml -> implementation_authorized: false`;
-6. set STATUS to the smallest S&T area that must be reconsidered.
+4. change `.planning/STATUS.yaml -> plan_state` back to `active`;
+5. set `.planning/STATUS.yaml -> implementation_authorized: false`;
+6. set `.planning/STATUS.yaml` to the smallest S&T area that must be reconsidered.
 
 No other execution may start while `plan_state: active` or `implementation_authorized: false`.
 
@@ -349,8 +349,8 @@ After the corrected planning area passes review:
 2. add any new implementation-ready leaves exactly once as `pending`;
 3. keep unaffected chat allocations and valid `done` nodes unchanged where practical;
 4. re-check dependencies and chat coherence only for affected work;
-5. set `plan_state: frozen` again while keeping `implementation_authorized: false`;
+5. set `.planning/STATUS.yaml -> plan_state: frozen` again while keeping `.planning/STATUS.yaml -> implementation_authorized: false`;
 6. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode applies) and fix any failure;
-7. rerun the mandatory repository-only fresh-chat handoff verification from `EXECUTOR_HANDOFF.md`, record the pass in `REVIEWS.md`, and only then explicitly restore `implementation_authorized: true`.
+7. rerun the mandatory repository-only fresh-chat handoff verification from `EXECUTOR_HANDOFF.md`, record the pass in `REVIEWS.md`, and only then explicitly restore `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 No plan-version registry is required. Git history already records prior file versions.
