@@ -1,14 +1,13 @@
 version: 1
 
+stage: planning
 mode: DEEP
 
 current_node: "0"
 
 blockers: []
 
-next_action: "Complete GOAL.md and validate the planning boundary"
-
-implementation_scope: []
+next_action: "Complete GOAL.md and continue building the S&T plan"
 
 last_review: null
-last_execution: null
+planning_baseline: null
