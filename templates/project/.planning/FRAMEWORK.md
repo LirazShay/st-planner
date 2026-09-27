@@ -163,11 +163,28 @@ Keep one source of truth for each kind of state:
 - `REVIEWS.md` owns review history.
 - `STATUS.yaml` is only the resume pointer: mode, current node, blockers, next action, implementation scope, and latest relevant review.
 
+Each TREE node uses the minimal V1 schema:
+
+- `status`
+- `strategy`
+- `tactic`
+- `parallel_assumptions`
+- `necessary_assumptions`
+- `sufficiency_assumptions`
+- `success_evidence`
+- `children`
+
+Do not add catch-all node metadata unless real use proves it necessary. Facts and unknowns belong in GOAL, alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS.
+
 Node planning status uses only:
 
-- `draft` — not yet approved;
-- `blocked` — cannot currently advance because an explicit blocker exists;
-- `approved` — the node's planning logic passed the relevant gates.
+- `draft` — this node's own planning logic is not yet approved;
+- `blocked` — this node itself cannot currently advance because a specific unresolved blocker prevents its planning;
+- `approved` — this node's own Strategy/Tactic logic and its immediate decomposition, if present, passed the relevant planning gates.
+
+Status is **local, never cascading**. An approved parent may have draft or blocked descendants. A blocked child does not automatically block its parent. Subtree readiness is determined by the actual descendant statuses and `implementation_scope`, not by propagating status upward.
+
+For an approved node, `success_evidence` must be concrete enough to recognize achievement of its strategy. For a parent, approval of its immediate decomposition does not imply that all descendants are executable.
 
 Do not duplicate approved-node lists in STATUS.
 
