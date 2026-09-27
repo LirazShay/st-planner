@@ -12,7 +12,7 @@ Provide a small portable S&T planning framework stored with the project, with ex
 - GPT already has general reasoning ability; it mainly needs a stable planning method.
 - S&T necessity/sufficiency logic improves plan structure.
 - Git files are enough for durable planning state.
-- Execution does not require a new framework when normal GitHub Issues/tasks can consume the final plan.
+- Execution can use the frozen S&T leaves directly; only minimal allocation/state is needed.
 
 **Success evidence**
 - A GPT can start from a goal and build a complete reviewed S&T tree.
@@ -38,13 +38,13 @@ Provide a small portable S&T planning framework stored with the project, with ex
 
 **Tactic:** require the whole intended tree to pass Final Planning Review before freezing.
 
-### 0.5 — The final plan can be executed without a second planning system
+### 0.5 — The final plan can be executed without duplicating the work model
 
-**Tactic:** compile frozen executable leaves into ordinary GitHub Issues/tasks with S&T traceability.
+**Tactic:** assign frozen implementation-ready leaf IDs directly to numbered executor chats in one minimal execution file.
 
 ## Sufficiency
 
-If GPT can build the tree correctly, critique it, persist it when needed, finish the whole intended plan before freezing, and hand its leaves to ordinary task tracking, the framework is sufficient for its V1 purpose.
+If GPT can build the tree correctly, critique it, persist it when needed, finish the whole intended plan before freezing, and allocate its leaves directly to executor chats without duplicating task descriptions, the framework is sufficient for its V1 purpose.
 
 ## V1 boundary
 
