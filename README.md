@@ -6,7 +6,7 @@ The goal is broader: **any capable GPT/chat should be able to connect to the sam
 
 ## Status
 
-**v0.1 — usable.** The portable project template has passed the fresh-session acceptance checks: it is self-contained, starts with implementation blocked, and tells a new AI session the next planning action from repository state.
+**v0.2 — lifecycle framework in validation.** The planning/handoff core is usable and has passed fresh-session checks. The framework now also covers connection, execution, verification, and feedback-driven replanning; those lifecycle additions are being acceptance-tested before the framework is treated as complete.
 
 This repository is the framework source. A real project carries a small portable kernel and durable lifecycle state in `.planning/`. The chat/model is replaceable; the framework state is not.
 
