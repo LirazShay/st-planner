@@ -12,10 +12,12 @@ After Final Planning Review passes:
 4. group the leaf node IDs into numbered executor chats;
 5. write the allocation to `.planning/EXECUTION.yaml`;
 6. initialize every assigned node as `pending`;
-7. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
-8. record the verification result in `.planning/REVIEWS.md`;
-9. fix and rerun any failed case;
-10. explicitly set `implementation_authorized: true` only after the gate passes.
+7. run `node .planning/validate-allocation.mjs --initial` and fix every failure;
+8. if numbered chats are explicitly serial, rerun/add `--serial-chats`;
+9. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
+10. record the verification result in `.planning/REVIEWS.md`;
+11. fix and rerun any failed case;
+12. explicitly set `implementation_authorized: true` only after both gates pass.
 
 A frozen plan is a stable baseline, not permission to implement. `.planning/EXECUTOR_HANDOFF.md` is the portable entry contract for every new executor chat.
 
@@ -109,6 +111,6 @@ Already completed work is preserved when its Strategy, success evidence, and pro
 
 If previously completed work is invalidated, reset only that work to `pending` (or remove an obsolete node) rather than restarting all execution.
 
-After focused review passes, repair the affected EXECUTION allocation and freeze again while still unauthorized; rerun and record the mandatory fresh-chat handoff gate before explicitly restoring authorization.
+After focused review passes, repair the affected EXECUTION allocation and freeze again while still unauthorized; run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable), then rerun and record the mandatory fresh-chat handoff gate before explicitly restoring authorization.
 
 Git history is sufficient version history for V1.
