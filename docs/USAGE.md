@@ -21,13 +21,16 @@ The agent:
 5. merges the S&T rules into the target `AGENTS.md` while preserving existing rules;
 6. continues immediately in the same chat to understand the requested goal and relevant repository context;
 7. builds, reviews, and persists the complete S&T plan;
-8. freezes only after Final Planning Review passes, with implementation still unauthorized;
-9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
-10. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
-11. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
-12. records the verification in `.planning/REVIEWS.md`;
-13. fixes/rechecks any failed handoff case;
-14. explicitly authorizes implementation only after both gates pass.
+8. after Final Planning Review, records the reviewed baseline evidence in `.planning/REVIEWS.md`;
+9. proves no material GOAL/TREE/DECISIONS drift from that reviewed baseline; when Git refs are available it uses `.planning/verify-freeze-baseline.mjs`;
+10. freezes only the reviewed no-drift baseline, with implementation still unauthorized;
+11. after any merge/rebase/integration that changes the frozen ref, repeats no-drift verification before allocation;
+12. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
+13. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
+14. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
+15. records the verification in `.planning/REVIEWS.md`;
+16. fixes/rechecks any failed handoff case;
+17. explicitly authorizes implementation only after freeze no-drift, allocation validation, and fresh-chat gates pass.
 
 The user does not manually copy files or explain the S&T workflow.
 
