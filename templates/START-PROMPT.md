@@ -3,7 +3,17 @@ Use the S&T Planner framework for this project.
 Project goal / requested outcome:
 <WRITE THE GOAL HERE>
 
-Read AGENTS.md and .planning/README.md first, then inspect only the project context needed to understand the current reality.
+Read AGENTS.md and .planning/README.md first.
+
+If the existing repository already defines its own context-loading, workstream-routing, status, or source-of-truth rules, follow those rules rather than inventing another loading sequence.
+
+Use progressive context loading:
+- start from the repository's normal AI entry point/routing;
+- identify the relevant workstream/component;
+- read only the current status/context and directly relevant code/docs/tests;
+- expand context only when a planning question actually requires it.
+
+Do not recursively preload the repository or read historical/background material merely because it exists.
 
 Your job in this conversation is planning, not implementation.
 
