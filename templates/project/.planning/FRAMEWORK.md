@@ -215,3 +215,58 @@ Dependencies remain only in TREE. A chat checks prerequisite node states in EXEC
 A chat that says "I am chat N" / "אני צ'אט מספר N" loads exactly its assigned nodes and works only within that scope.
 
 Do not build an execution engine, scheduler, or duplicated task database.
+
+
+## 14. Replanning after execution discovers a defect
+
+A frozen plan may still meet reality and prove wrong.
+
+Do not patch around a material planning defect during execution.
+
+### Executor response
+
+When an executor discovers a material planning defect:
+
+1. stop the affected node;
+2. set that node in `EXECUTION.yaml` to `blocked`;
+3. put a short concrete reason in `result`;
+4. change `STATUS.yaml -> plan_state` back to `active`;
+5. set STATUS to the smallest S&T area that must be reconsidered.
+
+No other execution may start while `plan_state: active`.
+
+### Planner response
+
+Reopen only the smallest affected planning area.
+
+Review:
+- the defective node/branch;
+- its parent logic upward until the changed logic is contained;
+- affected `depends_on` relationships;
+- any previously executed nodes whose validity depends on the changed outcome;
+- whole-plan coverage only where the change can affect it.
+
+Do not re-plan unrelated branches.
+
+### Preserve valid completed work
+
+A node already marked `done` stays `done` if:
+- its Strategy still means the same thing;
+- its success evidence still proves that Strategy;
+- the revised plan does not invalidate the produced outcome.
+
+If any of those are false, reset that node to `pending` (or remove it if the node no longer exists) and record the reason in the review.
+
+Do not add a `stale` state.
+
+### Rebuild only affected allocation
+
+After the corrected planning area passes review:
+
+1. ensure obsolete leaf IDs are removed from EXECUTION;
+2. add any new implementation-ready leaves exactly once as `pending`;
+3. keep unaffected chat allocations and valid `done` nodes unchanged where practical;
+4. re-check dependencies and chat coherence only for affected work;
+5. set `plan_state: frozen` again.
+
+No plan-version registry is required. Git history already records prior file versions.
