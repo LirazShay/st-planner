@@ -1,0 +1,32 @@
+version: 1
+
+status: not_generated
+planning_baseline: null
+
+# This file becomes authoritative only after Final Planning Review passes.
+# During planning it must not be used to authorize implementation.
+
+work_packages: []
+
+# Frozen work-package shape:
+#
+# - id: "WP-001"
+#   status: ready
+#   responsibility: "..."
+#   source_nodes:
+#     - "1.2.3"
+#   scope:
+#     allowed:
+#       - "..."
+#     forbidden:
+#       - "..."
+#   inputs:
+#     - "..."
+#   dependencies:
+#     - "WP-000"
+#   planned_approach:
+#     - "..."
+#   verification:
+#     - "..."
+#   handoff_outputs:
+#     - "..."
