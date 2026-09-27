@@ -8,7 +8,7 @@ version: 1
 # numbered chats are explicitly serial.
 # Then the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF.md
 # must pass and be recorded in REVIEWS.md.
-# Executors may start only when STATUS.yaml has:
+# Executors may start only when .planning/STATUS.yaml has:
 #   plan_state: frozen
 #   implementation_authorized: true
 #
@@ -23,8 +23,8 @@ version: 1
 # - blocked: execution cannot continue because of a real execution/planning blocker
 #
 # If blocked because the frozen plan itself is materially wrong/incomplete:
-# - set STATUS.yaml -> plan_state: active;
-# - set STATUS.yaml -> implementation_authorized: false;
+# - set .planning/STATUS.yaml -> plan_state: active;
+# - set .planning/STATUS.yaml -> implementation_authorized: false;
 # - stop starting new execution work;
 # - replan/review the smallest affected S&T area;
 # - preserve done nodes only if still valid;
