@@ -1,6 +1,6 @@
 # Numbered Executor Chats
 
-After the complete S&T plan is frozen, implementation-ready leaves are allocated directly to numbered chats in `.planning/EXECUTION.yaml`.
+After the complete S&T plan is frozen, implementation-ready leaves are allocated directly to numbered chats in `.planning/EXECUTION.yaml`. Allocation still does not authorize execution.
 
 No separate task layer is required.
 
@@ -18,13 +18,14 @@ The executor then:
 
 1. reads repository `AGENTS.md`;
 2. confirms `.planning/STATUS.yaml -> plan_state: frozen`;
-3. reads `.planning/EXECUTION.yaml`;
-4. finds chat N;
-5. reads only the assigned S&T nodes from `TREE.yaml` plus referenced decisions/context;
-6. checks each node's `depends_on` prerequisites;
-7. finds those prerequisite node states in `EXECUTION.yaml`;
-8. executes only assigned nodes whose prerequisites are `done`;
-9. updates execution state as work proceeds.
+3. confirms `.planning/STATUS.yaml -> implementation_authorized: true`;
+4. reads `.planning/EXECUTION.yaml`;
+5. finds chat N;
+6. reads only the assigned S&T nodes from `TREE.yaml` plus referenced decisions/context;
+7. checks each node's `depends_on` prerequisites;
+8. finds those prerequisite node states in `EXECUTION.yaml`;
+9. executes only assigned nodes whose prerequisites are `done`;
+10. updates execution state as work proceeds.
 
 If chat N does not exist, do not invent work.
 
@@ -92,8 +93,9 @@ If the executor finds a material missing/contradictory planning decision:
 2. set the affected node to `blocked`;
 3. write a short factual blocker in `result`;
 4. set `STATUS.yaml -> plan_state: active`;
-5. do not continue other execution until planning is frozen again.
+5. set `STATUS.yaml -> implementation_authorized: false`;
+6. do not continue other execution until planning is re-frozen, required handoff checks pass again, and authorization is explicitly restored.
 
 A planner then reopens the smallest affected S&T area.
 
-After re-freeze, the same or another numbered chat resumes from the updated EXECUTION file. Unaffected valid completed nodes remain done.
+After re-freeze and explicit re-authorization, the same or another numbered chat resumes from the updated EXECUTION file. Unaffected valid completed nodes remain done.
