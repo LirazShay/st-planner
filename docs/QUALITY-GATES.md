@@ -68,7 +68,9 @@ For each final leaf:
 - responsibility is clear;
 - scope is clear;
 - relevant decisions are resolved;
-- required inputs/dependencies are known;
+- required inputs are known;
+- every real execution prerequisite is recorded in `depends_on`;
+- no dependency is invented merely to express preference or priority;
 - success evidence is objective;
 - no material design decision is left for the executor.
 
@@ -93,7 +95,7 @@ Before freezing:
 - inspect the complete intended tree, not only individual branches;
 - confirm no necessary branch is missing;
 - confirm all groups remain sufficient when considered together;
-- confirm execution dependencies/order are understandable;
+- confirm execution dependencies are explicit, acyclic, and sufficient to derive required ordering;
 - confirm implementation-ready leaves can be grouped into coherent executor-chat responsibilities without hidden design decisions;
 - confirm all material decisions that affect implementation are resolved;
 - run one final KISS pass.
