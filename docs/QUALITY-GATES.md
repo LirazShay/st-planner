@@ -103,7 +103,34 @@ Before freezing:
 - confirm all material decisions that affect implementation are resolved;
 - run one final KISS pass.
 
-Only a pass here allows `.planning/STATUS.yaml -> plan_state: frozen`. Freeze does not authorize implementation; `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
+A pass here approves a **specific reviewed baseline**. Record baseline evidence in `.planning/REVIEWS.md`.
+
+## Gate 10A — Freeze no-drift
+
+Before setting `.planning/STATUS.yaml -> plan_state: frozen`, prove that the material planning baseline still matches the baseline that passed Final Planning Review.
+
+Default material files:
+- `.planning/GOAL.md`;
+- `.planning/TREE.yaml`;
+- `.planning/DECISIONS.md`.
+
+When Git refs are available, prefer:
+
+```text
+node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref>
+```
+
+If merge/rebase/integration later creates a different actual frozen ref, repeat with:
+
+```text
+node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref> --frozen-ref <frozen-ref>
+```
+
+A non-Git workflow may use equivalent reproducible evidence, but must record it in REVIEWS.
+
+Any material drift is `changes-required`: keep/return planning active, review the changed baseline again, and record new reviewed-baseline evidence. Do not waive drift based on perceived smallness.
+
+Only Gate 10 plus Gate 10A allow `.planning/STATUS.yaml -> plan_state: frozen`. Freeze does not authorize implementation; `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
 
 ## Fresh planning-chat continuity check
 
@@ -117,6 +144,8 @@ For planning continuation, a fresh GPT should be able to read repository state a
 This is separate from the mandatory **executor** handoff gate below.
 
 ## Gate 11 — Execution allocation
+
+Before allocation, if any merge/rebase/integration occurred after Gate 10A, re-confirm no drift against the resulting frozen ref.
 
 After freeze, with `.planning/STATUS.yaml -> implementation_authorized: false`, pass only when:
 
