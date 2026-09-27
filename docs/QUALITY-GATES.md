@@ -52,8 +52,11 @@ If yes, the decomposition is incomplete.
 - all child references resolve;
 - every non-root V1 node has one logical parent;
 - no cycles;
-- statuses are draft / blocked / approved;
-- approval is local, not recursive.
+- statuses are only draft / blocked / approved;
+- draft is used for normal unfinished planning;
+- every blocked node is referenced by an open D-entry that explains the material unresolved question;
+- no separate blocked-by state is duplicated in TREE;
+- approval/blocking is local, not recursive.
 
 ## Gate 8 — Implementation readiness
 
