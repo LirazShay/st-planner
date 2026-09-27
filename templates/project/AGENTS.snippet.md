@@ -10,7 +10,7 @@ Before meaningful implementation:
 4. Validate required children as necessary individually and sufficient together.
 5. Separate facts, assumptions, decisions and unknowns.
 6. Run a KISS review before approving an execution horizon.
-7. Do not implement while `implementation_allowed: false`.
+7. Implement only node IDs explicitly listed in `.planning/STATUS.yaml -> implementation_scope`; an empty list blocks all implementation.
 8. Keep `.planning/` updated so a fresh AI session can continue without chat history.
 
 If this repository already has an `AGENTS.md`, merge these rules into it rather than replacing existing project instructions.
