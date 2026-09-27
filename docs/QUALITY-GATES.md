@@ -82,11 +82,11 @@ It must identify:
 A project passes when a new AI session, using only repository state, can correctly state:
 
 1. the goal;
-2. the current planning phase;
-3. the active node or scope;
-4. the important unresolved issue;
-5. the next action;
-6. whether implementation is currently allowed.
+2. the active planning node;
+3. the important unresolved issue;
+4. the next action;
+5. the exact implementation scope;
+6. which relevant nodes are draft, blocked, or approved.
 
 ## Gate 9 — Execution release
 
@@ -94,7 +94,9 @@ Implementation may begin for the approved horizon when:
 
 - Gates 1–8 pass for that horizon;
 - unresolved future questions cannot invalidate the next work;
-- STATUS explicitly says implementation is allowed.
+- the exact approved executable leaves appear in `STATUS.yaml -> implementation_scope`.
+
+An empty implementation scope means no implementation.
 
 ---
 
