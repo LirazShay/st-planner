@@ -205,6 +205,7 @@ Use management files only:
 - `TREE.yaml` — work definition, rationale, dependencies, success evidence.
 - `EXECUTION.yaml` — chat allocation, execution state, short result.
 - `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap and mandatory post-allocation verification contract; no task descriptions.
+- `validate-allocation.mjs` — mechanical allocation validator; no planning state or task content.
 
 Create/populate `EXECUTION.yaml` while `STATUS.yaml -> implementation_authorized: false`.
 
@@ -246,6 +247,27 @@ Use only:
 Set `done` only after success evidence is verified.
 
 Dependencies remain only in TREE. A chat checks prerequisite node states in EXECUTION.
+
+### Mandatory mechanical allocation gate
+
+Before first implementation authorization, run:
+
+```text
+node .planning/validate-allocation.mjs --initial
+```
+
+It must prove mechanically that:
+- every approved implementation-ready leaf is assigned exactly once;
+- no non-leaf, missing, or non-approved node is assigned;
+- execution states are valid;
+- initial allocation is `pending` with `result: null`;
+- every dependency references an approved implementation-ready leaf and is assigned.
+
+If the target explicitly uses serial numbered chats, also pass `--serial-chats`. That mode additionally requires chat IDs `1..N` and every dependency to be in an earlier chat or earlier in the same chat. Do not enable serial mode merely because chats have numbers.
+
+After execution has already begun and replanning preserves valid completed work, use `--resume` instead of `--initial`; it validates state/result consistency without requiring completed nodes to return to pending.
+
+Any validator failure keeps `implementation_authorized: false`.
 
 ### Mandatory fresh-chat handoff gate
 
@@ -328,6 +350,7 @@ After the corrected planning area passes review:
 3. keep unaffected chat allocations and valid `done` nodes unchanged where practical;
 4. re-check dependencies and chat coherence only for affected work;
 5. set `plan_state: frozen` again while keeping `implementation_authorized: false`;
-6. rerun the mandatory repository-only fresh-chat handoff verification from `EXECUTOR_HANDOFF.md`, record the pass in `REVIEWS.md`, and only then explicitly restore `implementation_authorized: true`.
+6. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode applies) and fix any failure;
+7. rerun the mandatory repository-only fresh-chat handoff verification from `EXECUTOR_HANDOFF.md`, record the pass in `REVIEWS.md`, and only then explicitly restore `implementation_authorized: true`.
 
 No plan-version registry is required. Git history already records prior file versions.
