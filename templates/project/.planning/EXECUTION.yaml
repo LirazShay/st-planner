@@ -22,6 +22,13 @@ version: 1
 # - done: success_evidence verified
 # - blocked: execution cannot continue because of a real execution/planning blocker
 #
+# A temporary external live-verification condition (for example unavailable auth,
+# market, hardware, environment, or third-party system) may use blocked after
+# implementation + offline/harness proof are complete. In that case result must say
+# what passed, what live evidence remains, and the factual availability reason.
+# This does not by itself reopen planning or stop unrelated nodes. Only real
+# depends_on relationships wait for that leaf to become done.
+#
 # If blocked because the frozen plan itself is materially wrong/incomplete:
 # - set .planning/STATUS.yaml -> plan_state: active;
 # - set .planning/STATUS.yaml -> implementation_authorized: false;

@@ -399,6 +399,21 @@ Use only:
 
 Set `done` only after success evidence is verified.
 
+### External live verification
+
+When a leaf requires a real external condition that may be temporarily unavailable — for example an authenticated session, open market, hardware device, deployment environment, or third-party system — keep the requirement explicit in that leaf's existing `success_evidence`.
+
+When implementation and offline/harness verification are complete but the external live check cannot factually run yet:
+- keep the leaf `blocked`, not `done`;
+- put a short `result` stating what offline/harness evidence already passed, which live evidence remains, and the factual availability reason;
+- do **not** reopen planning merely because the external condition is unavailable when the plan itself is still correct;
+- continue unrelated execution normally;
+- only leaves whose `depends_on` genuinely requires this live-verified outcome wait for it.
+
+When the external condition becomes available, run the live verification. Mark the leaf `done` only after the remaining success evidence passes.
+
+Do not silently waive or delete live evidence because it could not run at the earlier time, and do not add a new execution state just for this case.
+
 Dependencies remain only in TREE. A chat checks prerequisite node states in EXECUTION.
 
 ### Mandatory mechanical allocation gate
