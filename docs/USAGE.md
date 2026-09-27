@@ -36,6 +36,8 @@ This is optional continuation, not the default workflow.
 
 Once `plan_state: frozen`, create GitHub Issues/tasks from implementation-ready leaves.
 
+Then populate `.planning/CHAT-ASSIGNMENTS.yaml` with the chat-to-Issue mapping.
+
 Each execution task should contain:
 - S&T node ID;
 - responsibility/outcome;
@@ -44,7 +46,11 @@ Each execution task should contain:
 - relevant decisions/constraints;
 - acceptance evidence.
 
-An executor chat can then work from the Issue plus referenced planning context.
+An executor chat can then start with only a number, for example:
+
+> I am chat 2.
+
+It reads `CHAT-ASSIGNMENTS.yaml`, pulls its assigned GitHub Issues, checks prerequisite chats, and works from those Issues plus referenced planning context.
 
 ## If implementation exposes a planning defect
 
