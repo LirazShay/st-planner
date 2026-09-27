@@ -1,110 +1,180 @@
-# S&T of the S&T Planner
+# S&T of the S&T Framework
 
-This document dogfoods the method: the planner itself is designed using S&T logic.
+This document dogfoods the method: the framework itself is designed using S&T logic.
 
 ## Root — 0
 
 **Strategy**  
-A user can start a meaningful project with GPT and obtain a logically justified, persistent, executable plan that another fresh GPT session can continue.
+Any capable GPT/chat can take a meaningful goal from intent to a verified outcome using the same logical planning method, while preserving enough durable state for another fresh session to continue correctly.
 
 **Tactic**  
-Provide a small repository-based planning framework that teaches GPT S&T logic, stores project planning state, reviews the plan, and releases only approved work into execution.
+Provide a portable S&T lifecycle framework that connects a chat to durable project state, plans and critiques work, releases only safe executable horizons, captures execution evidence, and feeds observed reality back into replanning.
 
 **Parallel assumptions**
-- GPT already has enough general reasoning capability; the main gap is a durable method and state model.
-- Plain text in Git is sufficient for V1.
-- A small protocol is more likely to be followed consistently than a large application.
-- Planning quality can be improved by explicitly testing necessity, sufficiency, assumptions, and executability.
+- General-purpose GPT models already have enough reasoning and tool-use capability; the main gap is a stable operating method and durable state.
+- The planning method must survive chat/model boundaries.
+- Planning without execution feedback is incomplete because reality can falsify assumptions.
+- A portable file-based kernel can provide the framework before a dedicated plugin exists.
+- Git/GitHub is a practical V1 host, but the logical framework must not depend on GitHub-specific semantics.
+
+**Root success evidence**
+- A fresh GPT can connect to a project with one short bootstrap instruction and recover the correct lifecycle state.
+- A new goal is converted into reviewed S&T logic rather than an arbitrary checklist.
+- Only approved executable leaves are released to execution.
+- Execution is verified against Strategy success evidence, not merely task completion.
+- Failed/partial evidence can reopen the smallest affected planning branch.
+- Another chat can continue planning or execution without needing the previous transcript.
+- The framework can be used without a custom application, database, or hidden chain-of-thought.
+
+---
+
+# Level 1 — Necessary conditions
+
+## 0.1 — Any GPT/chat can connect consistently
+
+**Strategy**  
+A fresh capable AI session can enter the framework without needing to know its internal design in advance.
+
+**Tactic**  
+Define a small connection contract and embed a portable framework kernel in each project.
+
+**Necessary assumption**  
+A correct methodology is useless across chats if each new session has to rediscover how to load and resume it.
 
 **Success evidence**
-- A new project can copy the template and begin planning immediately.
-- A fresh GPT session can recover the project's goal, status, and next action from repository files.
-- A reviewed S&T branch can be converted into executable tasks.
-- The framework does not require a service, database, or custom UI.
+- A fresh session using the documented connection instruction identifies the goal, current focus, blocker, next action, implementation scope, and relevant prior evidence.
 
-## Level 1
+---
 
-The root tactic requires four conditions.
-
-### 0.1 — GPT has a precise planning method
+## 0.2 — The goal is converted into defensible S&T logic
 
 **Strategy**  
-GPT knows how to transform a goal into a valid S&T plan.
+The project has a logical path from desired outcome to executable leaves.
 
 **Tactic**  
-Provide an explicit S&T methodology and deterministic planning protocol.
+Apply the S&T method: Strategy/Tactic pairs, Parallel/Necessary/Sufficiency assumptions, explicit uncertainty, success evidence, and contextual stopping rules.
 
 **Necessary assumption**  
-Without a defined method, planning behavior varies by session and can collapse into arbitrary checklists.
+Without a common planning logic, GPT can produce plausible but arbitrary plans whose steps are neither proven necessary nor sufficient.
 
-**Evidence**
-- A fresh GPT can explain Strategy/Tactic, necessity, sufficiency, and stopping rules from repository docs.
+**Success evidence**
+- Active branches survive Strategy/Tactic, necessity, sufficiency, epistemic, and KISS review.
 
-### 0.2 — Planning state survives chat boundaries
+---
+
+## 0.3 — Framework state survives session boundaries
 
 **Strategy**  
-The plan can be resumed without depending on previous chat history.
+The framework can resume accurately after chat/model replacement.
 
 **Tactic**  
-Store the minimal planning state in a project-local `.planning/` directory.
+Persist the minimal authoritative state in project-local files with one owner for each type of information.
 
 **Necessary assumption**  
-A method alone is insufficient when the next session cannot reconstruct prior decisions and progress.
+The framework cannot control a multi-session project if conclusions and progress exist only inside the previous transcript.
 
-**Evidence**
-- STATUS + GOAL + active TREE state identify the correct next planning action.
+**Success evidence**
+- A fresh session resumes from repository state without requesting the previous conversation.
 
-### 0.3 — Bad plans are challenged before execution
+---
+
+## 0.4 — Only decision-quality work reaches execution
 
 **Strategy**  
-Logical gaps and unnecessary complexity are detected before implementation.
+Execution begins from an explicit, reviewed, bounded horizon.
 
 **Tactic**  
-Run explicit review gates for necessity, sufficiency, assumptions, KISS, and executability.
+Run adversarial quality gates and place only approved executable leaves into `implementation_scope`.
 
 **Necessary assumption**  
-Authoring alone tends to confirm its own plan; an adversarial review pass is needed to expose defects.
+Planning has little value if unreviewed or ambiguous nodes can still flow directly into action.
 
-**Evidence**
-- The quality-gate document can produce a clear pass or changes-required outcome for a branch.
+**Success evidence**
+- Everything outside `implementation_scope` remains blocked.
+- Each released leaf has objective success evidence and no material unresolved decision.
 
-### 0.4 — The framework is easy to adopt
+---
+
+## 0.5 — Execution produces verified reality, not just completed activity
 
 **Strategy**  
-A user can use S&T Planner in another repository without building infrastructure.
+The framework knows whether execution actually achieved the intended Strategy.
 
 **Tactic**  
-Provide a copyable template, a starter instruction, and a minimal read order.
+Execute through any suitable tool/human/agent, verify against node `success_evidence`, and record the observed outcome in `EXECUTION.md`.
 
 **Necessary assumption**  
-A powerful method that requires installation or bespoke integration would not satisfy the V1 KISS objective.
+"Work was performed" is not equivalent to "the intended outcome exists."
 
-**Evidence**
-- Adoption requires only copying files/instructions into the target repository and giving GPT the project goal.
+**Success evidence**
+- Each completed execution can be classified verified / failed / partial with concrete observed evidence.
+- External task trackers may be used without becoming the source of S&T truth.
 
-## Sufficiency assumption for 0
+---
+
+## 0.6 — Reality can correct the plan
+
+**Strategy**  
+New facts discovered during execution improve the plan instead of being ignored.
+
+**Tactic**  
+Feed execution outcomes back into the smallest affected S&T branch, reopen decisions/reviews when needed, and release a corrected next horizon.
+
+**Necessary assumption**  
+Even a logically sound plan rests on assumptions that real execution can falsify.
+
+**Success evidence**
+- A failed/partial execution can identify affected nodes and cause bounded replanning without restarting the entire project.
+
+---
+
+# Sufficiency assumption for 0
 
 If:
-1. GPT has a precise S&T planning method,
-2. planning state is durable,
-3. plans are reviewed before execution, and
-4. another project can adopt the framework with minimal setup,
 
-then the V1 root tactic is sufficient to let GPT plan and resume work in other repositories.
+1. any GPT/chat can connect consistently;
+2. goals are transformed into reviewed S&T logic;
+3. authoritative state survives sessions;
+4. only reviewed executable horizons are released;
+5. execution is verified against intended outcomes; and
+6. observed reality can update the plan,
 
-No application, service, database, or plugin API is necessary to prove the concept.
+then the framework is sufficient to guide a project continuously from intent to verified outcome while remaining resumable across GPT chats.
 
-## V1 boundary
+---
 
-The following are intentionally outside the first usable version:
+# Architecture boundary
 
-- custom GPT/plugin packaging;
-- web UI;
-- database;
-- automated graph editor;
+The **framework** is the stable logical contract.
+
+The **adapter** is how a particular GPT/product connects to it.
+
+V1 adapter:
+- project-local portable files;
+- short bootstrap prompt;
+- Git/GitHub as durable storage when available.
+
+Possible future adapters:
+- ChatGPT plugin/connector;
+- CLI;
+- GitHub App/Action;
+- IDE integration;
+- other AI agent integrations.
+
+Adapters may automate transport and validation. They must not become the source of planning truth.
+
+---
+
+# Deferred complexity
+
+Do not add these until real use proves the need:
+
+- custom UI;
+- database service;
+- rich graph support for multiple parents;
+- rich scheduling semantics;
+- automatic orchestration across multiple agents;
 - automatic GitHub Issue generation;
-- rich handling of multiple parents;
-- rich modeling of supporting steps;
-- rich scheduling/time-dependency semantics.
+- plugin-specific state.
 
-These may be considered only after real projects expose a concrete need.
+The framework must work correctly before convenience automation is layered on top.
