@@ -100,7 +100,28 @@ Check:
 
 Local approval means planning logic is sound locally. It does not authorize implementation.
 
-## 10. Finish the entire plan before execution
+## 10. Whole-plan completeness audit
+
+Local Necessity/Sufficiency checks can still miss a whole concern if that concern never entered the tree.
+
+Before Final Planning Review, perform one **outside-in coverage audit** from `GOAL.md`.
+
+Do not create a separate coverage file. Use these challenge questions:
+
+1. **Goal traceability** — For every meaningful clause in the desired outcome and every hard constraint, where is it protected by the TREE, a material assumption, a decision, or success evidence?
+2. **Root gap test** — Assume every planned leaf succeeds exactly as written. Can the desired outcome still fail for a reason the plan should have handled?
+3. **Boundary challenge** — Look only at actors, system boundaries, external dependencies, and failure paths that materially affect this goal. Did the plan silently assume one of them away?
+4. **Negative-space check** — Did the tree accidentally include work that belongs to a stated non-goal?
+5. **Scenario walkthrough** — Walk a small number of representative end-to-end scenarios implied by the goal. Include a failure/edge scenario only when it could materially invalidate the plan.
+
+If the audit finds a gap:
+- add/correct the smallest affected S&T branch;
+- create a D-entry if the gap is an unresolved material question;
+- re-run affected Necessity/Sufficiency reviews.
+
+If it finds no gap, record the pass in the normal Final Planning Review. Do not persist a duplicate coverage matrix.
+
+## 11. Finish the entire plan before execution
 
 Do not hand partially planned leaves to implementation.
 
@@ -118,7 +139,7 @@ Before that:
 plan_state: active
 ```
 
-## 11. Keep state simple
+## 12. Keep state simple
 
 - `GOAL.md` — stable boundary.
 - `TREE.yaml` — S&T plan.
@@ -128,7 +149,7 @@ plan_state: active
 
 Prefer one planning conversation. Repository state exists so continuation is possible when needed.
 
-## 12. Execution handoff
+## 13. Execution handoff
 
 After freeze, convert implementation-ready leaves into ordinary GitHub Issues/tasks.
 
