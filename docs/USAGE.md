@@ -15,7 +15,7 @@ Do not replace an existing `AGENTS.md`; merge the S&T rules into it.
 
 Give GPT the project repository and this instruction:
 
-> Use the S&T Planner protocol in this repository. Read AGENTS.md and .planning/README.md first. Do not implement yet. Start by establishing the goal, current reality, constraints, non-goals, success evidence, and material unknowns. Persist the planning state in .planning/.
+> Use the S&T Planner protocol in this repository. Read AGENTS.md and .planning/README.md first. Do not implement yet. Start by establishing the stable goal boundary: desired outcome, established current reality, constraints, and non-goals. Put material unresolved questions in DECISIONS.md and success evidence on S&T nodes in TREE.yaml. Persist the planning state in .planning/.
 
 Then describe the project normally.
 
