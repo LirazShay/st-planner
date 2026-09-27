@@ -2,17 +2,22 @@
 
 S&T Planner does not need its own execution engine.
 
-After Final Planning Review passes and the plan is frozen, convert implementation-ready S&T leaves into ordinary GitHub Issues/tasks.
+After Final Planning Review passes and the plan is frozen, compile implementation-ready S&T leaves into ordinary GitHub Issues/tasks using `docs/ISSUE-COMPILATION.md`.
 
-## Each task should contain
+## Compilation rule
 
-- S&T node ID(s)
-- responsibility / desired outcome
-- scope
-- relevant constraints and decisions
-- dependencies / prerequisites
-- acceptance or success evidence
-- explicit out-of-scope notes when useful
+Default:
+
+```
+one implementation-ready leaf
+→ one GitHub Issue
+```
+
+Group leaves only when they are one coherent executor responsibility with compatible prerequisites and jointly verifiable evidence.
+
+If one leaf needs to be split into materially different Issues, reopen planning: the leaf was not implementation-ready.
+
+Use `templates/EXECUTION-ISSUE.md` as the canonical Issue-body shape.
 
 ## Executor chat
 
