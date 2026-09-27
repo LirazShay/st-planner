@@ -68,6 +68,7 @@ No server, database, plugin runtime, state machine, or execution engine is requi
 
 The external bootstrap copies these from `templates/project/.planning/` into the target repository:
 
+- `README.md` — target-installed planning read order and ownership map
 - `FRAMEWORK.md` — portable S&T rules
 - `GOAL.md` — stable goal boundary
 - `TREE.yaml` — S&T plan
@@ -77,6 +78,7 @@ The external bootstrap copies these from `templates/project/.planning/` into the
 - `EXECUTION.yaml` — after freeze, maps numbered executor chats directly to S&T leaves and tracks execution state
 - `EXECUTOR_HANDOFF.md` — portable fresh-executor read order, context routing, dependency behavior, and mandatory handoff-verification contract
 - `validate-allocation.mjs` — zero-dependency mechanical validator for TREE/EXECUTION allocation invariants
+- `verify-freeze-baseline.mjs` — verifies that the baseline being frozen is the baseline that passed Final Planning Review
 
 The bootstrap also merges `templates/project/AGENTS.snippet.md` into the target project's `AGENTS.md`.
 
@@ -89,16 +91,18 @@ For the exact external installation behavior, `BOOTSTRAP.md` is authoritative.
 The entire intended tree must be implementation-ready and pass Final Planning Review.
 
 Only then:
-1. freeze the plan while keeping `.planning/STATUS.yaml -> implementation_authorized: false`;
-2. collect every implementation-ready leaf;
-3. group those leaf node IDs into numbered chats in `.planning/EXECUTION.yaml`;
-4. initialize each assigned node as `pending`;
-5. run `node .planning/validate-allocation.mjs --initial` and fix any failure;
-6. if numbered chats are explicitly serial, also validate with `--serial-chats`;
-7. simulate the required repository-only fresh executor cases from `.planning/EXECUTOR_HANDOFF.md`;
-8. record the verification in `.planning/REVIEWS.md`;
-9. fix/rerun any failed case;
-10. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after both gates pass.
+1. record the reviewed baseline evidence in `.planning/REVIEWS.md`;
+2. verify no material planning drift with `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` (or equivalent reproducible evidence when a stable ref is unavailable);
+3. if material drift exists, keep planning active and review the changed baseline again;
+4. freeze the verified baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`;
+5. if merge/rebase/integration later creates a different frozen ref, verify it again with `--frozen-ref <ref>`;
+6. collect every implementation-ready leaf;
+7. group those leaf node IDs into numbered chats in `.planning/EXECUTION.yaml`;
+8. initialize each assigned node as `pending`;
+9. run `node .planning/validate-allocation.mjs --initial` and fix any failure;
+10. if numbered chats are explicitly serial, also validate with `--serial-chats`;
+11. simulate the required repository-only fresh executor cases from `.planning/EXECUTOR_HANDOFF.md`, record the verification in `.planning/REVIEWS.md`, and fix/rerun any failed case;
+12. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after all gates pass.
 
 Then a new executor chat can say, for example, **"I am chat 1"** and immediately discover the S&T nodes it owns without the user re-explaining the project.
 
@@ -106,7 +110,6 @@ If execution later discovers a real planning defect, revoke implementation autho
 
 ## Main documentation
 
-- `PILOT_RECOMMENDATIONS.md` — actionable backlog from the first full MarketScope pilot; start here before the next framework-improvement pass
 - `docs/SNT-GOLDRATT-GUIDE.html` — מדריך HTML חזותי בעברית למאמר המקורי ולמיפוי שלו ל-S&T Planner
 - `docs/SNT-METHODOLOGY.md` — expanded S&T method
 - `docs/AI-PLANNING-PROTOCOL.md` — how GPT plans

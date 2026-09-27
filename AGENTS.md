@@ -6,7 +6,7 @@ This repository builds a reusable S&T planning framework for GPT.
 
 If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after that gate passes.
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, record the reviewed baseline and verify no material drift before freeze, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after all gates pass.
 
 Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
 
@@ -79,7 +79,7 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
+Then record the reviewed baseline in `.planning/REVIEWS.md`, verify no material drift with `.planning/verify-freeze-baseline.mjs` (or equivalent reproducible evidence), freeze only that verified baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 ## Execution handoff
 

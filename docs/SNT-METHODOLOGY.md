@@ -559,6 +559,7 @@ The recommended target-project state is:
 ```
 .planning/
 ├── README.md
+├── FRAMEWORK.md
 ├── GOAL.md
 ├── TREE.yaml
 ├── STATUS.yaml
@@ -566,11 +567,14 @@ The recommended target-project state is:
 ├── REVIEWS.md
 ├── EXECUTION.yaml
 ├── EXECUTOR_HANDOFF.md
-└── validate-allocation.mjs
+├── validate-allocation.mjs
+└── verify-freeze-baseline.mjs
 ```
 
 Purpose:
 
+- `README.md`: installed planning read order and ownership map.
+- `FRAMEWORK.md`: portable S&T planning/execution contract.
 - `GOAL.md`: stable problem/outcome boundary.
 - `TREE.yaml`: the actual S&T work model — rationale, decomposition, dependencies, and success evidence.
 - `.planning/STATUS.yaml`: S&T Planner-owned minimal planning resume point, active/frozen planning state, and separate implementation-authorization gate. A target repository's own status/phase remains target-owned.
@@ -579,6 +583,7 @@ Purpose:
 - `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
 - `EXECUTOR_HANDOFF.md`: stable repository-only fresh-executor bootstrap, context-routing rules, and mandatory handoff-verification contract; it never duplicates task content.
 - `validate-allocation.mjs`: zero-dependency helper that mechanically validates the frozen TREE → EXECUTION projection before authorization; it stores no state.
+- `verify-freeze-baseline.mjs`: zero-dependency helper that proves the baseline being frozen matches the baseline that passed Final Planning Review; it stores no state.
 
 This is intentionally small.
 
@@ -787,7 +792,8 @@ The plan is good enough when:
 - important alternatives are decided or intentionally left open;
 - all intended execution leaves are implementation-ready;
 - the complete intended tree has passed Final Planning Review;
+- the baseline being frozen is proven not to have materially drifted from the baseline that passed that review;
 - repository-only fresh-executor simulations have proven that authorization, assignment, dependencies, context routing, and blockers are recoverable without planning-chat memory;
 - additional decomposition would not materially improve execution.
 
-That is the point at which the plan can be frozen and execution allocation can be generated. Freeze still does not authorize implementation; authorization is a separate post-handoff gate.
+That is the point at which the reviewed baseline can pass the freeze no-drift gate, be frozen, and then generate execution allocation. Freeze still does not authorize implementation; authorization is a separate post-handoff gate.

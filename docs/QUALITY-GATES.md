@@ -103,7 +103,9 @@ Before freezing:
 - confirm all material decisions that affect implementation are resolved;
 - run one final KISS pass.
 
-Only a pass here allows `.planning/STATUS.yaml -> plan_state: frozen`. Freeze does not authorize implementation; `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
+After this review passes, record the reviewed baseline in `REVIEWS.md` and prove no material drift before freeze. In Git workflows prefer `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>`; any material drift makes the review stale and requires review of the changed baseline.
+
+Only the verified reviewed baseline may become `.planning/STATUS.yaml -> plan_state: frozen`. Freeze does not authorize implementation; `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
 
 ## Fresh planning-chat continuity check
 
