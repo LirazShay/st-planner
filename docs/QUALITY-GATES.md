@@ -128,3 +128,27 @@ Before calling a planning horizon ready, ask:
 8. Is there a simpler plan with the same logical coverage?
 
 If an answer exposes a material defect, fix the plan and re-run the affected gates.
+
+
+## Gate 11 — Execution verification
+
+After released work is executed, pass when:
+
+- an E-entry records the relevant S&T node ID;
+- observed evidence is compared with the node's `success_evidence`;
+- result is classified verified / failed / partial;
+- new facts or falsified assumptions are recorded;
+- any required replanning is reflected in TREE/DECISIONS/STATUS;
+- verified work is not confused with planning approval.
+
+## Gate 12 — Root outcome completion
+
+The overall project may be declared complete only when:
+
+- the root Strategy's success evidence is observed;
+- relevant execution outcomes are verified;
+- no material open D-entry invalidates the root claim;
+- a final sufficiency/KISS review finds no missing necessary condition;
+- durable framework state matches observed reality.
+
+Closed tasks alone are not completion evidence.
