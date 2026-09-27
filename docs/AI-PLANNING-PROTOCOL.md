@@ -101,11 +101,15 @@ If Final Planning Review passes:
 
 ## 9. Handoff to execution
 
-Create GitHub Issues/tasks from executable leaves.
+Compile GitHub Issues/tasks from implementation-ready leaves using `docs/ISSUE-COMPILATION.md`.
 
-Every task keeps its S&T node ID and enough context for execution.
+Default to one leaf → one Issue.
 
-When creating Issues, copy each leaf's `depends_on` prerequisites into the Issue relationship/description using the corresponding generated Issue IDs.
+Group leaves only when they form one coherent executor responsibility and preserve traceability. If one leaf needs material splitting, reopen planning instead of silently decomposing during Issue creation.
+
+Every Issue keeps its exact S&T node ID(s), Strategy-derived outcome, Tactic-derived planned approach, required context, prerequisites, and success evidence.
+
+Create Issues in two passes so `depends_on` S&T node IDs can be translated into the generated Issue numbers without inventing a persistent mapping database.
 
 Then group the Issues into coherent numbered executor-chat assignments in `.planning/CHAT-ASSIGNMENTS.yaml`.
 
