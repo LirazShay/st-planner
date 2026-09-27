@@ -6,7 +6,7 @@ The goal is simple: **before an AI executes a meaningful project, it should be a
 
 ## Status
 
-**v0.1 bootstrap — usable planning protocol under construction.**
+**v0.1 — usable.** The portable project template has passed the fresh-session acceptance checks: it is self-contained, starts with implementation blocked, and tells a new AI session the next planning action from repository state.
 
 This repository is the framework. A real project keeps its own planning state in a small `.planning/` directory.
 
@@ -28,9 +28,13 @@ When going up a level, ask: **Why do we need to achieve this strategy?**
 
 ## Quick start
 
-For a new project, copy `templates/project/.planning/` into the target repository and tell the AI:
+For a new project:
 
-> Read this project's AGENTS.md and .planning/README.md. Use the S&T Planner protocol. Do not implement until planning gates allow implementation.
+1. Copy `templates/project/.planning/` into the target repository.
+2. Merge `templates/project/AGENTS.snippet.md` into the target repository's `AGENTS.md`.
+3. Start GPT with `templates/START-PROMPT.md`.
+
+The copied `.planning/FRAMEWORK.md` is a self-contained S&T kernel, so ordinary planning does not depend on this repository or on previous chat history.
 
 Then provide the goal in normal language.
 
@@ -51,8 +55,10 @@ The AI should:
 - `docs/AI-PLANNING-PROTOCOL.md` — deterministic workflow for AI planning
 - `docs/QUALITY-GATES.md` — review gates and completion criteria
 - `docs/PLANNER-SNT.md` — S&T tree for this planner itself
-- `templates/project/.planning/` — files copied into a target project
-- `examples/` — worked examples
+- `templates/project/.planning/` — self-contained planning state and portable S&T kernel copied into a target project
+- `templates/START-PROMPT.md` — first-message bootstrap for GPT
+- `docs/USAGE.md` — exact adoption and resume instructions
+- `examples/` — guidance for future worked examples
 
 ## Modes
 
