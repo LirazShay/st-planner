@@ -18,7 +18,7 @@ nodes:
       - "If supported input is interpreted consistently, invalid data is blocked before persistence, accepted data is persisted coherently, and the outcome is reported clearly, no additional import-specific capability is required for the stated goal"
       - "Existing authentication, service availability, and customer-domain rules are already-satisfied conditions rather than new import work"
 
-    evidence:
+    success_evidence:
       - "Valid supported files create expected records; invalid files create none; the caller receives a deterministic result"
 
     children:
@@ -41,7 +41,7 @@ nodes:
     sufficiency_assumptions:
       - "An unambiguous contract plus a parser that applies it is sufficient to turn supported CSV text into structured candidate rows"
 
-    evidence:
+    success_evidence:
       - "The same supported file produces the same structured candidate rows and the same structural errors"
 
     children:
@@ -61,7 +61,7 @@ nodes:
 
     sufficiency_assumptions: []
 
-    evidence:
+    success_evidence:
       - "A reviewer can classify example files as supported or unsupported using the written contract alone"
 
     children: []
@@ -79,13 +79,13 @@ nodes:
 
     sufficiency_assumptions: []
 
-    evidence:
+    success_evidence:
       - "Parser tests prove supported files become expected candidate rows and malformed files return structural errors"
 
     children: []
 
   "0.2":
-    status: blocked
+    status: approved
     strategy: "Invalid or unsafe candidate data cannot reach customer persistence"
     tactic: "Apply an explicit admissibility policy to every candidate and enforce a persistence gate that accepts only candidates that pass it"
 
@@ -99,7 +99,7 @@ nodes:
     sufficiency_assumptions:
       - "If admissibility is explicitly defined, every candidate is checked against it, and persistence accepts only passing candidates, invalid or unsafe candidate data cannot reach customer persistence"
 
-    evidence:
+    success_evidence:
       - "Invalid candidate data produces no customer write"
       - "A bypass test cannot persist a candidate that has not passed the admissibility gate"
 
@@ -122,7 +122,7 @@ nodes:
 
     sufficiency_assumptions: []
 
-    evidence:
+    success_evidence:
       - "A reviewer can classify representative candidate rows as admissible or inadmissible from the policy alone"
 
     children: []
@@ -140,7 +140,7 @@ nodes:
 
     sufficiency_assumptions: []
 
-    evidence:
+    success_evidence:
       - "Tests show every candidate has a deterministic pass/fail result and validation errors where applicable"
 
     children: []
@@ -158,7 +158,7 @@ nodes:
 
     sufficiency_assumptions: []
 
-    evidence:
+    success_evidence:
       - "Persistence-boundary tests prove rejected or unevaluated candidates cannot create customer records"
 
     children: []
@@ -172,7 +172,7 @@ nodes:
     necessary_assumptions:
       - "Interpreting and validating data is insufficient unless accepted records are actually committed with a defined failure policy"
     sufficiency_assumptions: []
-    evidence:
+    success_evidence:
       - "Persistence tests demonstrate the selected batch/failure semantics"
     children: []
 
@@ -185,11 +185,7 @@ nodes:
     necessary_assumptions:
       - "A user cannot rely on an import whose accepted, rejected, or failed outcome is opaque"
     sufficiency_assumptions: []
-    evidence:
+    success_evidence:
       - "The response identifies the overall result and row-level outcome required by the agreed contract"
     children: []
 
-notes:
-  special_cases:
-    - "Maximum file size remains an unknown and may affect the contract branch"
-    - "Duplicate-customer semantics are deferred to branch 0.3 or 0.2 depending on the selected domain rule"
