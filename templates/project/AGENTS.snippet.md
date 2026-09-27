@@ -13,4 +13,6 @@ For meaningful work:
 7. Run a Final Planning Review before freezing.
 8. Do not implement target-project work while `plan_state: active`.
 9. After `plan_state: frozen`, create ordinary GitHub Issues/tasks from executable leaves.
-10. Prefer one planning chat; use repository state for durability and optional continuation.
+10. Populate `.planning/CHAT-ASSIGNMENTS.yaml` to assign those Issues to numbered executor chats.
+11. If the user says "I am chat N" / "אני צ'אט מספר N", look up N, check dependencies, pull only its assigned Issues, and execute only that scope.
+12. Prefer one planning chat; use repository state for durability and optional continuation.
