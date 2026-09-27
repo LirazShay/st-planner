@@ -2,13 +2,13 @@
 
 A reusable planning framework for GPT and other AI agents, based on Strategy & Tactics (S&T) logic from the Theory of Constraints.
 
-The goal is simple: **before an AI executes a meaningful project, it should be able to explain and validate the path from the desired outcome to executable work.**
+The goal is broader: **any capable GPT/chat should be able to connect to the same framework, plan with S&T logic, execute only reviewed work, verify outcomes against evidence, learn from reality, and hand off cleanly to another fresh session.**
 
 ## Status
 
 **v0.1 — usable.** The portable project template has passed the fresh-session acceptance checks: it is self-contained, starts with implementation blocked, and tells a new AI session the next planning action from repository state.
 
-This repository is the framework. A real project keeps its own planning state in a small `.planning/` directory.
+This repository is the framework source. A real project carries a small portable kernel and durable lifecycle state in `.planning/`. The chat/model is replaceable; the framework state is not.
 
 ## Core idea
 
@@ -40,13 +40,15 @@ Then provide the goal in normal language.
 
 The AI should:
 
-1. establish the goal, current reality, constraints and non-goals;
-2. construct the S&T tree;
-3. challenge necessity and sufficiency;
-4. simplify the plan;
-5. stop decomposition only at executable leaves;
-6. persist the state in `.planning/`;
-7. compile approved leaves into implementation work.
+1. connect to the framework state;
+2. establish the stable goal boundary;
+3. construct and critique the S&T tree;
+4. release only approved executable leaves;
+5. execute within the released scope;
+6. verify outcomes against node success evidence;
+7. record execution evidence and new facts;
+8. replan the smallest affected branch when reality invalidates assumptions;
+9. persist enough state for the next fresh chat to continue.
 
 ## Repository structure
 
@@ -54,7 +56,10 @@ The AI should:
 - `docs/SNT-METHODOLOGY.md` — expanded S&T methodology
 - `docs/AI-PLANNING-PROTOCOL.md` — deterministic workflow for AI planning
 - `docs/QUALITY-GATES.md` — review gates and completion criteria
-- `docs/PLANNER-SNT.md` — S&T tree for this planner itself
+- `docs/FRAMEWORK-LIFECYCLE.md` — full connect → plan → execute → verify → replan loop
+- `docs/CONNECTION-MODEL.md` — how any GPT/chat attaches to the framework
+- `docs/EXECUTION-PROTOCOL.md` — execution, verification, and feedback rules
+- `docs/PLANNER-SNT.md` — S&T tree for the framework itself
 - `templates/project/.planning/` — self-contained planning state and portable S&T kernel copied into a target project
 - `templates/START-PROMPT.md` — first-message bootstrap for GPT
 - `docs/USAGE.md` — exact adoption and resume instructions
