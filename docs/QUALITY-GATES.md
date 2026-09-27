@@ -7,10 +7,10 @@ Use these gates as a review checklist. A node or branch does not need ceremony; 
 Pass when:
 
 - desired outcome is understandable without chat history;
-- success evidence is observable;
+- established current reality is separated from assumptions;
 - constraints that materially change the plan are explicit;
 - non-goals prevent obvious scope drift;
-- blocking unknowns are visible.
+- material unresolved questions are represented as open D-entries rather than buried in GOAL or reviews.
 
 ## Gate 2 — Step validity
 
@@ -52,7 +52,9 @@ Pass when:
 
 - material facts are distinguishable from assumptions;
 - unknowns are not silently guessed;
-- selected alternatives are recorded as decisions;
+- selected alternatives are recorded as resolved D-entries;
+- material unresolved questions have open D-entries;
+- reviews reference those D-entries instead of creating a second source of truth;
 - confidence is not overstated.
 
 ## Gate 6 — KISS
