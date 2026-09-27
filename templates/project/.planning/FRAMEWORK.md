@@ -55,6 +55,23 @@ Stop when an executor would not need another material design/product decision.
 
 Do not decompose into trivial coding/clicking instructions.
 
+## 7. Node planning status
+
+Use exactly three local planning statuses:
+
+- `draft` — the node is still being designed/reviewed and may change.
+- `blocked` — planning for this node cannot proceed because a material unresolved question exists.
+- `approved` — this node's own Strategy/Tactic logic and immediate decomposition have passed local review.
+
+KISS rules:
+
+- Do not add more node statuses in V1.
+- `blocked` is not a synonym for "unfinished"; ordinary unfinished work stays `draft`.
+- Every `blocked` node must have at least one open entry in `DECISIONS.md` that references that node.
+- Do not add a separate `blocked_by` field to TREE; the D-entry is the source of the reason.
+- Status is local. A blocked descendant does not automatically change its parent from approved to blocked.
+- Local approval never authorizes implementation before the whole plan is frozen.
+
 ## 7. Review as you build
 
 Check:
