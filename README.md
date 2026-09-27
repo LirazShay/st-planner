@@ -51,8 +51,9 @@ The entire intended tree must be implementation-ready and pass Final Planning Re
 
 Only then:
 1. freeze the plan;
-2. create execution tasks/Issues from executable leaves;
-3. group those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`;
+2. compile execution Issues from implementation-ready leaves (one leaf → one Issue by default);
+3. validate the Issue projection against the frozen plan;
+4. group those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`;
 4. keep the S&T node ID on every task for traceability.
 
 Then a new executor chat can say, for example, **"I am chat 1"** and discover its assigned GitHub work without the user re-explaining the project.
@@ -66,6 +67,7 @@ If execution later discovers a real planning defect, return that defect to plann
 - `docs/QUALITY-GATES.md` — how GPT critiques the plan
 - `docs/FRAMEWORK-LIFECYCLE.md` — simple planning lifecycle
 - `docs/EXECUTION-HANDOFF.md` — minimal post-planning handoff
+- `docs/ISSUE-COMPILATION.md` — deterministic frozen-plan → GitHub Issue rules
 - `docs/CHAT-EXECUTION.md` — numbered executor-chat lookup from GitHub
 - `docs/PLANNER-SNT.md` — S&T of this framework itself
 - `docs/USAGE.md` — how to use it in another project
