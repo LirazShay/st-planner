@@ -13,4 +13,6 @@ next_action: "Complete GOAL.md and validate the planning boundary"
 
 implementation_allowed: false
 
+implementation_scope: []
+
 last_review: null
