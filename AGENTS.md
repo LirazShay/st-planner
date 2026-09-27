@@ -1,6 +1,6 @@
 # AGENTS.md — S&T Planner Operating Contract
 
-This repository defines a reusable planning protocol. When an AI agent works here, or uses this framework for another project, these rules are mandatory unless the user explicitly overrides them.
+This repository defines a reusable S&T lifecycle framework. When an AI agent works here, or uses this framework for another project, these rules govern planning, execution, verification, replanning, and handoff unless the user explicitly overrides them.
 
 ## 1. Planning before implementation
 
@@ -104,7 +104,7 @@ The target repository's `.planning/` directory is the durable planning state. Ke
 - `DECISIONS.md`
 - `REVIEWS.md`
 
-After meaningful planning work, update the durable state before ending the work session.
+After meaningful planning or execution work, update the durable state before ending the work session. Execution outcomes belong in `EXECUTION.md`.
 
 ## 9. Status discipline
 
@@ -147,30 +147,31 @@ For now:
 
 Do not add machinery for these cases until real use demonstrates that it is needed.
 
-## 12. Compiling into work
+## 12. Releasing and executing work
 
 Do not treat GitHub Issues as the source of truth while the logic is still changing.
 
 After the relevant plan is approved:
-1. select executable leaves;
-2. group only when grouping preserves traceability;
-3. create implementation tasks/issues;
-4. retain each task's S&T node ID;
-5. include completion evidence;
-6. update planning state when execution reveals a false assumption.
+1. place only approved executable leaves into `implementation_scope`;
+2. retain each task/action's S&T node ID;
+3. execute without silently broadening scope;
+4. verify the Strategy against its `success_evidence`;
+5. record the result in `EXECUTION.md` as verified / failed / partial;
+6. feed new facts or falsified assumptions back into the smallest affected planning branch.
 
-Issues are compiled execution output; the S&T model remains the rationale.
+Issues, PRs, tools, and humans are execution adapters; the S&T model remains the rationale.
 
 ## 13. Change control
 
 A frozen plan is not immutable.
 
 When reality contradicts an assumption:
-- record the new fact;
+- record the observed execution evidence and new fact;
 - identify affected nodes;
+- remove unsafe affected work from the released scope;
 - reopen only the necessary portion of the tree;
 - re-run necessity/sufficiency review upward until the impact is contained;
-- preserve the decision history.
+- preserve decision, review, and execution history.
 
 ## 14. Definition of a planning-complete project
 
