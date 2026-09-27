@@ -56,4 +56,5 @@ For meaningful work:
 18. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `.planning/STATUS.yaml -> plan_state: active` and `.planning/STATUS.yaml -> implementation_authorized: false`, and stop starting new execution work.
 19. Reopen only the smallest affected S&T area; preserve `done` work only when it remains valid under the corrected plan.
 20. After focused review, record the corrected reviewed baseline, pass freeze no-drift verification again, repair only affected EXECUTION entries, and freeze that verified baseline; then run allocation validation in `--resume` mode and rerun the mandatory fresh-chat verification before re-authorization. Git history is sufficient version history.
-21. Prefer one planning chat; use repository state for durability and optional continuation.
+21. For a meaningful unexpected failure, capture technical root cause, reasoning/process cause, escape cause, local fix + regression proof, and the smallest reusable prevention. Skip this ceremony for normal TDD red states, trivial typos, and expected validation failures.
+22. Prefer one planning chat; use repository state for durability and optional continuation.

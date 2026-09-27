@@ -361,7 +361,24 @@ A chat that says "I am chat N" / "אני צ'אט מספר N" reads `EXECUTOR_HAN
 Do not build an execution engine, scheduler, or duplicated task database.
 
 
-## 14. Replanning after execution discovers a defect
+## 14. Learn from meaningful unexpected failures
+
+Do not create ceremony for normal red-green TDD, trivial typos, expected validation failures, or one-off operator mistakes.
+
+When a **meaningful unexpected failure** exposes a reusable process or reasoning weakness, close the loop before treating the work as complete:
+
+1. identify the technical root cause;
+2. identify the reasoning/process cause that allowed it;
+3. identify the escape cause — why existing review/test/guardrails did not catch it earlier;
+4. apply the local fix;
+5. add regression proof appropriate to the failure;
+6. add the **smallest reusable prevention** that would stop the same class of failure recurring.
+
+Record this in the target project's existing incident/retrospective/review owner when one exists. If there is no project-native owner and the failure is relevant to S&T planning/execution quality, record it briefly in `.planning/REVIEWS.md`.
+
+Do not turn a single failure into broad framework machinery unless the reusable prevention is clearly justified.
+
+## 15. Replanning after execution discovers a defect
 
 A frozen plan may still meet reality and prove wrong.
 
