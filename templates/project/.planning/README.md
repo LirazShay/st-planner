@@ -43,6 +43,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - EXECUTION — after freeze only: numbered chat allocation + execution state/result for leaf node IDs.
 - EXECUTOR_HANDOFF — stable fresh-executor bootstrap/read-order and handoff verification contract; never task content.
 - validate-allocation.mjs — portable mechanical validator for TREE/EXECUTION allocation invariants; framework tooling, not project state.
+- verify-freeze-baseline.mjs — portable freeze no-drift verifier for the reviewed material baseline; framework tooling, not project state.
 
 ## Important
 
