@@ -63,12 +63,27 @@ Correct defects immediately.
 
 Branch approval means the branch logic is sound; it does **not** permit implementation before the overall plan is frozen.
 
-## 6. Final whole-plan review
+## 6. Outside-in completeness audit
 
-When the intended tree appears complete, review it as one system.
+Before the final review, challenge the tree from the goal boundary rather than from its existing branches.
+
+For every meaningful desired-outcome clause and hard constraint, identify where the plan protects it through a node, assumption, decision, or success evidence.
+
+Then ask:
+
+> Assume every planned leaf succeeds exactly as written. Can the project still miss the desired outcome for a reason this plan should have handled?
+
+Also inspect only materially relevant actors, boundaries, dependencies, and failure paths, and walk a small number of representative end-to-end scenarios.
+
+Do not create a separate coverage artifact. Persist only defects/corrections in the existing TREE, DECISIONS, and REVIEWS files.
+
+## 7. Final whole-plan review
+
+When the intended tree appears complete and the completeness audit finds no unresolved gap, review it as one system.
 
 Planning is complete only if:
 - intended scope is fully represented;
+- every desired-outcome clause and hard constraint is accounted for;
 - every required branch is sufficiently decomposed;
 - material decisions are resolved;
 - leaves are implementation-ready;
@@ -78,13 +93,13 @@ Planning is complete only if:
 
 Record the result in `REVIEWS.md`.
 
-## 7. Freeze
+## 8. Freeze
 
 If Final Planning Review passes:
 - set `STATUS.yaml -> plan_state: frozen`;
 - stop changing the baseline except for a documented later planning correction.
 
-## 8. Handoff to execution
+## 9. Handoff to execution
 
 Create GitHub Issues/tasks from executable leaves.
 
