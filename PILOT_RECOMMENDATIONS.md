@@ -1,6 +1,7 @@
 # S&T Planner — MarketScope Pilot Recommendations
 
-Status: backlog / implementation recommendations  
+Status: active backlog / implementation recommendations  
+Implemented: P0-1, P0-2, P0-3  
 Source pilot: `LirazShay/market-scope`  
 Pilot date: 2026-09-27
 
@@ -348,7 +349,7 @@ Review these together rather than patching one file in isolation:
 - `templates/project/.planning/README.md`
 - `templates/project/.planning/STATUS.yaml`
 - `templates/project/.planning/EXECUTION.yaml`
-- optional new executor-handoff template
+- `templates/project/.planning/EXECUTOR_HANDOFF.md`
 - `docs/AI-PLANNING-PROTOCOL.md`
 - `docs/QUALITY-GATES.md`
 - `docs/EXECUTION-HANDOFF.md`
