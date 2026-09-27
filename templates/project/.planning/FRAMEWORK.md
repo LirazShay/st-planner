@@ -38,6 +38,19 @@ Do not narrate every tool call, repeat the same status, or turn updates into a s
 
 If the user requested one stage per message, progress updates stay within that stage and do not advance to a new stage by themselves.
 
+## 0.2 Helper scripts over complex CI heredocs
+
+When repository validation logic becomes non-trivial, keep the logic in a small versioned helper script and let CI/workflow files call that script.
+
+Prefer:
+- normal source files with focused tests;
+- short CI steps such as `node scripts/check-x.mjs`;
+- reusable logic that can run locally and in CI.
+
+Avoid embedding large parsers, multi-line programs, or complex data transformations directly inside GitHub Actions YAML, shell heredocs, or workflow strings. Inline workflow logic is appropriate only while it remains genuinely trivial.
+
+This is a repository-engineering guideline, not a requirement to add scripts where plain commands are already clear.
+
 ## 1. Strategy + Tactic
 
 Every node contains:
