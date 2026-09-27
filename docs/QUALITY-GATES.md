@@ -219,7 +219,9 @@ When a frozen plan is reopened, first set `.planning/STATUS.yaml -> implementati
 - invalidated completed nodes were reset to `pending` or removed if obsolete;
 - obsolete execution leaf IDs were removed;
 - new implementation-ready leaves appear exactly once in EXECUTION;
-- unaffected valid work was not unnecessarily reset.
+- unaffected valid work was not unnecessarily reset;
+- the corrected baseline has a new focused-review baseline evidence record;
+- Gate 10A no-drift verification passes for that corrected baseline before re-freeze.
 
 Re-freeze alone does not restore execution permission. First rerun Gate 11 mechanical validation with `--resume`, then Gate 12 must pass again and be recorded before `.planning/STATUS.yaml -> implementation_authorized: true` is restored.
 
