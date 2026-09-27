@@ -12,7 +12,7 @@ Provide a small portable S&T planning framework stored with the project, with ex
 - GPT already has general reasoning ability; it mainly needs a stable planning method.
 - S&T necessity/sufficiency logic improves plan structure.
 - Git files are enough for durable planning state.
-- Execution can use the frozen S&T leaves directly; only minimal allocation/state plus an explicit authorization gate is needed.
+- Execution can use the frozen S&T leaves directly; only minimal allocation/state, a small mechanical validator, and an explicit authorization gate are needed.
 
 **Success evidence**
 - A GPT can start from a goal and build a complete reviewed S&T tree.
@@ -41,7 +41,7 @@ Provide a small portable S&T planning framework stored with the project, with ex
 
 ### 0.5 — The final plan can be executed without duplicating the work model
 
-**Tactic:** assign frozen implementation-ready leaf IDs directly to numbered executor chats in one minimal execution file, provide a portable EXECUTOR_HANDOFF bootstrap, keep execution unauthorized while representative fresh-chat simulations run, and authorize only after the repository-only gate passes.
+**Tactic:** assign frozen implementation-ready leaf IDs directly to numbered executor chats in one minimal execution file, mechanically validate that projection, provide a portable EXECUTOR_HANDOFF bootstrap, keep execution unauthorized while representative fresh-chat simulations run, and authorize only after both gates pass.
 
 ## Sufficiency
 

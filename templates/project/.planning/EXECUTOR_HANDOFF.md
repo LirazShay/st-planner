@@ -90,7 +90,15 @@ After correction, re-freeze alone is not enough: the required fresh-chat handoff
 
 ## Mandatory fresh-chat verification before authorization
 
-After allocation and before setting `implementation_authorized: true`, the planner must simulate a brand-new executor using **repository state only**, without relying on planning-chat memory.
+After allocation, first require a clean mechanical allocation validation:
+
+```text
+node .planning/validate-allocation.mjs --initial
+```
+
+Use `--resume` instead when re-authorizing after execution/replanning, and add `--serial-chats` only when numbered chats are explicitly serial.
+
+Only after allocation validation passes may the planner simulate a brand-new executor using **repository state only**, without relying on planning-chat memory.
 
 Verify these representative situations:
 
@@ -112,4 +120,4 @@ For every simulation, the fresh executor must be able to determine:
 
 Record the post-allocation verification result in `.planning/REVIEWS.md`.
 
-Any failed simulation keeps `implementation_authorized: false`. Fix the handoff/allocation/routing defect and repeat the failed verification before authorization.
+Any allocation-validator failure or failed simulation keeps `implementation_authorized: false`. Fix the smallest allocation/handoff/routing defect and repeat the failed gate before authorization.

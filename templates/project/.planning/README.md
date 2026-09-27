@@ -42,6 +42,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - STATUS — small planning resume pointer, active/frozen planning state, and explicit implementation-authorization gate.
 - EXECUTION — after freeze only: numbered chat allocation + execution state/result for leaf node IDs.
 - EXECUTOR_HANDOFF — stable fresh-executor bootstrap/read-order and handoff verification contract; never task content.
+- validate-allocation.mjs — portable mechanical validator for TREE/EXECUTION allocation invariants; framework tooling, not project state.
 
 ## Important
 
@@ -52,6 +53,9 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - `plan_state: frozen` does **not** authorize implementation.
 - Keep `implementation_authorized: false` while post-freeze allocation/handoff checks are still being completed.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
-- Execution may begin only after the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF passes, is recorded in REVIEWS, and `implementation_authorized: true` is set explicitly.
+- Before first authorization run `node .planning/validate-allocation.mjs --initial`. Any failure blocks authorization.
+- Use `--serial-chats` only when the target explicitly treats numbered chats as a serial execution order.
+- After replanning with preserved execution state, validate with `--resume`.
+- Execution may begin only after allocation validation passes, the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF passes and is recorded in REVIEWS, and `implementation_authorized: true` is set explicitly.
 - Do not duplicate Strategy/Tactic/task descriptions in EXECUTION.
 - Execution dependencies remain in TREE -> depends_on.

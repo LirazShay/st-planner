@@ -113,12 +113,13 @@ After the plan is frozen:
 3. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
 4. initialize each node as `pending`;
 5. leave Strategy/Tactic/success evidence in TREE rather than copying them into EXECUTION or EXECUTOR_HANDOFF;
-6. follow `.planning/EXECUTOR_HANDOFF.md` and simulate the mandatory representative fresh executors from repository state only;
-7. record the handoff verification in `REVIEWS.md`;
-8. fix and rerun any failed simulation;
-9. explicitly set `implementation_authorized: true`.
+6. run `node .planning/validate-allocation.mjs --initial` and fix every failure; add `--serial-chats` only for explicitly serial numbered chats;
+7. follow `.planning/EXECUTOR_HANDOFF.md` and simulate the mandatory representative fresh executors from repository state only;
+8. record the handoff verification in `REVIEWS.md`;
+9. fix and rerun any failed simulation;
+10. explicitly set `implementation_authorized: true`.
 
-No executor may start before step 9.
+No executor may start before step 10.
 
 ### Chat allocation
 
@@ -173,7 +174,8 @@ If execution exposes a material defect in the frozen plan:
 8. reset invalidated completed nodes to `pending` or remove obsolete nodes;
 9. update only affected EXECUTION allocation;
 10. re-freeze after the corrected plan passes the required focused review, still unauthorized;
-11. rerun and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, then explicitly re-authorize implementation before execution resumes.
+11. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable) and fix every failure;
+12. rerun and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, then explicitly re-authorize implementation before execution resumes.
 
 Do not restart planning from the root unless the defect actually changes the root framing.
 

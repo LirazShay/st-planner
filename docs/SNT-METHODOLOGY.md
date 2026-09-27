@@ -565,7 +565,8 @@ The recommended target-project state is:
 ├── DECISIONS.md
 ├── REVIEWS.md
 ├── EXECUTION.yaml
-└── EXECUTOR_HANDOFF.md
+├── EXECUTOR_HANDOFF.md
+└── validate-allocation.mjs
 ```
 
 Purpose:
@@ -577,6 +578,7 @@ Purpose:
 - `REVIEWS.md`: planning/replanning audit evidence.
 - `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
 - `EXECUTOR_HANDOFF.md`: stable repository-only fresh-executor bootstrap, context-routing rules, and mandatory handoff-verification contract; it never duplicates task content.
+- `validate-allocation.mjs`: zero-dependency helper that mechanically validates the frozen TREE → EXECUTION projection before authorization; it stores no state.
 
 This is intentionally small.
 
@@ -597,6 +599,7 @@ The normal V1 flow is:
 ```
 frozen TREE.yaml + implementation_authorized: false
 → allocate leaf node IDs in EXECUTION.yaml
+→ mechanically validate allocation
 → simulate mandatory fresh executors via EXECUTOR_HANDOFF.md
 → record handoff verification in REVIEWS.md
 → fix/recheck any failed case
@@ -659,6 +662,8 @@ Creating a second task object for every S&T leaf would duplicate:
 - status linkage.
 
 Direct execution from S&T node IDs keeps planning and implementation connected and reduces synchronization errors.
+
+Before first authorization, `node .planning/validate-allocation.mjs --initial` mechanically proves the allocation shape. Use `--resume` after execution/replanning so valid completed work may remain completed. `--serial-chats` is optional and applies only when a target explicitly treats chat numbers as execution order; ordinary parallel-capable allocation must not infer serial order from numbering alone.
 
 Execution can still falsify assumptions. When that happens, mark the affected execution node blocked, set `implementation_authorized: false`, and return the defect to planning rather than improvising.
 

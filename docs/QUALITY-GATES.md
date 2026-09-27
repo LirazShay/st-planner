@@ -135,6 +135,22 @@ Execution allocation is a thin projection of the frozen tree, not a second plann
 
 Passing allocation is necessary but does not itself authorize execution.
 
+### Mechanical proof for Gate 11
+
+Before first authorization run:
+
+```text
+node .planning/validate-allocation.mjs --initial
+```
+
+The validator must pass. It checks exact leaf coverage, rejects non-leaf/non-approved assignments, validates execution states and dependency targets, and requires initial nodes to remain `pending` with `result: null`.
+
+If numbered chats are explicitly serial, add `--serial-chats`; that mode additionally requires contiguous chat IDs and dependency placement in an earlier chat or earlier in the same chat. Do not enable it for ordinary parallel-capable allocation.
+
+For re-authorization after execution/replanning, run `--resume` instead so valid completed nodes can remain completed while state/result consistency is still checked.
+
+Any validator failure keeps `implementation_authorized: false`.
+
 ## Gate 12 — Mandatory fresh-chat executor handoff
 
 Before implementation authorization, follow `.planning/EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only.
@@ -176,6 +192,6 @@ When a frozen plan is reopened, first set `implementation_authorized: false`, th
 - new implementation-ready leaves appear exactly once in EXECUTION;
 - unaffected valid work was not unnecessarily reset.
 
-Re-freeze alone does not restore execution permission. Gate 12 must pass again and be recorded before `implementation_authorized: true` is restored.
+Re-freeze alone does not restore execution permission. First rerun Gate 11 mechanical validation with `--resume`, then Gate 12 must pass again and be recorded before `implementation_authorized: true` is restored.
 
 Do not require a new global plan version. Git history and REVIEWS provide the audit trail.

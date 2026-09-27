@@ -77,7 +77,7 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan while keeping `implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `implementation_authorized: true`.
+Then freeze the plan while keeping `implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `implementation_authorized: true`.
 
 ## Execution handoff
 
@@ -89,7 +89,9 @@ After freeze:
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
 - keep execution prerequisites only in `TREE.yaml -> depends_on`;
 - use execution states only in EXECUTION: `pending / in_progress / done / blocked`;
-- after allocation is complete, run the four representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`;
+- after allocation is complete, run `node .planning/validate-allocation.mjs --initial`; any failure keeps implementation unauthorized;
+- if the target explicitly uses serial numbered chats, add `--serial-chats`;
+- after mechanical allocation validation passes, run the four representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`;
 - record the result in `.planning/REVIEWS.md`;
 - fix and rerun any failed simulation before authorization.
 
@@ -117,6 +119,7 @@ If execution exposes a material planning defect:
 - reopen only the smallest affected S&T area;
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
 - after focused re-review, repair only affected EXECUTION assignments/states and set `plan_state: frozen` again;
+- run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode is used);
 - rerun and record the mandatory fresh-chat verification;
 - do not resume execution until that gate passes and `implementation_authorized: true` is explicitly restored.
 

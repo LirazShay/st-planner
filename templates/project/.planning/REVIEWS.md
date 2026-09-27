@@ -32,11 +32,15 @@ It is **not** the source of truth for open questions or current state. If a revi
 
 ## Post-allocation fresh-chat handoff review
 
-Before `implementation_authorized: true`, record a dedicated review that simulates repository-only fresh executors according to `EXECUTOR_HANDOFF.md`.
+Before `implementation_authorized: true`, first require a passing allocation validator, then record a dedicated review that simulates repository-only fresh executors according to `EXECUTOR_HANDOFF.md`.
 
 ### R-XXX — YYYY-MM-DD — Fresh-chat executor handoff
 
 **Result:** pass | changes-required
+
+**Allocation validation:**
+- command/mode: `node .planning/validate-allocation.mjs --initial` | `--resume` | optional `--serial-chats`
+- result: pass | changes-required
 
 **Representative scenarios checked:**
 - first available executor

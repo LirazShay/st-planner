@@ -41,7 +41,9 @@ Goal
 → repeated critique
 → final whole-plan review
 → frozen implementation-ready plan
-→ execution allocation + handoff checks
+→ execution allocation
+→ mechanical allocation validation
+→ fresh-chat handoff verification
 → explicit implementation authorization
 → numbered execution chats directly from S&T node IDs
 ```
@@ -56,6 +58,7 @@ Default:
 - move to another planning chat only if needed;
 - after the plan is final, freeze it with implementation still unauthorized;
 - allocate implementation-ready leaves directly to numbered execution chats in `.planning/EXECUTION.yaml`;
+- mechanically validate allocation with `.planning/validate-allocation.mjs`;
 - run and record the mandatory repository-only fresh-chat handoff verification, then explicitly authorize implementation;
 - execution chats work directly from their assigned S&T node IDs.
 
@@ -73,6 +76,7 @@ The external bootstrap copies these from `templates/project/.planning/` into the
 - `STATUS.yaml` — small resume pointer plus separate planning-freeze and implementation-authorization state
 - `EXECUTION.yaml` — after freeze, maps numbered executor chats directly to S&T leaves and tracks execution state
 - `EXECUTOR_HANDOFF.md` — portable fresh-executor read order, context routing, dependency behavior, and mandatory handoff-verification contract
+- `validate-allocation.mjs` — zero-dependency mechanical validator for TREE/EXECUTION allocation invariants
 
 The bootstrap also merges `templates/project/AGENTS.snippet.md` into the target project's `AGENTS.md`.
 
@@ -87,10 +91,12 @@ Only then:
 2. collect every implementation-ready leaf;
 3. group those leaf node IDs into numbered chats in `.planning/EXECUTION.yaml`;
 4. initialize each assigned node as `pending`;
-5. simulate the required repository-only fresh executor cases from `.planning/EXECUTOR_HANDOFF.md`;
-6. record the verification in `.planning/REVIEWS.md`;
-7. fix/rerun any failed case;
-8. explicitly set `implementation_authorized: true` only after the gate passes.
+5. run `node .planning/validate-allocation.mjs --initial` and fix any failure;
+6. if numbered chats are explicitly serial, also validate with `--serial-chats`;
+7. simulate the required repository-only fresh executor cases from `.planning/EXECUTOR_HANDOFF.md`;
+8. record the verification in `.planning/REVIEWS.md`;
+9. fix/rerun any failed case;
+10. explicitly set `implementation_authorized: true` only after both gates pass.
 
 Then a new executor chat can say, for example, **"I am chat 1"** and immediately discover the S&T nodes it owns without the user re-explaining the project.
 
