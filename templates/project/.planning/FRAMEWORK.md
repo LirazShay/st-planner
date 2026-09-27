@@ -102,6 +102,8 @@ Do not decompose into implementation trivia merely to make the tree larger.
 
 ## 9. Review as a critic
 
+During planning, review branches repeatedly, but do not treat a locally executable branch as permission to implement it.
+
 After authoring a coherent branch, switch roles and try to break it.
 
 Check:
@@ -190,35 +192,54 @@ For an approved node, `success_evidence` must be concrete enough to recognize ac
 
 Do not duplicate approved-node lists in STATUS.
 
-## 13. Implementation gate
+## 13. Planning completion gate
 
-`implementation_scope` is the single source of truth for execution permission:
+Planning and implementation are separate programs.
 
-- `implementation_scope: []` → no implementation is permitted.
-- A non-empty list → implementation is permitted **only** for those node IDs.
-- Everything outside that list remains blocked.
+During `stage: planning`:
 
-Only approved, executable leaves may enter `implementation_scope`.
+- do not implement target-project work;
+- do not release individual leaves for implementation;
+- continue building and reviewing the complete intended S&T plan;
+- resolve all material decisions that would otherwise be pushed onto executors.
 
-Do not add a second permission boolean; it creates contradictory states without adding information.
+Planning may stay in one chat from beginning to end. Persisting state exists for safety, auditability, and optional continuation if a new chat is ever needed; it does not require planned chat splitting.
 
-GitHub Issues or other task trackers are execution output. They are not the source of the S&T rationale.
+Execution becomes possible only after a **Final Planning Review** passes for the whole intended plan.
 
+Then:
 
-## 14. Execute, verify, learn
+1. freeze a planning baseline;
+2. compile the frozen S&T into `EXECUTION-PLAN.yaml`;
+3. set `STATUS.yaml -> stage: execution`;
+4. start separate executor chats from explicit work packages.
 
-The framework continues after planning.
+## 14. Executor role
 
-For every released leaf:
+Executor chats consume the frozen plan. They do not continue unfinished S&T design.
 
-1. execute only within that node's scope;
-2. retain the S&T node ID in the execution/task reference;
-3. verify the result against `TREE.yaml -> success_evidence`;
-4. write an E-entry in `EXECUTION.md` as `verified`, `failed`, or `partial`;
-5. record any new fact or falsified assumption;
-6. if plan impact is `review-required`, reopen the smallest affected S&T branch;
-7. remove verified/completed work from the current implementation scope and release the next safe horizon when appropriate.
+Each executor receives a bounded work package with:
 
-Do not mark a Strategy achieved merely because its Tactic was attempted.
+- responsibility/outcome;
+- source S&T node IDs;
+- allowed scope;
+- inputs and dependencies;
+- already-decided implementation constraints;
+- verification evidence;
+- explicit out-of-scope boundaries;
+- required handoff result.
 
-External Issues/PRs/tools may track operational task state. EXECUTION.md exists only to persist the evidence and learning that matter to the framework.
+If execution exposes a material planning defect, the executor stops and returns a planning exception. A planner role may then reopen the smallest affected portion of the frozen plan.
+
+The default is:
+
+```
+one continuous planning conversation
+→ complete S&T
+→ full review
+→ freeze
+→ execution work packages
+→ separate executor conversations
+```
+
+Planner-to-planner continuation is optional fallback, not a required workflow.
