@@ -1,55 +1,78 @@
 # Execution Handoff
 
-S&T Planner does not need its own execution engine.
+S&T Planner does not need GitHub Issues or a separate task system to execute a frozen plan.
 
-After Final Planning Review passes and the plan is frozen, compile implementation-ready S&T leaves into ordinary GitHub Issues/tasks using `docs/ISSUE-COMPILATION.md`.
+The S&T leaves are already the planned work units.
 
-## Compilation rule
+After Final Planning Review passes:
 
-Default:
+1. freeze the plan;
+2. collect every implementation-ready leaf;
+3. group the leaf node IDs into numbered executor chats;
+4. write the allocation to `.planning/EXECUTION.yaml`;
+5. initialize every assigned node as `pending`.
 
+## Why direct node execution
+
+The S&T tree already contains:
+
+- responsibility/outcome in Strategy;
+- planned approach in Tactic;
+- relevant assumptions;
+- dependencies in `depends_on`;
+- acceptance evidence in `success_evidence`.
+
+Creating another task object would duplicate that information.
+
+## Execution file
+
+`EXECUTION.yaml` contains only execution allocation/state:
+
+```yaml
+chats:
+  "1":
+    nodes:
+      "1.2.1":
+        state: pending
+        result: null
+      "1.2.2":
+        state: pending
+        result: null
 ```
-one implementation-ready leaf
-→ one GitHub Issue
-```
 
-Group leaves only when they are one coherent executor responsibility with compatible prerequisites and jointly verifiable evidence.
+It does not copy Strategy/Tactic details.
 
-If one leaf needs to be split into materially different Issues, reopen planning: the leaf was not implementation-ready.
+## Allocation rule
 
-Use `templates/EXECUTION-ISSUE.md` as the canonical Issue-body shape.
+Every implementation-ready leaf appears exactly once.
 
-## Executor chat
+Group nodes into chats by:
 
-An executor receives one Issue/task or a small compatible group.
+1. coherent implementation context/responsibility;
+2. real execution dependencies;
+3. reasonable amount of work for one chat.
 
-It implements what was already planned.
+There is no fixed node count per chat.
 
-If it encounters a **material planning gap** rather than an implementation detail, it stops the affected work and returns the problem to planning.
+Do not mix unrelated areas only to make chat sizes numerically equal.
 
-## Why this is enough
+If one leaf is itself too large for a practical executor chat, reopen planning and decompose it further.
 
-GitHub already provides:
-- task status;
-- ownership;
-- dependencies/links;
-- discussion;
-- PRs;
-- history.
+## Execution states
 
-The S&T framework should not duplicate those features.
+Use only:
 
+- `pending`
+- `in_progress`
+- `done`
+- `blocked`
 
-## Numbered executor chats
+A chat-level status is unnecessary; derive it from its nodes.
 
-After Issues are created, optionally group them in:
+## Completion
 
-`.planning/CHAT-ASSIGNMENTS.yaml`
+A node becomes `done` only when its S&T `success_evidence` has been verified.
 
-This supports the generic workflow:
+The `result` field stores only a short result/evidence reference, not a new execution history system.
 
-> I am chat 1.
-
-The executor then reads the assignment for chat 1, checks dependencies, pulls the listed GitHub Issues, reads their referenced S&T context, and performs only that work.
-
-The assignment map is intentionally thin. It does not duplicate Issue descriptions or create another execution tracker.
+Git remains the normal implementation/history mechanism for code changes.
