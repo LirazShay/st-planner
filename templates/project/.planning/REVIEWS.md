@@ -19,6 +19,7 @@ It is **not** the source of truth for open questions or current state. If a revi
 - KISS
 - executability
 - tree-state consistency
+- durable contract vs live status hygiene
 - planning fresh-session continuity
 
 **Findings:**
@@ -29,6 +30,12 @@ It is **not** the source of truth for open questions or current state. If a revi
 
 **Opened/referenced decisions:**
 - None / D-XXX
+
+**Durable contract hygiene (Final Planning Review when applicable):**
+- durable specs/README checked: None / paths
+- live progress duplicated in durable contracts: None / findings
+- moved/removed stale live-status text: None / paths
+- target status/review owner used instead: None / path
 
 ## Final Planning Review freeze-baseline evidence
 

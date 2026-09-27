@@ -165,6 +165,26 @@ If it finds no gap, record the pass in the normal Final Planning Review. Do not 
 
 Do not hand partially planned leaves to implementation.
 
+### Durable contract vs live status hygiene
+
+As part of Final Planning Review, inspect only the durable target-project contracts that materially govern this plan (for example product/data/technical/test specs and any README used as a durable entry point).
+
+Durable contracts should describe what must remain true, not today's planning/extraction/readiness progress.
+
+Move or remove live snapshots such as:
+- current planning stage/readiness result;
+- extraction/migration progress;
+- temporary investigation progress;
+- "as of now" completion snapshots.
+
+Live progress belongs in the target repository's designated status/review owner (or S&T Planner's own REVIEWS/STATUS when it is S&T state), not duplicated inside durable specs.
+
+A README should be phase-neutral unless the target repository explicitly defines it as live status.
+
+Do not erase durable history, decision rationale, version compatibility notes, or intentionally time-scoped contractual facts merely because they contain dates. The problem is duplicated **current progress**, not historical context.
+
+Do not recursively scan unrelated documentation. Check the contracts actually used by the plan.
+
 When the whole intended tree is ready, run Final Planning Review across the complete plan.
 
 Only after it passes **and the reviewed baseline passes freeze no-drift verification**:
