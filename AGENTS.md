@@ -69,33 +69,32 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan, compile GitHub Issues/tasks from implementation-ready leaves using the repository's Issue-compilation rules, and map those Issues to numbered executor chats in `.planning/CHAT-ASSIGNMENTS.yaml`.
+Then freeze the plan and allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`.
 
 ## Execution handoff
 
-Issue compilation rules:
-- default one implementation-ready leaf → one Issue;
-- group only coherent leaves with compatible prerequisites and jointly verifiable evidence;
-- if a leaf must be materially split, reopen planning;
-- preserve S&T node IDs;
-- derive outcome from Strategy and planned approach from Tactic;
-- copy only relevant constraints/decisions;
-- translate `depends_on` into Issue prerequisites;
-- include objective success/acceptance evidence.
+After freeze:
 
-Executor chats implement the task; they do not redesign the plan.
+- create/populate `.planning/EXECUTION.yaml`;
+- assign every implementation-ready leaf to exactly one numbered chat;
+- do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
+- keep execution prerequisites only in `TREE.yaml -> depends_on`;
+- use execution states only in EXECUTION: `pending / in_progress / done / blocked`.
 
-If the user identifies an executor as "chat N" (for example "אני צ'אט מספר 2"), the agent must:
+When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
+
 - confirm the plan is frozen;
-- read `CHAT-ASSIGNMENTS.yaml`;
-- find assignment N;
-- pull only N's assigned Issues and referenced S&T context;
-- inspect prerequisite/dependency information on those assigned Issues;
-- execute only that scope.
+- read `EXECUTION.yaml`;
+- find chat N;
+- read only its assigned S&T nodes plus necessary decisions/context;
+- for each node, check `TREE.yaml -> depends_on` and confirm prerequisite nodes are `done` in EXECUTION;
+- execute only assigned unblocked nodes;
+- set a node `in_progress` before working on it;
+- set it `done` only after its `success_evidence` is verified;
+- record a short result/reference;
+- set `blocked` with a short reason if a real planning/execution blocker prevents progress.
 
-If N is missing or an assigned Issue has an incomplete prerequisite, do not invent or steal work.
-
-If execution exposes a material planning defect, return it to planning rather than silently improvising.
+If execution exposes a material planning defect, do not improvise. Mark the affected node blocked and return the defect to planning.
 
 ## KISS
 
