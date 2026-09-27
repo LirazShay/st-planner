@@ -375,7 +375,7 @@ Rules:
 - omit the field content when no prerequisite exists;
 - do not encode priority, dates, estimates, or scheduling policy.
 
-At execution handoff, these node dependencies are copied to the generated GitHub Issues. Numbered chat blocking is then derived from Issue dependencies rather than modeled separately.
+At execution handoff, these node dependencies remain in TREE. Numbered executor chats read them directly and check prerequisite node execution state in EXECUTION.yaml.
 
 ---
 
@@ -470,13 +470,13 @@ Documents grow but decisions do not improve.
 Fix:
 KISS review. Delete planning artifacts that provide no control, rationale, handoff, or validation value.
 
-## 16.8 Premature issues
+## 16.8 Premature execution allocation
 
 Failure:
-Opening dozens of GitHub Issues while the intended S&T plan is still incomplete.
+Allocating implementation work to executor chats while the intended S&T plan is still incomplete.
 
 Fix:
-Complete and freeze the whole intended plan first; compile implementation-ready leaves afterward.
+Complete and freeze the whole intended plan first; allocate implementation-ready leaves afterward.
 
 ---
 
@@ -582,20 +582,19 @@ Do not create one file per node unless project scale proves it necessary.
 
 # 20. Planning versus execution
 
-The S&T model is the rationale.
+The frozen S&T leaves are already the execution work definition.
 
-Execution tools are projections of that rationale:
-- GitHub Issues;
-- milestones;
-- pull requests;
-- checklists;
-- project boards.
+V1 deliberately avoids compiling them into a second task model.
 
-The projection may change without losing the reason the work exists.
+After freeze:
+- EXECUTION.yaml assigns leaf node IDs to numbered chats;
+- TREE remains the source for Strategy, Tactic, assumptions, dependencies, and success evidence;
+- EXECUTION stores only execution state/result;
+- Git/commits/PRs may still be used as normal implementation history, but they are not the framework's task source.
 
-Every generated task should retain its S&T node ID so execution can be traced back to the strategy.
+This preserves one chain of identity from planning to execution.
 
-Execution can also falsify assumptions. When that happens, update the plan rather than forcing reality to match the old plan.
+Execution can falsify assumptions. When that happens, mark the affected execution node blocked and return the defect to planning rather than forcing reality to match the frozen plan.
 
 ---
 
