@@ -2,6 +2,8 @@ version: 1
 
 # Generated only after the complete S&T plan is frozen.
 # A populated allocation does NOT authorize execution by itself.
+# Before authorization, the mandatory repository-only fresh-chat verification in
+# EXECUTOR_HANDOFF.md must pass and be recorded in REVIEWS.md.
 # Executors may start only when STATUS.yaml has:
 #   plan_state: frozen
 #   implementation_authorized: true
@@ -50,6 +52,6 @@ chats: {}
 #         result: null
 #
 # A chat says "I am chat 1" / "אני צ'אט מספר 1".
-# It reads only its assigned nodes plus their required context.
+# It follows EXECUTOR_HANDOFF.md, then reads only its assigned nodes plus required context.
 # Before executing a node, it checks TREE.yaml -> depends_on and confirms every
 # prerequisite node is state: done somewhere in this file.

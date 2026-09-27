@@ -25,11 +25,13 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 
 ## Executor read order
 
-1. project `AGENTS.md`
-2. `STATUS.yaml` — require both `plan_state: frozen` and `implementation_authorized: true`
-3. `EXECUTION.yaml`
-4. only assigned `TREE.yaml` nodes
-5. referenced decisions/context when needed
+1. project `AGENTS.md` and its routing/source-of-truth rules
+2. `EXECUTOR_HANDOFF.md`
+3. `STATUS.yaml` — require both `plan_state: frozen` and `implementation_authorized: true`
+4. `EXECUTION.yaml`
+5. only assigned `TREE.yaml` nodes
+6. dependency states from EXECUTION
+7. only referenced/materially required decisions and target-project context
 
 ## Ownership
 
@@ -39,6 +41,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - REVIEWS — planning review history.
 - STATUS — small planning resume pointer, active/frozen planning state, and explicit implementation-authorization gate.
 - EXECUTION — after freeze only: numbered chat allocation + execution state/result for leaf node IDs.
+- EXECUTOR_HANDOFF — stable fresh-executor bootstrap/read-order and handoff verification contract; never task content.
 
 ## Important
 
@@ -49,6 +52,6 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - `plan_state: frozen` does **not** authorize implementation.
 - Keep `implementation_authorized: false` while post-freeze allocation/handoff checks are still being completed.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
-- Execution may begin only after the required handoff checks pass and `implementation_authorized: true` is set explicitly.
+- Execution may begin only after the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF passes, is recorded in REVIEWS, and `implementation_authorized: true` is set explicitly.
 - Do not duplicate Strategy/Tactic/task descriptions in EXECUTION.
 - Execution dependencies remain in TREE -> depends_on.

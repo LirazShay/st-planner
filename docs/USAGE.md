@@ -23,8 +23,10 @@ The agent:
 7. builds, reviews, and persists the complete S&T plan;
 8. freezes only after Final Planning Review passes, with implementation still unauthorized;
 9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
-10. completes the required post-freeze handoff checks;
-11. explicitly authorizes implementation.
+10. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
+11. records the verification in `.planning/REVIEWS.md`;
+12. fixes/rechecks any failed handoff case;
+13. explicitly authorizes implementation only after the gate passes.
 
 The user does not manually copy files or explain the S&T workflow.
 
@@ -46,7 +48,7 @@ After planning is frozen, allocation/handoff is complete, and `.planning/STATUS.
 
 > אני צ'אט מספר 1
 
-The executor reads its assigned nodes from `EXECUTION.yaml`, loads those nodes from `TREE.yaml`, checks `depends_on`, and executes only available assigned work.
+The executor first follows `.planning/EXECUTOR_HANDOFF.md`, then reads its assigned nodes from `EXECUTION.yaml`, loads those nodes from `TREE.yaml`, checks `depends_on`, and loads only the target-project context required for available assigned work.
 
 ## If execution exposes a planning defect
 
@@ -57,8 +59,9 @@ Keep it simple:
 3. reopen only the smallest affected S&T area;
 4. correct/review/freeze it;
 5. repair only affected EXECUTION entries;
-6. repeat required handoff checks and explicitly re-authorize;
-7. preserve valid completed work.
+6. rerun and record the mandatory fresh-chat handoff verification;
+7. explicitly re-authorize only after it passes;
+8. preserve valid completed work.
 
 ## Authoritative external entry point
 

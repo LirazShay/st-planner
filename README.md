@@ -56,7 +56,7 @@ Default:
 - move to another planning chat only if needed;
 - after the plan is final, freeze it with implementation still unauthorized;
 - allocate implementation-ready leaves directly to numbered execution chats in `.planning/EXECUTION.yaml`;
-- complete the required handoff checks and explicitly authorize implementation;
+- run and record the mandatory repository-only fresh-chat handoff verification, then explicitly authorize implementation;
 - execution chats work directly from their assigned S&T node IDs.
 
 No server, database, plugin runtime, state machine, or execution engine is required.
@@ -72,6 +72,7 @@ The external bootstrap copies these from `templates/project/.planning/` into the
 - `REVIEWS.md` — planning reviews
 - `STATUS.yaml` — small resume pointer plus separate planning-freeze and implementation-authorization state
 - `EXECUTION.yaml` — after freeze, maps numbered executor chats directly to S&T leaves and tracks execution state
+- `EXECUTOR_HANDOFF.md` — portable fresh-executor read order, context routing, dependency behavior, and mandatory handoff-verification contract
 
 The bootstrap also merges `templates/project/AGENTS.snippet.md` into the target project's `AGENTS.md`.
 
@@ -86,8 +87,10 @@ Only then:
 2. collect every implementation-ready leaf;
 3. group those leaf node IDs into numbered chats in `.planning/EXECUTION.yaml`;
 4. initialize each assigned node as `pending`;
-5. complete the required post-freeze handoff checks;
-6. explicitly set `implementation_authorized: true`.
+5. simulate the required repository-only fresh executor cases from `.planning/EXECUTOR_HANDOFF.md`;
+6. record the verification in `.planning/REVIEWS.md`;
+7. fix/rerun any failed case;
+8. explicitly set `implementation_authorized: true` only after the gate passes.
 
 Then a new executor chat can say, for example, **"I am chat 1"** and immediately discover the S&T nodes it owns without the user re-explaining the project.
 
