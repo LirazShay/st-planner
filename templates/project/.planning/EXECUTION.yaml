@@ -2,8 +2,6 @@ version: 1
 
 # Generated only after the complete S&T plan is frozen.
 # A populated allocation does NOT authorize execution by itself.
-# The Final Planning Review baseline must first have passed freeze no-drift verification,
-# including any post-review merge/rebase/integration result.
 # Before first authorization:
 #   node .planning/validate-allocation.mjs --initial
 # must pass. Use --resume after execution/replanning. Add --serial-chats only when
