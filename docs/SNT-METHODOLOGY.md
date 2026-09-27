@@ -573,7 +573,7 @@ Purpose:
 
 - `GOAL.md`: stable problem/outcome boundary.
 - `TREE.yaml`: the actual S&T work model — rationale, decomposition, dependencies, and success evidence.
-- `STATUS.yaml`: minimal planning resume point, active/frozen planning state, and separate implementation-authorization gate.
+- `.planning/STATUS.yaml`: S&T Planner-owned minimal planning resume point, active/frozen planning state, and separate implementation-authorization gate. A target repository's own status/phase remains target-owned.
 - `DECISIONS.md`: material unresolved questions and resolved choices.
 - `REVIEWS.md`: planning/replanning audit evidence.
 - `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
@@ -597,13 +597,13 @@ In particular, the S&T Planner workflow does **not** require GitHub Issues.
 The normal V1 flow is:
 
 ```
-frozen TREE.yaml + implementation_authorized: false
+frozen TREE.yaml + .planning/STATUS.yaml -> implementation_authorized: false
 → allocate leaf node IDs in EXECUTION.yaml
 → mechanically validate allocation
 → simulate mandatory fresh executors via EXECUTOR_HANDOFF.md
 → record handoff verification in REVIEWS.md
 → fix/recheck any failed case
-→ explicitly set implementation_authorized: true
+→ explicitly set .planning/STATUS.yaml -> implementation_authorized: true
 → executor chat reads EXECUTOR_HANDOFF.md and its node IDs
 → executor reads the actual Strategy/Tactic directly from TREE.yaml
 → execute
@@ -636,8 +636,8 @@ Do not recreate each leaf as a second task description.
 A numbered executor chat should:
 
 1. read target `AGENTS.md` and `.planning/EXECUTOR_HANDOFF.md`;
-2. confirm the plan is frozen;
-3. confirm `implementation_authorized: true`;
+2. confirm `.planning/STATUS.yaml -> plan_state: frozen`;
+3. confirm `.planning/STATUS.yaml -> implementation_authorized: true`;
 4. read its assigned leaf IDs from `EXECUTION.yaml`;
 5. load those exact nodes from `TREE.yaml`;
 6. check each node's `depends_on` leaves and their EXECUTION states;
@@ -665,7 +665,7 @@ Direct execution from S&T node IDs keeps planning and implementation connected a
 
 Before first authorization, `node .planning/validate-allocation.mjs --initial` mechanically proves the allocation shape. Use `--resume` after execution/replanning so valid completed work may remain completed. `--serial-chats` is optional and applies only when a target explicitly treats chat numbers as execution order; ordinary parallel-capable allocation must not infer serial order from numbering alone.
 
-Execution can still falsify assumptions. When that happens, mark the affected execution node blocked, set `implementation_authorized: false`, and return the defect to planning rather than improvising.
+Execution can still falsify assumptions. When that happens, mark the affected execution node blocked, set `.planning/STATUS.yaml -> implementation_authorized: false`, and return the defect to planning rather than improvising.
 
 ---
 
@@ -756,7 +756,7 @@ The schema may evolve, but additions must justify their cost.
 - A parent with children records why those children are sufficient together.
 - A non-root child records why it is necessary for its parent.
 
-Keep stable current-reality facts in GOAL, material unresolved questions/alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS rather than growing TREE into a general-purpose database.
+Keep stable current-reality facts in GOAL, material unresolved questions/alternatives in DECISIONS, review history in REVIEWS, and resume state in `.planning/STATUS.yaml` rather than growing TREE into a general-purpose database.
 
 ---
 

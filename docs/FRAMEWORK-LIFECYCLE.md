@@ -73,6 +73,8 @@ If defects exist, return to the tree and correct them.
 
 ## 5. Freeze
 
+All lifecycle fields below belong to **`.planning/STATUS.yaml`**, never to an unrelated target-project status file.
+
 After the final review passes:
 
 ```yaml
@@ -87,7 +89,7 @@ plan_state: active
 implementation_authorized: false
 ```
 
-`plan_state` remains the small planning lifecycle state. `implementation_authorized` is a separate execution gate, not another planning phase.
+`.planning/STATUS.yaml -> plan_state` remains the small planning lifecycle state. `.planning/STATUS.yaml -> implementation_authorized` is a separate execution gate, not another planning phase.
 
 ## 6. Allocate execution
 
@@ -117,7 +119,9 @@ plan_state: frozen
 implementation_authorized: true
 ```
 
-Only this combination permits executor chats to start.
+Only this combination in `.planning/STATUS.yaml` permits executor chats to start.
+
+If the target repository has its own operational status/phase, it remains target-owned and changes only under the target repository's own rules.
 
 ## Planning chats
 

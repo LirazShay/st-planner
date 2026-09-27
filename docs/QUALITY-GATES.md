@@ -103,7 +103,7 @@ Before freezing:
 - confirm all material decisions that affect implementation are resolved;
 - run one final KISS pass.
 
-Only a pass here allows `plan_state: frozen`. Freeze does not authorize implementation; `implementation_authorized` remains false through post-freeze handoff.
+Only a pass here allows `.planning/STATUS.yaml -> plan_state: frozen`. Freeze does not authorize implementation; `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
 
 ## Fresh planning-chat continuity check
 
@@ -118,7 +118,7 @@ This is separate from the mandatory **executor** handoff gate below.
 
 ## Gate 11 — Execution allocation
 
-After freeze, with `implementation_authorized: false`, pass only when:
+After freeze, with `.planning/STATUS.yaml -> implementation_authorized: false`, pass only when:
 
 - every implementation-ready frozen leaf appears exactly once in `EXECUTION.yaml`;
 - no non-leaf or non-approved planning node is assigned as executable work;
@@ -149,7 +149,7 @@ If numbered chats are explicitly serial, add `--serial-chats`; that mode additio
 
 For re-authorization after execution/replanning, run `--resume` instead so valid completed nodes can remain completed while state/result consistency is still checked.
 
-Any validator failure keeps `implementation_authorized: false`.
+Any validator failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`.
 
 ## Gate 12 — Mandatory fresh-chat executor handoff
 
@@ -173,13 +173,13 @@ Use actual allocated chats/nodes when possible. If the allocation is too small t
 
 Record the gate result in `REVIEWS.md`.
 
-Any failure keeps `implementation_authorized: false`. Fix the smallest handoff/allocation/context-routing defect and rerun the failed case.
+Any failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`. Fix the smallest handoff/allocation/context-routing defect and rerun the failed case.
 
-Only a pass here allows `STATUS.yaml -> implementation_authorized: true`.
+Only a pass here allows `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 ## Gate 13 — Re-freeze after an execution-discovered defect
 
-When a frozen plan is reopened, first set `implementation_authorized: false`, then re-freeze only when:
+When a frozen plan is reopened, first set `.planning/STATUS.yaml -> implementation_authorized: false`, then re-freeze only when:
 
 - the material defect is represented and corrected in TREE/DECISIONS;
 - affected Necessity/Sufficiency/parallel logic has been re-reviewed;
@@ -192,6 +192,6 @@ When a frozen plan is reopened, first set `implementation_authorized: false`, th
 - new implementation-ready leaves appear exactly once in EXECUTION;
 - unaffected valid work was not unnecessarily reset.
 
-Re-freeze alone does not restore execution permission. First rerun Gate 11 mechanical validation with `--resume`, then Gate 12 must pass again and be recorded before `implementation_authorized: true` is restored.
+Re-freeze alone does not restore execution permission. First rerun Gate 11 mechanical validation with `--resume`, then Gate 12 must pass again and be recorded before `.planning/STATUS.yaml -> implementation_authorized: true` is restored.
 
 Do not require a new global plan version. Git history and REVIEWS provide the audit trail.

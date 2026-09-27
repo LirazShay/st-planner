@@ -1,5 +1,9 @@
 version: 1
 
+# S&T Planner owns this file only.
+# A target repository may have its own root STATUS.yaml/phase/workstream state.
+# Do not treat those as aliases or mutate them unless target-project rules explicitly require integration.
+
 plan_state: active
 
 # Freeze and implementation authorization are deliberately separate.

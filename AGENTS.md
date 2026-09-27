@@ -49,7 +49,9 @@ Stop when leaves are detailed enough that execution does not require another mat
 - `TREE.yaml` — S&T logic and node planning status.
 - `DECISIONS.md` — material unresolved questions and decisions.
 - `REVIEWS.md` — review history.
-- `.planning/STATUS.yaml` — current planning pointer plus plan freeze and implementation-authorization state.
+- `.planning/STATUS.yaml` — S&T Planner-owned planning pointer plus plan freeze and implementation-authorization state.
+
+S&T Planner owns **only** `.planning/STATUS.yaml`. A target repository may have its own root/operational `STATUS.yaml`, phase file, release state, or workstream status; that remains target-owned. Do not read S&T lifecycle meaning from it or mutate it unless the target repository's own contract explicitly requires an integration update.
 
 Do not duplicate the same state in multiple files.
 
@@ -77,7 +79,7 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan while keeping `implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `implementation_authorized: true`.
+Then freeze the plan while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 ## Execution handoff
 
@@ -118,10 +120,10 @@ If execution exposes a material planning defect:
 - stop starting new execution work;
 - reopen only the smallest affected S&T area;
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
-- after focused re-review, repair only affected EXECUTION assignments/states and set `plan_state: frozen` again;
+- after focused re-review, repair only affected EXECUTION assignments/states and set `.planning/STATUS.yaml -> plan_state: frozen` again;
 - run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode is used);
 - rerun and record the mandatory fresh-chat verification;
-- do not resume execution until that gate passes and `implementation_authorized: true` is explicitly restored.
+- do not resume execution until that gate passes and `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
 
 Do not create plan-version machinery; Git history and REVIEWS are enough.
 

@@ -31,6 +31,10 @@ The agent:
 
 The user does not manually copy files or explain the S&T workflow.
 
+## Status ownership
+
+S&T Planner owns only `.planning/STATUS.yaml`. If the target repository also contains a root `STATUS.yaml`, release phase, workstream status, or another operational state file, that remains target-owned. Do not use it as an alias for S&T planning state and do not mutate it unless the target repository's own instructions explicitly require an integration update.
+
 ## Existing installation
 
 If the target repository already contains S&T Planner project state, do not overwrite the live planning state from templates.
@@ -41,7 +45,7 @@ Use the existing installation unless the user explicitly requests an upgrade/rei
 
 One planning chat is preferred.
 
-If continuation in another chat becomes necessary, the repository state is sufficient. The new planner reads the target project's AGENTS and `.planning/` state and continues from STATUS.
+If continuation in another chat becomes necessary, the repository state is sufficient. The new planner reads the target project's AGENTS and `.planning/` state and continues from `.planning/STATUS.yaml`.
 
 ## Execution
 

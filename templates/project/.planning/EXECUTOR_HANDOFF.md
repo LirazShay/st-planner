@@ -8,7 +8,7 @@ It explains **how to resume execution from repository state only**. It does not 
 
 Before reading implementation details, read `.planning/STATUS.yaml`.
 
-Execution is allowed only when both are true:
+Execution is allowed only when both values in **`.planning/STATUS.yaml`** are true:
 
 ```yaml
 plan_state: frozen
@@ -86,7 +86,7 @@ If implementation reveals a material planning gap or contradiction:
 
 Do not redesign the plan inside an executor chat.
 
-After correction, re-freeze alone is not enough: the required fresh-chat handoff verification must pass again before implementation is explicitly re-authorized.
+After correction, re-freeze alone is not enough: the required fresh-chat handoff verification must pass again before `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
 
 ## Mandatory fresh-chat verification before authorization
 
@@ -120,4 +120,4 @@ For every simulation, the fresh executor must be able to determine:
 
 Record the post-allocation verification result in `.planning/REVIEWS.md`.
 
-Any allocation-validator failure or failed simulation keeps `implementation_authorized: false`. Fix the smallest allocation/handoff/routing defect and repeat the failed gate before authorization.
+Any allocation-validator failure or failed simulation keeps `.planning/STATUS.yaml -> implementation_authorized: false`. Fix the smallest allocation/handoff/routing defect and repeat the failed gate before authorization.
