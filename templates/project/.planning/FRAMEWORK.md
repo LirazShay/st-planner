@@ -99,4 +99,15 @@ Prefer one planning conversation. Repository state exists so continuation is pos
 
 After freeze, convert implementation-ready leaves into ordinary GitHub Issues/tasks.
 
-The task should reference the S&T node and contain enough resolved context that execution is implementation, not a second round of planning.
+Then map those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`.
+
+The map is intentionally tiny:
+- Issue numbers;
+- referenced S&T node IDs;
+- prerequisite chat numbers.
+
+The task details remain in GitHub.
+
+A chat that says "I am chat N" / "אני צ'אט מספר N" reads that assignment, checks prerequisites, pulls only its Issues, and executes only that scope.
+
+Do not create a new execution state machine.
