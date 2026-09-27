@@ -21,8 +21,10 @@ The agent:
 5. merges the S&T rules into the target `AGENTS.md` while preserving existing rules;
 6. continues immediately in the same chat to understand the requested goal and relevant repository context;
 7. builds, reviews, and persists the complete S&T plan;
-8. freezes only after Final Planning Review passes;
-9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments.
+8. freezes only after Final Planning Review passes, with implementation still unauthorized;
+9. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
+10. completes the required post-freeze handoff checks;
+11. explicitly authorizes implementation.
 
 The user does not manually copy files or explain the S&T workflow.
 
@@ -40,7 +42,7 @@ If continuation in another chat becomes necessary, the repository state is suffi
 
 ## Execution
 
-After planning is frozen, open an executor chat in the target repository and say:
+After planning is frozen, allocation/handoff is complete, and `.planning/STATUS.yaml -> implementation_authorized: true`, open an executor chat in the target repository and say:
 
 > אני צ'אט מספר 1
 
@@ -51,11 +53,12 @@ The executor reads its assigned nodes from `EXECUTION.yaml`, loads those nodes f
 Keep it simple:
 
 1. block the affected node with a short factual reason;
-2. set planning active again;
+2. set planning active again and revoke implementation authorization;
 3. reopen only the smallest affected S&T area;
 4. correct/review/freeze it;
 5. repair only affected EXECUTION entries;
-6. preserve valid completed work.
+6. repeat required handoff checks and explicitly re-authorize;
+7. preserve valid completed work.
 
 ## Authoritative external entry point
 

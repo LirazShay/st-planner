@@ -1,6 +1,7 @@
 version: 1
 
 plan_state: active
+implementation_authorized: false
 
 current_node: "0.2.1"
 

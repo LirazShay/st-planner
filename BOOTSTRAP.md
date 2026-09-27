@@ -48,8 +48,10 @@ When invoked from another repository:
    - build/update GOAL, TREE, DECISIONS, REVIEWS, and STATUS;
    - do not implement target-project work while planning;
    - continue until the complete intended plan passes Final Planning Review;
-   - freeze the plan;
-   - populate EXECUTION with numbered executor-chat assignments.
+   - freeze the plan with implementation still unauthorized;
+   - populate EXECUTION with numbered executor-chat assignments;
+   - complete the required post-freeze handoff checks;
+   - explicitly authorize implementation only after those checks pass.
 10. Do not ask the user to repeat framework instructions. Ask only for a missing project goal if neither the request nor the target repository makes it unambiguous.
 
 ## Safety against accidental overwrite
@@ -60,7 +62,7 @@ An existing S&T planning state is project data. Never replace GOAL/TREE/DECISION
 
 ## Normal execution after planning
 
-Once planning is frozen, a new executor chat in the target repository can simply say:
+Once planning is frozen, execution allocation/handoff is complete, and `.planning/STATUS.yaml -> implementation_authorized: true`, a new executor chat in the target repository can simply say:
 
 > אני צ'אט מספר 1
 

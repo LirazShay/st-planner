@@ -1,16 +1,21 @@
 # Execution Handoff
 
-S&T Planner executes the frozen plan directly from S&T node IDs; no separate task layer is needed.
+S&T Planner executes an explicitly authorized frozen plan directly from S&T node IDs; no separate task layer is needed.
 
 The S&T leaves are already the planned work units.
 
 After Final Planning Review passes:
 
 1. freeze the plan;
-2. collect every implementation-ready leaf;
-3. group the leaf node IDs into numbered executor chats;
-4. write the allocation to `.planning/EXECUTION.yaml`;
-5. initialize every assigned node as `pending`.
+2. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
+3. collect every implementation-ready leaf;
+4. group the leaf node IDs into numbered executor chats;
+5. write the allocation to `.planning/EXECUTION.yaml`;
+6. initialize every assigned node as `pending`;
+7. complete the required post-freeze handoff checks;
+8. explicitly set `implementation_authorized: true`.
+
+A frozen plan is a stable baseline, not permission to implement.
 
 ## Why direct node execution
 
@@ -93,6 +98,7 @@ When one appears:
 - stop the affected node;
 - mark it `blocked` with a short factual reason;
 - switch `STATUS.yaml -> plan_state: active`;
+- set `STATUS.yaml -> implementation_authorized: false`;
 - return to planning.
 
 The planner changes only the smallest affected S&T area.
@@ -101,6 +107,6 @@ Already completed work is preserved when its Strategy, success evidence, and pro
 
 If previously completed work is invalidated, reset only that work to `pending` (or remove an obsolete node) rather than restarting all execution.
 
-After focused review passes, repair the affected EXECUTION allocation and freeze again.
+After focused review passes, repair the affected EXECUTION allocation and freeze again while still unauthorized; complete the required handoff checks again before explicitly restoring authorization.
 
 Git history is sufficient version history for V1.

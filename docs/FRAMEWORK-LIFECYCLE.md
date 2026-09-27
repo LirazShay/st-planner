@@ -15,6 +15,10 @@ FREEZE
   ↓
 ALLOCATE S&T LEAVES TO NUMBERED CHATS
   ↓
+POST-FREEZE HANDOFF CHECKS
+  ↓
+AUTHORIZE IMPLEMENTATION
+  ↓
 EXECUTE
 ```
 
@@ -71,15 +75,17 @@ After the final review passes:
 
 ```yaml
 plan_state: frozen
+implementation_authorized: false
 ```
 
 Until then:
 
 ```yaml
 plan_state: active
+implementation_authorized: false
 ```
 
-That is the only planning lifecycle state needed in V1.
+`plan_state` remains the small planning lifecycle state. `implementation_authorized` is a separate execution gate, not another planning phase.
 
 ## 6. Allocate execution
 
@@ -93,6 +99,19 @@ The tree remains the work definition. EXECUTION stores only:
 - short result/blocker reference.
 
 No second task system is required.
+
+## 7. Authorize implementation
+
+Freeze and allocation still leave implementation unauthorized.
+
+After the required post-freeze handoff checks pass:
+
+```yaml
+plan_state: frozen
+implementation_authorized: true
+```
+
+Only this combination permits executor chats to start.
 
 ## Planning chats
 
