@@ -356,7 +356,25 @@ When diving down, the lower tactics are details of how the parent tactic is perf
 
 Do not infer execution order merely from parent/child position.
 
-Ordering is one of the advanced cases intentionally kept simple in V1.
+V1 uses one minimal execution-order mechanism only when needed:
+
+```yaml
+depends_on:
+  - "2.1.3"
+```
+
+Normally this appears only on implementation-ready leaves.
+
+It means the referenced node outcome is a real prerequisite for executing this node. It does not mean "do this first because it seems convenient."
+
+Rules:
+- reference S&T node IDs;
+- no self-dependency;
+- dependencies must be acyclic;
+- omit the field content when no prerequisite exists;
+- do not encode priority, dates, estimates, or scheduling policy.
+
+At execution handoff, these node dependencies are copied to the generated GitHub Issues. Numbered chat blocking is then derived from Issue dependencies rather than modeled separately.
 
 ---
 
@@ -368,7 +386,7 @@ The V1 rule is deliberately simple:
 
 - If a step is merely helpful but not necessary, do not force it into the required S&T tree. Record it in notes for later review.
 - If one step appears to belong to more than one parent, do not invent a graph model yet. Record the ambiguity and keep the clearest single-parent representation until the case is reviewed.
-- If execution order matters, record a plain-text dependency note. Do not redesign the S&T hierarchy to represent chronology.
+- If execution order matters, use the minimal leaf `depends_on` relation. Do not redesign the S&T hierarchy to represent chronology and do not add richer scheduling semantics.
 
 These cases must not be "solved" prematurely. If they become common in real projects, design their representation as a separate, evidence-driven stage.
 
@@ -631,6 +649,8 @@ nodes:
 
     success_evidence:
       - "A fresh session reads only repository state and identifies the correct next action"
+
+    depends_on: []
 
     children:
       - "1.2.1"
