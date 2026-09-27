@@ -107,9 +107,9 @@ Do not require the entire future to be decomposed to microscopic detail.
 
 Planning is deep enough when the next meaningful execution horizon is composed of executable leaves and unresolved future detail cannot change that work.
 
-Mark approved nodes accordingly.
+Mark approved nodes in `TREE.yaml`.
 
-When implementation is released, `implementation_scope` must enumerate the exact approved executable node IDs. `implementation_allowed: true` never grants permission outside that list.
+When implementation is released, `implementation_scope` must enumerate the exact approved executable leaf IDs. An empty scope means implementation is blocked. No separate permission boolean is used.
 
 ## 8. Persist session state
 
@@ -118,12 +118,13 @@ Before ending a planning session, update `.planning/STATUS.yaml`.
 A fresh session must be able to determine:
 
 - current mode;
-- current phase;
 - current node;
-- approved scope;
 - open blockers;
 - next action;
-- whether implementation is allowed.
+- exact implementation scope;
+- latest relevant review.
+
+Approval itself is read from node status in `TREE.yaml`; do not duplicate it in STATUS.
 
 Chat history is supplementary, never the source of truth.
 
