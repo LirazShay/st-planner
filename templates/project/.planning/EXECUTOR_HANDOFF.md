@@ -86,7 +86,7 @@ If implementation reveals a material planning gap or contradiction:
 
 Do not redesign the plan inside an executor chat.
 
-After correction, re-freeze alone is not enough: the required fresh-chat handoff verification must pass again before `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
+After correction, re-freeze alone is not enough. The planner must record the corrected reviewed baseline, pass freeze no-drift verification again, freeze that verified baseline, run allocation validation in `--resume` mode, and rerun the required fresh-chat handoff verification before `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
 
 ## Mandatory fresh-chat verification before authorization
 
