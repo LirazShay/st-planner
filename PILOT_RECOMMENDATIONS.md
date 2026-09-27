@@ -1,7 +1,7 @@
 # S&T Planner — MarketScope Pilot Recommendations
 
 Status: active backlog / implementation recommendations  
-Implemented: P0-1, P0-2, P0-3  
+Implemented: P0-1, P0-2, P0-3, P0-4  
 Source pilot: `LirazShay/market-scope`  
 Pilot date: 2026-09-27
 
@@ -350,6 +350,7 @@ Review these together rather than patching one file in isolation:
 - `templates/project/.planning/STATUS.yaml`
 - `templates/project/.planning/EXECUTION.yaml`
 - `templates/project/.planning/EXECUTOR_HANDOFF.md`
+- `templates/project/.planning/validate-allocation.mjs`
 - `docs/AI-PLANNING-PROTOCOL.md`
 - `docs/QUALITY-GATES.md`
 - `docs/EXECUTION-HANDOFF.md`
@@ -375,6 +376,7 @@ goal
 → Final Planning Review
 → freeze
 → allocation
+→ mechanical allocation validation
 → fresh-chat verification
 → explicit implementation authorization
 → Chat 1 starts without planning-history context
