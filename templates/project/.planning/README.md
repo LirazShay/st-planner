@@ -43,6 +43,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - EXECUTION — after freeze only: numbered chat allocation + execution state/result for leaf node IDs.
 - EXECUTOR_HANDOFF — stable fresh-executor bootstrap/read-order and handoff verification contract; never task content.
 - validate-allocation.mjs — portable mechanical validator for TREE/EXECUTION allocation invariants; framework tooling, not project state.
+- verify-freeze-baseline.mjs — optional Git-backed helper for the mandatory freeze no-drift gate; framework tooling, not project state.
 
 ## Important
 
@@ -50,6 +51,10 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - New planning chats are optional continuation only.
 - Do not implement while `.planning/STATUS.yaml -> plan_state: active`.
 - The whole intended plan must pass Final Planning Review before `.planning/STATUS.yaml -> plan_state: frozen`.
+- Final Planning Review must record reviewed-baseline evidence in REVIEWS.
+- Before freeze, prove that material GOAL/TREE/DECISIONS content has not drifted from that reviewed baseline. Use `verify-freeze-baseline.mjs` when a Git ref is available; otherwise record equivalent evidence.
+- If merge/rebase/integration changes the frozen ref after that proof, repeat the no-drift check before allocation/handoff.
+- Any material drift invalidates the Final Planning Review and requires review of the changed baseline before freeze.
 - `.planning/STATUS.yaml -> plan_state: frozen` does **not** authorize implementation.
 - Keep `.planning/STATUS.yaml -> implementation_authorized: false` while post-freeze allocation/handoff checks are still being completed.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
