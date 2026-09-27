@@ -28,4 +28,9 @@ nodes:
 
     success_evidence: []
 
+    # Execution-order prerequisites by S&T node ID.
+    # Normally used only on implementation-ready leaves.
+    # This is not the logical parent/child relationship.
+    depends_on: []
+
     children: []
