@@ -50,3 +50,30 @@ The persisted project state does not contain enough information to choose respon
 
 **What would reopen this:**  
 Not applicable while open. Once resolved, reopen if the product/domain duplicate policy changes.
+
+
+### D-003 — Structural-error continuation policy
+
+**Status:** open
+
+**Related S&T node(s):** 0.1.2, 0.2, 0.3
+
+**Question:**  
+If a CSV file contains a structural parsing error, does V1 reject the whole import, allow structurally valid rows to continue, or apply another explicit rule?
+
+**Why it matters:**  
+The current tree can detect structural errors, but it does not yet define whether any candidate rows from the same import may continue to validation/persistence. Without this rule, every local branch could succeed while the root safety/predictability outcome remains ambiguous.
+
+**Options considered:**
+- Reject the entire import when any structural error exists.
+- Continue only structurally valid rows and report rejected rows.
+- Another explicit product/domain rule.
+
+**Resolution:**  
+Open.
+
+**Resolution basis / rationale:**  
+The existing project state does not define the intended atomicity/continuation behavior for structural file errors.
+
+**What would reopen this:**  
+Not applicable while open. Once resolved, reopen if import atomicity/error-handling requirements change.
