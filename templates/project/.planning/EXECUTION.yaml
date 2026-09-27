@@ -1,0 +1,43 @@
+version: 1
+
+# Generated only after the complete S&T plan is frozen.
+#
+# Each implementation-ready leaf must appear exactly once under one numbered chat.
+# TREE.yaml remains the planning source.
+# depends_on remains only in TREE.yaml.
+#
+# Execution states:
+# - pending: assigned, not started
+# - in_progress: currently being executed
+# - done: success_evidence verified
+# - blocked: execution cannot continue because of a real execution/planning blocker
+#
+# result:
+# - null while pending/in_progress
+# - short verification/result reference when done
+# - short blocker explanation when blocked
+
+chats: {}
+
+# Example:
+#
+# chats:
+#   "1":
+#     nodes:
+#       "1.2.1":
+#         state: pending
+#         result: null
+#       "1.2.2":
+#         state: pending
+#         result: null
+#
+#   "2":
+#     nodes:
+#       "1.3.1":
+#         state: pending
+#         result: null
+#
+# A chat says "I am chat 1" / "אני צ'אט מספר 1".
+# It reads only its assigned nodes plus their required context.
+# Before executing a node, it checks TREE.yaml -> depends_on and confirms every
+# prerequisite node is state: done somewhere in this file.
