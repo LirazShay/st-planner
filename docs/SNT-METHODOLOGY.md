@@ -169,7 +169,11 @@ Then verify:
 
 A decomposition containing only one child is usually just the parent rewritten with more words.
 
-Default action:
+There is no predetermined upper limit on the number of children. The count must emerge from necessity and sufficiency.
+
+A child belongs in this sibling group only if it is necessary **on its own merit** for the parent. If it exists merely as a means for achieving another sibling, it belongs lower in the tree under that sibling.
+
+Default action for a one-child group:
 - merge the levels; or
 - add the missing independent necessary steps.
 
@@ -323,11 +327,40 @@ decision:
   rationale: "Already available, versioned, inspectable, no service to operate"
 ```
 
-Once a tactic is selected, the active tree follows it. Preserve rejected alternatives in decision history, not as active required branches.
+Alternatives can occur in two legitimate places:
+
+1. **Within a step** — another tactic could also be sufficient for the same strategy.
+2. **Between levels** — another complete lower-level group could also be sufficient for the same higher step.
+
+Alternatives do not belong on a necessary connection: if A and B are alternatives, neither is individually necessary in that formulation.
+
+Once a tactic/group is selected, the active tree follows it. Preserve rejected alternatives in decision history, not as active required branches.
 
 ---
 
-# 12. Special cases deferred in V1
+# 12. Numbering and stable identity
+
+Large S&T trees need stable references.
+
+The original paper proposes location-oriented numbering so a step can be identified by its level, group, and position. S&T Planner V1 deliberately uses simpler stable hierarchical IDs such as `0`, `1`, `1.2`, `1.2.3`.
+
+The ID is an identifier, not an argument. Do not encode schedule, priority, or status into it.
+
+If future real-world trees require a richer location scheme, evolve the representation without changing the S&T logic.
+
+---
+
+# 13. Logical hierarchy is not a schedule
+
+When diving down, the lower tactics are details of how the parent tactic is performed. That relationship is logical decomposition, not a timeline.
+
+Do not infer execution order merely from parent/child position.
+
+Ordering is one of the advanced cases intentionally kept simple in V1.
+
+---
+
+# 14. Special cases deferred in V1
 
 The original material notes additional cases such as supporting steps, multiple parents, and time dependency. They are real planning concerns, but they are **not part of the V1 core model**.
 
@@ -569,6 +602,8 @@ parallel_assumptions:
 necessary_assumptions:
   - "Without persistent state, a new session cannot reliably reconstruct prior planning decisions"
 
+sufficiency_assumptions: []
+
 evidence:
   - "A fresh session reads only repository state and identifies the correct next action"
 
@@ -585,14 +620,15 @@ The schema may evolve, but additions must justify their cost.
 
 # 22. Reading an S&T plan to a fresh reviewer
 
-A useful order is:
+When presenting a completed tree to someone who did not build it, use the source method's logic:
 
-1. Start at the parent strategy and tactic.
-2. Explain why each lower objective is necessary.
-3. State the parent group's sufficiency logic.
-4. Then present each child's Strategy + Tactic + parallel assumptions.
+1. Start at the top.
+2. Before presenting a lower group, read the group's necessary assumptions so the listener understands why the branches are needed.
+3. Pair each necessary assumption with its corresponding child strategy.
+4. Read the higher step's sufficiency assumptions so the listener understands why the group is enough.
+5. Then read each child's Strategy + Tactic + parallel assumptions.
 
-This lets the reviewer understand **why the branches exist before drowning in implementation detail**.
+This order deliberately explains **why the lower steps exist before asking the listener to absorb their implementation detail**.
 
 ---
 
