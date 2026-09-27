@@ -44,7 +44,7 @@ The leaf should provide enough information to derive:
 - responsibility;
 - scope;
 - relevant constraints;
-- dependencies;
+- execution prerequisites in `depends_on`, when real;
 - success/acceptance evidence.
 
 Do not decompose into trivial implementation steps.
@@ -105,19 +105,22 @@ Create GitHub Issues/tasks from executable leaves.
 
 Every task keeps its S&T node ID and enough context for execution.
 
+When creating Issues, copy each leaf's `depends_on` prerequisites into the Issue relationship/description using the corresponding generated Issue IDs.
+
 Then group the Issues into coherent numbered executor-chat assignments in `.planning/CHAT-ASSIGNMENTS.yaml`.
 
 The grouping should:
 - keep related responsibility together;
-- respect dependencies;
+- avoid putting a dependent Issue into a chat that would have to run before its prerequisite;
 - allow parallel chats where dependencies permit;
 - avoid forcing executor chats to make new material planning decisions.
 
 The assignment map contains only:
 - Issue numbers;
-- source S&T node IDs;
-- prerequisite chat numbers.
+- source S&T node IDs.
 
-Task details and execution status remain in GitHub.
+A chat determines whether it can start by inspecting the dependencies of its assigned GitHub Issues. Do not manually maintain a second dependency graph at chat level.
+
+Task details, dependency status, and execution status remain in GitHub.
 
 The planning framework does not become an execution engine.
