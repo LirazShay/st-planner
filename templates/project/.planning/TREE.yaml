@@ -15,8 +15,15 @@ nodes:
     strategy: "TBD"
     tactic: "TBD"
 
+    # Why this Tactic can achieve this Strategy.
     parallel_assumptions: []
+
+    # Why this node is necessary for its parent.
+    # Root must keep this empty.
     necessary_assumptions: []
+
+    # Why this node's children are sufficient together for this node.
+    # Leaves normally keep this empty.
     sufficiency_assumptions: []
 
     success_evidence: []
