@@ -21,6 +21,20 @@ It is **not** the source of truth for open questions or current state. If a revi
 - tree-state consistency
 - fresh-session continuity
 
+## Post-allocation fresh-chat handoff review
+
+Before `implementation_authorized: true`, record a dedicated review that simulates repository-only fresh executors according to `EXECUTOR_HANDOFF.md`.
+
+Record the representative scenarios checked:
+- first available executor
+- dependency-blocked early executor
+- mid-plan executor with multiple dependencies
+- final closure executor
+
+For each scenario, record whether the executor could determine authorization, assigned nodes, prerequisite states, first available node (or none), exact next context to load, and the factual blocker when unavailable.
+
+Any failure is `changes-required` and keeps implementation unauthorized until corrected and rechecked.
+
 **Findings:**
 - None / TBD
 
