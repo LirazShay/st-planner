@@ -267,7 +267,7 @@ If the target explicitly uses serial numbered chats, also pass `--serial-chats`.
 
 After execution has already begun and replanning preserves valid completed work, use `--resume` instead of `--initial`; it validates state/result consistency without requiring completed nodes to return to pending.
 
-Any validator failure keeps `implementation_authorized: false`.
+Any validator failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`.
 
 ### Mandatory fresh-chat handoff gate
 
@@ -289,11 +289,11 @@ For every case verify that repository state alone reveals:
 
 Use actual allocation cases where possible. If a small plan lacks a literal example, simulate the condition against the closest real assignment without mutating durable execution state.
 
-Record the result in `REVIEWS.md`. Any failure keeps `implementation_authorized: false`; correct the smallest handoff/allocation/routing defect and rerun the failed verification.
+Record the result in `REVIEWS.md`. Any failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`; correct the smallest handoff/allocation/routing defect and rerun the failed verification.
 
 Only after this gate passes, explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
-A chat that says "I am chat N" / "אני צ'אט מספר N" reads `EXECUTOR_HANDOFF.md` and may execute its assigned nodes only when both `plan_state: frozen` and `implementation_authorized: true`.
+A chat that says "I am chat N" / "אני צ'אט מספר N" reads `EXECUTOR_HANDOFF.md` and may execute its assigned nodes only when both `.planning/STATUS.yaml -> plan_state: frozen` and `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 Do not build an execution engine, scheduler, or duplicated task database.
 
@@ -315,7 +315,7 @@ When an executor discovers a material planning defect:
 5. set `.planning/STATUS.yaml -> implementation_authorized: false`;
 6. set `.planning/STATUS.yaml` to the smallest S&T area that must be reconsidered.
 
-No other execution may start while `plan_state: active` or `implementation_authorized: false`.
+No other execution may start while `.planning/STATUS.yaml -> plan_state: active` or `.planning/STATUS.yaml -> implementation_authorized: false`.
 
 ### Planner response
 
