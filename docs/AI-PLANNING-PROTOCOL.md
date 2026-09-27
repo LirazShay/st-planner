@@ -1,5 +1,7 @@
 # AI Planning Protocol
 
+Planning depth is adaptive; there is no QUICK/DEEP mode. Use the same S&T rules for every task and stop decomposing when further detail would not materially improve implementation readiness or logical confidence.
+
 ## 1. Start with the goal boundary
 
 Update `.planning/GOAL.md` with:
