@@ -1,18 +1,15 @@
 version: 1
 
 mode: DEEP
+plan_state: active
 
 current_node: "0.2.1"
 
 blockers:
   - "D-002 duplicate-customer policy is unresolved and blocks approval of node 0.2.1"
-  - "Nodes 0.2.2 and 0.2.3 cannot be approved until the admissibility policy is complete"
-  - "Branches 0.3 and 0.4 are not yet sufficiently decomposed for implementation"
+  - "Nodes 0.2.2 and 0.2.3 cannot be finalized until the admissibility policy is complete"
+  - "Branches 0.3 and 0.4 are not yet decomposed to implementation-ready leaves"
 
-next_action: "Resolve decision D-002: define duplicate-customer behavior for CSV import; then review node 0.2.1 for executability"
-
-implementation_scope:
-  - "0.1.1"
-  - "0.1.2"
+next_action: "Resolve D-002, complete branch 0.2, then continue planning the remaining branches"
 
 last_review: "R-002"
