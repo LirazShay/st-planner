@@ -82,3 +82,25 @@ A node becomes `done` only when its S&T `success_evidence` has been verified.
 The `result` field stores only a short result/evidence reference, not a new execution history system.
 
 Git remains the normal implementation/history mechanism for code changes.
+
+
+## When execution proves the plan wrong
+
+A material planning defect is different from an ordinary implementation difficulty.
+
+When one appears:
+
+- stop the affected node;
+- mark it `blocked` with a short factual reason;
+- switch `STATUS.yaml -> plan_state: active`;
+- return to planning.
+
+The planner changes only the smallest affected S&T area.
+
+Already completed work is preserved when its Strategy, success evidence, and produced outcome are still valid under the corrected plan.
+
+If previously completed work is invalidated, reset only that work to `pending` (or remove an obsolete node) rather than restarting all execution.
+
+After focused review passes, repair the affected EXECUTION allocation and freeze again.
+
+Git history is sufficient version history for V1.
