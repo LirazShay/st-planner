@@ -87,11 +87,11 @@ If the user identifies an executor as "chat N" (for example "אני צ'אט מס
 - confirm the plan is frozen;
 - read `CHAT-ASSIGNMENTS.yaml`;
 - find assignment N;
-- check prerequisite chats by their assigned GitHub Issues;
 - pull only N's assigned Issues and referenced S&T context;
+- inspect prerequisite/dependency information on those assigned Issues;
 - execute only that scope.
 
-If N is missing or a prerequisite is incomplete, do not invent or steal work.
+If N is missing or an assigned Issue has an incomplete prerequisite, do not invent or steal work.
 
 If execution exposes a material planning defect, return it to planning rather than silently improvising.
 
