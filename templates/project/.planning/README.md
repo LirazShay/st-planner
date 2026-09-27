@@ -24,6 +24,6 @@ This directory is self-contained for V1. The central S&T Planner repository cont
 - DECISIONS owns material unresolved questions and their resolutions.
 - REVIEWS owns planning audit history only.
 - EXECUTION owns observed execution/verification outcomes and facts learned from doing the work.
-- STATUS owns only the resume pointer and implementation scope.
+- STATUS owns only the resume pointer and implementation scope, including pointers to the latest relevant planning review and execution outcome.
 - Update planning state after material decisions or reviews.
 - Keep these files concise; store each fact in one authoritative place.
