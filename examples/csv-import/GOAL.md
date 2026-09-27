@@ -11,13 +11,6 @@ Users can import supported customer CSV files into the existing backend service 
 - There is no CSV import flow yet.
 - Authentication and authorization are existing system responsibilities and are outside this change.
 
-## Success evidence
-
-- A supported CSV file with valid rows produces the expected customer records.
-- Structurally invalid or unsafe input does not create customer records.
-- The user receives a deterministic import result showing accepted and rejected rows.
-- The same documented input rules produce the same interpretation across runs.
-
 ## Constraints
 
 - Reuse existing customer creation rules where possible.
@@ -30,8 +23,3 @@ Users can import supported customer CSV files into the existing backend service 
 - Background job infrastructure.
 - Bulk-import analytics.
 - UI design.
-
-## Material unknowns
-
-- Final maximum file size.
-- Final duplicate-customer policy.
