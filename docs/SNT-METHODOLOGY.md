@@ -618,7 +618,10 @@ The schema may evolve, but additions must justify their cost.
 - In V1, every non-root node has exactly one logical parent.
 - The child graph must be acyclic.
 - Node status is local: `approved` means that node's own logic and immediate decomposition passed review; it does not approve the full subtree.
-- `blocked` is used only when that node itself cannot advance because of a specific blocker; blocking does not cascade automatically.
+- `draft` means normal unfinished planning.
+- `blocked` is reserved for a node that cannot advance because of a **material unresolved question**.
+- Every blocked node must be referenced by at least one open D-entry in `DECISIONS.md`; do not duplicate the reason in a TREE `blocked_by` field.
+- Blocking does not cascade automatically.
 - Only `draft`, `blocked`, and `approved` are valid node statuses.
 - Approved nodes have explicit Strategy, Tactic, material assumptions, and success evidence.
 - A parent with children records why those children are sufficient together.
