@@ -4,7 +4,7 @@ This project uses the S&T Planner framework.
 
 Before meaningful implementation:
 
-1. Read `.planning/README.md`.
+1. Read `.planning/README.md` and `.planning/FRAMEWORK.md`.
 2. Resume from `.planning/STATUS.yaml`.
 3. Use Strategy & Tactics logic rather than arbitrary task lists.
 4. Validate required children as necessary individually and sufficient together.
