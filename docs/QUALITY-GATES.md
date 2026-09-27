@@ -74,6 +74,7 @@ Before freezing:
 - confirm no necessary branch is missing;
 - confirm all groups remain sufficient when considered together;
 - confirm execution dependencies/order are understandable;
+- confirm implementation-ready leaves can be grouped into coherent executor-chat responsibilities without hidden design decisions;
 - confirm all material decisions that affect implementation are resolved;
 - run one final KISS pass.
 
