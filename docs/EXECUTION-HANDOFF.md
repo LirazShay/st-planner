@@ -17,7 +17,7 @@ After Final Planning Review passes:
 9. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
 10. record the verification result in `.planning/REVIEWS.md`;
 11. fix and rerun any failed case;
-12. explicitly set `implementation_authorized: true` only after both gates pass.
+12. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after both gates pass.
 
 A frozen plan is a stable baseline, not permission to implement. `.planning/EXECUTOR_HANDOFF.md` is the portable entry contract for every new executor chat.
 
@@ -101,8 +101,8 @@ When one appears:
 
 - stop the affected node;
 - mark it `blocked` with a short factual reason;
-- switch `STATUS.yaml -> plan_state: active`;
-- set `STATUS.yaml -> implementation_authorized: false`;
+- switch `.planning/STATUS.yaml -> plan_state: active`;
+- set `.planning/STATUS.yaml -> implementation_authorized: false`;
 - return to planning.
 
 The planner changes only the smallest affected S&T area.
