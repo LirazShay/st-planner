@@ -169,7 +169,19 @@ Prefer one planning conversation. Repository state exists so continuation is pos
 
 ## 13. Execution handoff
 
-After freeze, convert implementation-ready leaves into ordinary GitHub Issues/tasks.
+After freeze, compile implementation-ready leaves into ordinary GitHub Issues/tasks.
+
+Default to **one leaf → one Issue**. Group leaves only when they are one coherent responsibility with compatible prerequisites and jointly verifiable evidence. If a leaf needs material splitting, reopen planning rather than designing during Issue creation.
+
+Each Issue must preserve:
+- source S&T node ID(s);
+- Strategy-derived outcome;
+- Tactic-derived planned approach;
+- only relevant decisions/constraints;
+- prerequisites translated from `depends_on`;
+- success evidence.
+
+Create Issues in two passes: first create them and obtain Issue numbers, then translate node-level dependencies into Issue prerequisites.
 
 Then map those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`.
 
