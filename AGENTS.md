@@ -6,7 +6,7 @@ This repository builds a reusable S&T planning framework for GPT.
 
 If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after that gate passes.
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review **and freeze no-drift verification**, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after that gate passes.
 
 Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
 
@@ -124,7 +124,7 @@ If execution exposes a material planning defect:
 - stop starting new execution work;
 - reopen only the smallest affected S&T area;
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
-- after focused re-review, repair only affected EXECUTION assignments/states and set `.planning/STATUS.yaml -> plan_state: frozen` again;
+- after focused re-review, record the corrected reviewed baseline and pass freeze no-drift verification again before setting `.planning/STATUS.yaml -> plan_state: frozen`;
 - run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode is used);
 - rerun and record the mandatory fresh-chat verification;
 - do not resume execution until that gate passes and `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
