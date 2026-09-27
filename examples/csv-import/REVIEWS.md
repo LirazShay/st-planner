@@ -41,9 +41,8 @@
 **Corrections made:**
 - Kept branch 0.1 strictly about deterministic input interpretation.
 
-**Open questions:**
-- Final maximum file size.
-- Duplicate-customer policy.
+**Opened/referenced decisions:**
+- D-002 — duplicate-customer policy.
 
 
 ### R-002 — Fresh-session handoff into branch 0.2
@@ -77,7 +76,7 @@ If admissibility is explicit, every candidate is evaluated, and the persistence 
 Duplicate-customer behavior is a material part of admissibility, but the persisted state does not define it. Choosing reject/update/merge would be an invented product decision.
 
 **Correction:**  
-Created open decision D-002 and marked node 0.2.1 blocked instead of fabricating a rule.
+Referenced open decision D-002 and marked node 0.2.1 blocked instead of fabricating a rule.
 
 Under the later clarified local-status semantics, node 0.2 itself is approved: its own Strategy/Tactic and immediate three-child decomposition passed necessity and sufficiency review. The blocker belongs only to 0.2.1 and does not cascade upward.
 
