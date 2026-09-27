@@ -23,11 +23,11 @@ This demonstrates two important properties:
 
 ## Files
 
-- `GOAL.md` — outcome, current reality, constraints, non-goals and evidence.
-- `TREE.yaml` — S&T structure and assumptions.
+- `GOAL.md` — stable outcome boundary: desired outcome, current reality, constraints and non-goals.
+- `TREE.yaml` — S&T structure, assumptions, node status and success evidence.
 - `STATUS.yaml` — exact resume point for a fresh session.
-- `DECISIONS.md` — decided and open alternatives.
-- `REVIEWS.md` — logical reviews plus the handoff test result.
+- `DECISIONS.md` — material open questions and their resolutions.
+- `REVIEWS.md` — audit history, including the handoff test result.
 
 ## Fresh-session exercise
 
