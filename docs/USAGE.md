@@ -65,12 +65,13 @@ Keep it simple:
 1. block the affected node with a short factual reason;
 2. set planning active again and revoke implementation authorization;
 3. reopen only the smallest affected S&T area;
-4. correct/review/freeze it;
-5. repair only affected EXECUTION entries;
-6. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
-7. rerun and record the mandatory fresh-chat handoff verification;
-8. explicitly re-authorize only after both gates pass;
-9. preserve valid completed work.
+4. correct/review it and record the corrected reviewed baseline;
+5. pass freeze no-drift verification again and freeze only that corrected baseline;
+6. repair only affected EXECUTION entries;
+7. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
+8. rerun and record the mandatory fresh-chat handoff verification;
+9. explicitly re-authorize only after freeze no-drift, allocation validation, and fresh-chat gates pass;
+10. preserve valid completed work.
 
 ## Authoritative external entry point
 
