@@ -72,7 +72,20 @@ For each final leaf:
 - success evidence is objective;
 - no material design decision is left for the executor.
 
-## Gate 9 — Final whole-plan review
+## Gate 9 — Whole-plan coverage
+
+Pass only when an outside-in audit from GOAL finds no material omission:
+
+- every meaningful desired-outcome clause is protected somewhere in the plan;
+- every hard constraint is respected by the relevant nodes/assumptions/decisions;
+- assuming every leaf succeeds does not reveal an uncovered reason the root goal can still fail;
+- materially relevant actors, boundaries, external dependencies, and failure paths were challenged;
+- representative end-to-end scenarios do not expose a missing necessary branch;
+- stated non-goals have not leaked into required work.
+
+Do not require a permanent coverage matrix. Record only defects and the final pass in the normal review history.
+
+## Gate 10 — Final whole-plan review
 
 **The whole intended plan must be complete before execution begins.**
 
