@@ -126,7 +126,7 @@ KISS rules:
 - Every `blocked` node must have at least one open entry in `DECISIONS.md` that references that node.
 - Do not add a separate `blocked_by` field to TREE; the D-entry is the source of the reason.
 - Status is local. A blocked descendant does not automatically change its parent from approved to blocked.
-- Local approval never authorizes implementation before the whole plan is frozen.
+- Local approval never authorizes implementation. A frozen plan also remains non-executable until explicit implementation authorization is granted.
 
 ## 9. Review as you build
 
@@ -171,13 +171,17 @@ Only after it passes:
 
 ```yaml
 plan_state: frozen
+implementation_authorized: false
 ```
 
 Before that:
 
 ```yaml
 plan_state: active
+implementation_authorized: false
 ```
+
+Freeze means the planning baseline is closed for ordinary editing. It does **not** mean executors may start.
 
 ## 12. Keep state simple
 
@@ -191,7 +195,7 @@ Prefer one planning conversation. Repository state exists so continuation is pos
 
 ## 13. Execution handoff
 
-After freeze, execute directly from the S&T tree.
+After freeze, prepare execution directly from the S&T tree, but keep implementation unauthorized until handoff is complete.
 
 **Do not create GitHub Issues merely to execute the S&T plan.**
 The implementation-ready leaves in `TREE.yaml` are already the work units.
@@ -201,7 +205,7 @@ Use management files only:
 - `TREE.yaml` — work definition, rationale, dependencies, success evidence.
 - `EXECUTION.yaml` — chat allocation, execution state, short result.
 
-Create/populate `EXECUTION.yaml`.
+Create/populate `EXECUTION.yaml` while `STATUS.yaml -> implementation_authorized: false`.
 
 Every implementation-ready leaf appears exactly once under one numbered chat:
 
@@ -242,7 +246,9 @@ Set `done` only after success evidence is verified.
 
 Dependencies remain only in TREE. A chat checks prerequisite node states in EXECUTION.
 
-A chat that says "I am chat N" / "אני צ'אט מספר N" loads exactly its assigned nodes and works only within that scope.
+After the required post-freeze handoff checks pass, explicitly set `STATUS.yaml -> implementation_authorized: true`.
+
+A chat that says "I am chat N" / "אני צ'אט מספר N" may load and execute its assigned nodes only when both `plan_state: frozen` and `implementation_authorized: true`.
 
 Do not build an execution engine, scheduler, or duplicated task database.
 
@@ -261,9 +267,10 @@ When an executor discovers a material planning defect:
 2. set that node in `EXECUTION.yaml` to `blocked`;
 3. put a short concrete reason in `result`;
 4. change `STATUS.yaml -> plan_state` back to `active`;
-5. set STATUS to the smallest S&T area that must be reconsidered.
+5. set `STATUS.yaml -> implementation_authorized: false`;
+6. set STATUS to the smallest S&T area that must be reconsidered.
 
-No other execution may start while `plan_state: active`.
+No other execution may start while `plan_state: active` or `implementation_authorized: false`.
 
 ### Planner response
 
@@ -297,6 +304,7 @@ After the corrected planning area passes review:
 2. add any new implementation-ready leaves exactly once as `pending`;
 3. keep unaffected chat allocations and valid `done` nodes unchanged where practical;
 4. re-check dependencies and chat coherence only for affected work;
-5. set `plan_state: frozen` again.
+5. set `plan_state: frozen` again while keeping `implementation_authorized: false`;
+6. complete the required handoff checks again and explicitly restore `implementation_authorized: true` before execution resumes.
 
 No plan-version registry is required. Git history already records prior file versions.
