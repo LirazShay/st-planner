@@ -38,7 +38,7 @@ Create one root node in `.planning/TREE.yaml`:
 - Strategy: the outcome that must exist.
 - Tactic: the chosen high-level way to achieve it.
 - Parallel assumptions: why this tactic can achieve the strategy.
-- Evidence: how the strategy will be recognized as achieved.
+- Success evidence: how the strategy will be recognized as achieved.
 
 If no tactic can yet be chosen responsibly, record the decision as open instead of guessing.
 
@@ -107,7 +107,7 @@ Do not require the entire future to be decomposed to microscopic detail.
 
 Planning is deep enough when the next meaningful execution horizon is composed of executable leaves and unresolved future detail cannot change that work.
 
-Mark approved nodes in `TREE.yaml`.
+Mark nodes in `TREE.yaml` using local status semantics: approve a node when its own logic and immediate decomposition pass review; do not propagate approval or blocking through the subtree.
 
 When implementation is released, `implementation_scope` must enumerate the exact approved executable leaf IDs. An empty scope means implementation is blocked. No separate permission boolean is used.
 
