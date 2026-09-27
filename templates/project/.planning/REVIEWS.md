@@ -29,6 +29,13 @@ It is **not** the source of truth for open questions or current state. If a revi
 **Corrections made:**
 - None / TBD
 
+**Failure learning (only for meaningful unexpected failures):**
+- technical root cause: None / summary
+- reasoning/process cause: None / summary
+- escape cause: None / summary
+- local fix + regression proof: None / summary
+- smallest reusable prevention: None / summary
+
 **Opened/referenced decisions:**
 - None / D-XXX
 
