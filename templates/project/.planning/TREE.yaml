@@ -1,5 +1,11 @@
 version: 1
 
+# Node status:
+# - draft: normal unfinished planning
+# - blocked: cannot advance because an open material D-entry references the node
+# - approved: local node logic/immediate decomposition passed review
+# Status is local; it does not cascade through the subtree.
+
 root: "0"
 
 nodes:
