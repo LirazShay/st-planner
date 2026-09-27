@@ -56,7 +56,7 @@ Default:
 - move to another planning chat only if needed;
 - after the plan is final, freeze it with implementation still unauthorized;
 - allocate implementation-ready leaves directly to numbered execution chats in `.planning/EXECUTION.yaml`;
-- complete the required handoff checks and explicitly authorize implementation;
+- run and record the mandatory repository-only fresh-chat handoff verification, then explicitly authorize implementation;
 - execution chats work directly from their assigned S&T node IDs.
 
 No server, database, plugin runtime, state machine, or execution engine is required.
