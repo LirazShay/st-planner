@@ -44,3 +44,43 @@
 **Open questions:**
 - Final maximum file size.
 - Duplicate-customer policy.
+
+
+### R-002 — Fresh-session handoff into branch 0.2
+
+**Result:** changes-required
+
+**Test setup:**  
+The continuation used only the portable S&T framework plus the persisted files in this example. No prior chat decision was treated as authoritative.
+
+**Recovered state:**
+- Overall goal was recovered correctly.
+- The previously approved execution horizon remained 0.1.1 + 0.1.2.
+- The next planning target was correctly identified as 0.2.
+- Implementation outside the approved scope remained blocked.
+
+**Decomposition result:**  
+Node 0.2 decomposed into three independently necessary conditions:
+- 0.2.1 defines what admissible data means.
+- 0.2.2 evaluates every candidate against that definition.
+- 0.2.3 enforces the result at the persistence boundary.
+
+**Necessity review:**
+- Without 0.2.1, pass/fail has no stable domain meaning.
+- Without 0.2.2, the policy is never applied to concrete candidates.
+- Without 0.2.3, a failed or unevaluated candidate could still reach persistence.
+
+**Sufficiency review:**  
+If admissibility is explicit, every candidate is evaluated, and the persistence boundary accepts only passing candidates, the branch strategy is sufficient under the stated current reality.
+
+**Blocking defect found:**  
+Duplicate-customer behavior is a material part of admissibility, but the persisted state does not define it. Choosing reject/update/merge would be an invented product decision.
+
+**Correction:**  
+Created open decision D-002 and marked node 0.2.1 blocked instead of fabricating a rule.
+
+**Framework defect found during handoff:**  
+A bare boolean `implementation_allowed: true` can be misread as global permission when only a subset is approved.
+
+**Required framework correction:**  
+Whenever implementation is allowed, `implementation_scope` must explicitly list the approved nodes. A fresh session must treat everything outside that scope as blocked.
