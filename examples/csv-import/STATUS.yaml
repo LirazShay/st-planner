@@ -1,0 +1,27 @@
+version: 1
+
+mode: DEEP
+phase: decomposition
+
+current_node: "0.2"
+
+approved_nodes:
+  - "0"
+  - "0.1"
+  - "0.1.1"
+  - "0.1.2"
+
+approved_execution_horizon:
+  - "0.1.1"
+  - "0.1.2"
+
+blockers:
+  - "Branches 0.2, 0.3 and 0.4 are not yet sufficiently decomposed for implementation"
+
+next_action: "Decompose node 0.2 by determining the independently necessary actions that prevent invalid or unsafe candidate data from reaching persistence"
+
+implementation_allowed: true
+
+implementation_scope: "Only nodes 0.1.1 and 0.1.2"
+
+last_review: "R-001"
