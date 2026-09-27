@@ -18,8 +18,8 @@ Steps:
 13. Execute the node's Tactic within its planned scope.
 14. Verify the node's success_evidence.
 15. If verified, set state: done and write a short result/evidence reference.
-16. If a real implementation blocker prevents correct execution, set state: blocked with a short reason.
+16. If a real implementation blocker prevents correct execution, set state: blocked with a short reason. If implementation/offline proof is complete but required external live verification is temporarily unavailable, record what passed, what live evidence remains, and the factual availability reason; do not reopen planning unless the plan itself is wrong.
 17. If the blocker is a material planning gap/contradiction, also set .planning/STATUS.yaml -> plan_state: active and implementation_authorized: false, then stop starting new execution work. Do not redesign the plan yourself.
-18. A planner will correct/review the smallest affected S&T area, freeze again, rerun and record the mandatory fresh-chat handoff verification, and explicitly re-authorize implementation; only then resume from the updated EXECUTION file.
+18. A planner will correct/review the smallest affected S&T area, record the corrected reviewed baseline, pass freeze no-drift verification again, freeze that verified baseline, repair affected EXECUTION entries, run allocation validation with --resume, rerun and record the mandatory fresh-chat handoff verification, and explicitly re-authorize implementation; only then resume from the updated EXECUTION file.
 
 The phrase "I am chat N" may also be expressed naturally, for example: "אני צ'אט מספר 1".
