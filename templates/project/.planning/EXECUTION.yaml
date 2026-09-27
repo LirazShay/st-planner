@@ -12,6 +12,13 @@ version: 1
 # - done: success_evidence verified
 # - blocked: execution cannot continue because of a real execution/planning blocker
 #
+# If blocked because the frozen plan itself is materially wrong/incomplete:
+# - set STATUS.yaml -> plan_state: active;
+# - stop starting new execution work;
+# - replan/review the smallest affected S&T area;
+# - preserve done nodes only if still valid;
+# - re-freeze and repair only affected execution entries.
+#
 # result:
 # - null while pending/in_progress
 # - short verification/result reference when done
