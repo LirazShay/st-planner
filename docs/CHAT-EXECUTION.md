@@ -1,82 +1,82 @@
 # Numbered Executor Chats
 
-This is a small generic handoff layer for projects implemented across multiple GPT chats.
+After the complete S&T plan is frozen, implementation-ready leaves are allocated directly to numbered chats in `.planning/EXECUTION.yaml`.
 
-It exists only after planning is complete.
+No GitHub Issue layer is required.
 
-## Goal
+## Starting a chat
 
-After the S&T plan is frozen and GitHub Issues are created, the planner groups those Issues into numbered executor chats.
-
-Then a new chat can begin with only:
+The user can write only:
 
 > I am chat 1.
 
 or:
 
-> אני צ'אט מספר 2
+> אני צ'אט מספר 1
 
-and discover its work without the user re-explaining the project.
+The executor then:
 
-## Source of truth
+1. reads repository `AGENTS.md`;
+2. confirms `.planning/STATUS.yaml -> plan_state: frozen`;
+3. reads `.planning/EXECUTION.yaml`;
+4. finds chat N;
+5. reads only the assigned S&T nodes from `TREE.yaml` plus referenced decisions/context;
+6. checks each node's `depends_on` prerequisites;
+7. finds those prerequisite node states in `EXECUTION.yaml`;
+8. executes only assigned nodes whose prerequisites are `done`;
+9. updates execution state as work proceeds.
 
-Keep responsibilities separate:
+If chat N does not exist, do not invent work.
 
-- `TREE.yaml` — planning rationale and leaf `depends_on` prerequisites.
-- GitHub Issues — detailed execution tasks, copied dependency relationships/status, discussion, PRs, and completion.
-- `CHAT-ASSIGNMENTS.yaml` — only chat number → Issue numbers + source S&T node IDs.
+## Node execution
 
-Do not copy full Issue descriptions or a second dependency graph into `CHAT-ASSIGNMENTS.yaml`.
-
-## Assignment format
+Before starting one assigned node:
 
 ```yaml
-assignments:
-  "1":
-    issues:
-      - 101
-      - 102
-    snt_nodes:
-      - "1.2.1"
-      - "1.2.2"
-
-  "2":
-    issues:
-      - 103
-    snt_nodes:
-      - "1.3.1"
+state: in_progress
 ```
 
-That is the whole V1 schema.
+After its `success_evidence` is verified:
 
-## What "I am chat N" means
+```yaml
+state: done
+result: "short verification / commit / test reference"
+```
 
-1. Read repository `AGENTS.md`.
-2. Confirm `.planning/STATUS.yaml -> plan_state: frozen`.
-3. Read `.planning/CHAT-ASSIGNMENTS.yaml`.
-4. Find assignment N. If missing, do not invent work.
-5. Pull only the assigned GitHub Issues.
-6. Inspect the dependency/prerequisite information on those Issues.
-7. If an assigned Issue is blocked by an incomplete prerequisite, report the blocker and do not steal unrelated work.
-8. Read only the referenced S&T nodes/decisions/project files needed for those Issues.
-9. Execute only the assigned work.
-10. Use the normal GitHub Issue/PR workflow for completion.
+If a real blocker prevents correct execution:
+
+```yaml
+state: blocked
+result: "short blocker reason"
+```
+
+Do not use `blocked` merely because another node dependency is not done; that node simply remains pending until its prerequisite completes.
 
 ## Parallel work
 
-Parallelism is derived from Issue dependencies.
+Parallelism comes directly from `TREE.yaml -> depends_on`.
 
-If chat 2's Issues have no unresolved prerequisites from chat 1's Issues, both chats may run.
+If two assigned nodes have no unmet prerequisites between them, their chats may work in parallel.
 
-No scheduler and no chat-level dependency graph are needed.
+No scheduler or chat-level dependency graph is needed.
 
-## Planning responsibility
+## Chat sizing
 
-After Final Planning Review:
-1. freeze the plan;
-2. create Issues from implementation-ready leaves;
-3. copy each leaf's `depends_on` relation into the corresponding Issue dependency/prerequisite information;
-4. group coherent Issues into numbered chats;
-5. write only the mapping to `CHAT-ASSIGNMENTS.yaml`.
+The planner decides the number of executor chats after seeing the complete frozen tree.
 
-Do not create one chat per Issue automatically. Group related work when doing so preserves clear responsibility and valid dependency ordering.
+Group work using these priorities:
+
+1. keep closely related nodes/context together;
+2. preserve dependency order;
+3. keep each chat to a manageable amount of work;
+4. then balance load across chats where practical.
+
+There is no fixed number of nodes per chat and no requirement to create one chat per node.
+
+If a single leaf is too large for one chat, the planning granularity is wrong; reopen that leaf and decompose it.
+
+## Completion
+
+A chat is effectively complete when all nodes assigned to it are `done`.
+
+The file does not need a duplicated chat-level status.
