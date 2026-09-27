@@ -39,6 +39,7 @@ Copy `templates/project/.planning/` into a target repository:
 - `DECISIONS.md` — material open questions and decisions
 - `REVIEWS.md` — planning reviews
 - `STATUS.yaml` — small resume pointer
+- `CHAT-ASSIGNMENTS.yaml` — after freeze, maps executor chat numbers to GitHub Issues/S&T nodes
 
 Also merge `templates/project/AGENTS.snippet.md` into the project's `AGENTS.md`.
 
@@ -51,8 +52,10 @@ The entire intended tree must be implementation-ready and pass Final Planning Re
 Only then:
 1. freeze the plan;
 2. create execution tasks/Issues from executable leaves;
-3. give each executor chat one bounded task or a small compatible group;
-4. keep the S&T node ID on the task for traceability.
+3. group those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`;
+4. keep the S&T node ID on every task for traceability.
+
+Then a new executor chat can say, for example, **"I am chat 1"** and discover its assigned GitHub work without the user re-explaining the project.
 
 If execution later discovers a real planning defect, return that defect to planning and reopen only the affected part.
 
@@ -63,6 +66,7 @@ If execution later discovers a real planning defect, return that defect to plann
 - `docs/QUALITY-GATES.md` — how GPT critiques the plan
 - `docs/FRAMEWORK-LIFECYCLE.md` — simple planning lifecycle
 - `docs/EXECUTION-HANDOFF.md` — minimal post-planning handoff
+- `docs/CHAT-EXECUTION.md` — numbered executor-chat lookup from GitHub
 - `docs/PLANNER-SNT.md` — S&T of this framework itself
 - `docs/USAGE.md` — how to use it in another project
 
