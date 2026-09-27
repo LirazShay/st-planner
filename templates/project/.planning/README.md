@@ -17,6 +17,11 @@ This directory is self-contained for V1. The central S&T Planner repository cont
 
 - Do not rely on chat history as project state.
 - Do not create an arbitrary number of phases or tasks.
-- Do not implement while `STATUS.yaml` says implementation is not allowed.
+- Implement only node IDs listed in `STATUS.yaml -> implementation_scope`; an empty list blocks all implementation.
+- GOAL owns the stable boundary only.
+- TREE owns S&T logic, node status, and success evidence.
+- DECISIONS owns material unresolved questions and their resolutions.
+- REVIEWS owns audit history only.
+- STATUS owns only the resume pointer and implementation scope.
 - Update planning state after material decisions or reviews.
-- Keep these files concise; store only information that changes planning or handoff.
+- Keep these files concise; store each fact in one authoritative place.
