@@ -2,8 +2,12 @@ version: 1
 
 # Generated only after the complete S&T plan is frozen.
 # A populated allocation does NOT authorize execution by itself.
-# Before authorization, the mandatory repository-only fresh-chat verification in
-# EXECUTOR_HANDOFF.md must pass and be recorded in REVIEWS.md.
+# Before first authorization:
+#   node .planning/validate-allocation.mjs --initial
+# must pass. Use --resume after execution/replanning. Add --serial-chats only when
+# numbered chats are explicitly serial.
+# Then the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF.md
+# must pass and be recorded in REVIEWS.md.
 # Executors may start only when STATUS.yaml has:
 #   plan_state: frozen
 #   implementation_authorized: true
