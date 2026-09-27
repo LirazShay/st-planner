@@ -49,6 +49,8 @@ Do not guess important unknowns.
 
 ## 6. Stop at implementation-ready leaves
 
+There is no QUICK/DEEP mode. Small problems naturally produce small trees; difficult problems naturally produce deeper trees.
+
 Stop when an executor would not need another material design/product decision.
 
 Do not decompose into trivial coding/clicking instructions.
