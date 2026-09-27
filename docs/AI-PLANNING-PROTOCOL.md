@@ -96,8 +96,8 @@ Record the result in `REVIEWS.md`.
 ## 8. Freeze
 
 If Final Planning Review passes:
-- set `STATUS.yaml -> plan_state: frozen`;
-- keep `STATUS.yaml -> implementation_authorized: false`;
+- set `.planning/STATUS.yaml -> plan_state: frozen`;
+- keep `.planning/STATUS.yaml -> implementation_authorized: false`;
 - stop changing the baseline except for a documented later planning correction.
 
 Freeze closes the planning baseline. It does not start implementation.
@@ -108,7 +108,7 @@ Do not create a second task system.
 
 After the plan is frozen:
 
-1. keep `implementation_authorized: false`;
+1. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
 2. collect every implementation-ready leaf;
 3. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
 4. initialize each node as `pending`;
@@ -117,7 +117,7 @@ After the plan is frozen:
 7. follow `.planning/EXECUTOR_HANDOFF.md` and simulate the mandatory representative fresh executors from repository state only;
 8. record the handoff verification in `REVIEWS.md`;
 9. fix and rerun any failed simulation;
-10. explicitly set `implementation_authorized: true`.
+10. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 No executor may start before step 10.
 
@@ -165,8 +165,8 @@ The framework does not become a scheduler or task-management application.
 If execution exposes a material defect in the frozen plan:
 
 1. the executor marks the affected node `blocked` with a short factual reason;
-2. set `STATUS.yaml -> plan_state: active`;
-3. set `STATUS.yaml -> implementation_authorized: false`;
+2. set `.planning/STATUS.yaml -> plan_state: active`;
+3. set `.planning/STATUS.yaml -> implementation_authorized: false`;
 4. identify the smallest affected S&T area;
 5. correct that area and review upward until the impact is contained;
 6. inspect affected dependencies and any completed work that relied on the changed outcome;
