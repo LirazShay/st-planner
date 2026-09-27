@@ -1,133 +1,105 @@
 # Execution Protocol
 
-This protocol governs what happens after S&T planning releases executable work.
+Execution begins **only after the complete planning program has passed Final Planning Review and been frozen**.
 
-Execution is part of the framework. It is not a separate uncontrolled phase.
+Executor chats do not participate in unfinished planning.
 
-## 1. Preconditions
+# 1. Frozen execution plan
 
-A node may be executed only when all are true:
+`EXECUTION-PLAN.yaml` is compiled from the completed S&T plan.
 
-- the node exists in TREE;
-- it is an executable leaf for the intended actor;
-- its planning status is `approved`;
-- its ID is currently listed in `STATUS.yaml -> implementation_scope`;
-- no blocker invalidates the action;
-- its `success_evidence` is concrete enough to verify afterward.
+Every work package must contain enough resolved information that an executor can act without making a material planning/design decision.
 
-If any precondition fails, return to planning/review rather than improvising.
+A package contains:
 
-## 2. Execute the tactic, preserve the strategy
+- package ID;
+- responsibility/outcome;
+- source S&T node IDs;
+- scope;
+- inputs;
+- dependencies;
+- planned approach/constraints;
+- verification evidence;
+- explicit out-of-scope boundaries;
+- status.
 
-The executor performs the node's tactic within the stated project constraints.
+# 2. Executor-chat contract
 
-Rules:
+An executor chat:
 
-- retain the S&T node ID in commits/issues/PRs/tool notes when possible;
-- do not silently broaden scope;
-- if execution requires a material new decision, stop and create a D-entry;
-- if reality contradicts a material assumption, do not patch around it invisibly — record the fact and trigger review.
+- receives a specific package ID;
+- implements only that package;
+- follows the decisions already made in planning;
+- may inspect required project context;
+- verifies the package outcome;
+- records results.
 
-## 3. Verify the outcome
+It may not:
+- redesign the S&T;
+- expand its responsibility because another improvement seems useful;
+- make a missing material product/architecture decision;
+- rewrite the frozen plan to fit what it happened to implement.
 
-After execution, evaluate the **Strategy**, not merely the activity.
+# 3. Verification
 
-Use the node's `success_evidence`.
+The executor verifies against the evidence defined by the frozen package/S&T.
 
-Classify:
+Execution result:
 
-### verified
+- `verified`
+- `failed`
+- `blocked`
 
-Observed evidence demonstrates the Strategy.
+A task being attempted is not verification.
 
-### failed
+# 4. Planning exception
 
-Observed evidence demonstrates that the Strategy was not achieved.
+If execution exposes a material flaw in the frozen plan:
 
-### partial
+- stop the affected package;
+- capture concrete evidence;
+- mark it `blocked`;
+- create a planning-exception entry in `EXECUTION.md`;
+- hand the exception back to a PLANNER chat.
 
-Some useful outcome exists, but the declared success evidence is not satisfied yet.
+The executor does not solve the planning defect by improvisation.
 
-Do not use `verified` because code compiled, a file was created, a meeting occurred, or a command ran unless that is itself the Strategy's success evidence.
+# 5. Reopening a frozen plan
 
-## 4. Record an execution outcome
+Only a planner role may reopen planning.
 
-Append an E-entry to `EXECUTION.md`.
+The planner:
 
-Record:
+1. reads the execution exception;
+2. determines affected S&T scope;
+3. reopens the minimum necessary planning area;
+4. re-runs impacted full-plan consistency checks;
+5. updates/freeze a new planning baseline;
+6. recompiles affected execution packages.
 
-- node ID;
-- result;
-- executor/reference;
-- what was done;
-- evidence observed;
-- new facts or assumption changes;
-- plan impact;
-- affected nodes;
-- follow-up.
+Execution then resumes from the revised frozen plan.
 
-The execution ledger is evidence history, not a replacement for an external task tracker.
+# 6. Responsibility boundaries
 
-## 5. Update the framework state
+Work packages should be sized for independent executor chats.
 
-### If verified
+Planning should decide:
 
-- remove completed work from the active `implementation_scope`;
-- update current focus / next action;
-- if the verification satisfies a higher Strategy, review whether the next horizon can be released.
+- what each chat owns;
+- what it may modify;
+- what it consumes;
+- what it must produce;
+- what must already exist;
+- how its result is verified;
+- which later packages depend on it.
 
-### If failed or partial with no planning impact
+The executor should not have to infer its role from the entire S&T tree.
 
-- keep/re-release the node only if another execution attempt follows from the same valid plan;
-- record the next execution action.
+# 7. Completion
 
-### If failed/partial with planning impact
+Project execution is complete when:
 
-- remove unsafe affected work from `implementation_scope`;
-- reopen the smallest affected TREE node(s);
-- create/update relevant D-entry when uncertainty exists;
-- run the required planning review again;
-- release a corrected horizon only after gates pass.
-
-## 6. Do not confuse planning status with execution result
-
-TREE node status is planning status:
-
-- draft
-- blocked
-- approved
-
-EXECUTION result is observed outcome:
-
-- verified
-- failed
-- partial
-
-These are separate dimensions.
-
-An approved node can fail in reality. That is not a contradiction; it is feedback.
-
-Do not add `done` or `failed` to TREE node status in V1.
-
-## 7. External execution adapters
-
-When using GitHub:
-
-- Issue/PR/task status may track operational progress.
-- Keep the S&T node ID in the issue/PR.
-- CI/test evidence may be referenced by E-entry.
-- The project board does not replace TREE/DECISIONS/REVIEWS/EXECUTION.
-
-When using another tool, preserve the same traceability contract.
-
-## 8. Completion of the overall goal
-
-The framework reaches overall completion only when:
-
-- the root Strategy's `success_evidence` is observed;
-- material execution outcomes are verified;
-- no unresolved D-entry invalidates the claimed result;
-- the final review finds no missing necessary condition;
-- durable state reflects the verified reality.
-
-Completion is evidence-based, not based on exhausting a task list.
+- all required frozen work packages are verified;
+- their combined verified evidence demonstrates the root Strategy;
+- no blocking execution exception remains;
+- final integration/acceptance evidence passes.
