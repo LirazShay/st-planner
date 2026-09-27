@@ -91,23 +91,16 @@ Planning is complete only if:
 - no important gap appears when the entire tree is considered together;
 - KISS review passes.
 
-Record the result in `REVIEWS.md` together with reviewed-baseline evidence for the material planning files.
+Record the result in `REVIEWS.md`.
 
 ## 8. Freeze
 
 If Final Planning Review passes:
-
-1. record the reviewed baseline evidence in `.planning/REVIEWS.md`;
-2. prove no material drift in `.planning/GOAL.md`, `.planning/TREE.yaml`, and `.planning/DECISIONS.md`;
-3. when Git refs are available, prefer `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>`;
-4. if drift exists, keep planning active, review the changed baseline again, and record new evidence;
-5. only after the no-drift proof set `.planning/STATUS.yaml -> plan_state: frozen`;
-6. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
+- set `.planning/STATUS.yaml -> plan_state: frozen`;
+- keep `.planning/STATUS.yaml -> implementation_authorized: false`;
 - stop changing the baseline except for a documented later planning correction.
 
-Freeze closes the **reviewed** planning baseline. It does not start implementation.
-
-If merge/rebase/integration creates a different frozen ref after the first no-drift proof, verify the reviewed ref against that resulting ref before execution allocation. A workflow without stable Git refs must record equivalent reproducible evidence.
+Freeze closes the planning baseline. It does not start implementation.
 
 ## 9. Handoff to execution
 
@@ -115,19 +108,18 @@ Do not create a second task system.
 
 After the plan is frozen:
 
-1. confirm the frozen baseline still matches the recorded Final Review baseline, including any post-review merge/rebase/integration;
-2. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
-3. collect every implementation-ready leaf;
-4. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
-5. initialize each node as `pending`;
-6. leave Strategy/Tactic/success evidence in TREE rather than copying them into EXECUTION or EXECUTOR_HANDOFF;
-7. run `node .planning/validate-allocation.mjs --initial` and fix every failure; add `--serial-chats` only for explicitly serial numbered chats;
-8. follow `.planning/EXECUTOR_HANDOFF.md` and simulate the mandatory representative fresh executors from repository state only;
-9. record the handoff verification in `REVIEWS.md`;
-10. fix and rerun any failed simulation;
-11. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
+1. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
+2. collect every implementation-ready leaf;
+3. allocate every leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`;
+4. initialize each node as `pending`;
+5. leave Strategy/Tactic/success evidence in TREE rather than copying them into EXECUTION or EXECUTOR_HANDOFF;
+6. run `node .planning/validate-allocation.mjs --initial` and fix every failure; add `--serial-chats` only for explicitly serial numbered chats;
+7. follow `.planning/EXECUTOR_HANDOFF.md` and simulate the mandatory representative fresh executors from repository state only;
+8. record the handoff verification in `REVIEWS.md`;
+9. fix and rerun any failed simulation;
+10. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
-No executor may start before step 11.
+No executor may start before step 10.
 
 ### Chat allocation
 
@@ -181,10 +173,9 @@ If execution exposes a material defect in the frozen plan:
 7. keep already-`done` nodes only when their Strategy/evidence/outcome remain valid under the revised plan;
 8. reset invalidated completed nodes to `pending` or remove obsolete nodes;
 9. update only affected EXECUTION allocation;
-10. after the corrected plan passes focused review, record the corrected reviewed baseline and pass freeze no-drift verification again;
-11. re-freeze only that verified corrected baseline, still unauthorized;
-12. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable) and fix every failure;
-13. rerun and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, then explicitly re-authorize implementation before execution resumes.
+10. re-freeze after the corrected plan passes the required focused review, still unauthorized;
+11. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable) and fix every failure;
+12. rerun and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, then explicitly re-authorize implementation before execution resumes.
 
 Do not restart planning from the root unless the defect actually changes the root framing.
 
