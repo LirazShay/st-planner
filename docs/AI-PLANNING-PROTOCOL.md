@@ -1,4 +1,4 @@
-# AI Planning Protocol
+# AI Planning and Release Protocol
 
 This is the operational flow an AI follows when using S&T Planner.
 
@@ -128,29 +128,32 @@ Approval itself is read from node status in `TREE.yaml`; do not duplicate it in 
 
 Chat history is supplementary, never the source of truth.
 
-## 9. Compile approved leaves into execution work
+## 9. Hand off to execution
 
 Only after planning gates pass.
 
-For every implementation task retain:
+For every released implementation task retain:
 
 - S&T node ID;
-- action;
-- completion evidence;
+- tactic/action;
+- success evidence;
 - relevant constraints.
 
 GitHub Issues may be used, but they are output of the plan, not the planning model itself.
 
+Execution and verification then follow `EXECUTION-PROTOCOL.md`.
+
 ## 10. Learn from execution
 
-If implementation disproves an assumption:
+If execution disproves an assumption or produces only partial/failed evidence:
 
-1. record the new fact;
-2. identify the affected S&T node;
-3. reopen the smallest affected branch;
-4. revise it;
-5. re-run review upward;
-6. continue execution when the affected horizon is valid again.
+1. record the execution outcome in `EXECUTION.md`;
+2. identify the affected S&T node(s);
+3. remove unsafe affected nodes from the current implementation scope;
+4. reopen the smallest affected branch;
+5. revise decisions/tree as required;
+6. re-run review upward;
+7. release a corrected execution horizon only when valid again.
 
 Do not preserve a plan merely because it was previously approved.
 
