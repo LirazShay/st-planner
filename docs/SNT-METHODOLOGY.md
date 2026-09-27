@@ -552,7 +552,7 @@ For each step:
 
 ---
 
-# 19. Planning state for GPT
+# 19. Project management state
 
 The recommended target-project state is:
 
@@ -563,38 +563,96 @@ The recommended target-project state is:
 ├── TREE.yaml
 ├── STATUS.yaml
 ├── DECISIONS.md
-└── REVIEWS.md
+├── REVIEWS.md
+└── EXECUTION.yaml
 ```
 
 Purpose:
 
 - `GOAL.md`: stable problem/outcome boundary.
-- `TREE.yaml`: machine-readable rationale and decomposition.
-- `STATUS.yaml`: minimal resume point.
-- `DECISIONS.md`: alternatives and why choices were made.
-- `REVIEWS.md`: audit evidence and open defects.
+- `TREE.yaml`: the actual S&T work model — rationale, decomposition, dependencies, and success evidence.
+- `STATUS.yaml`: minimal planning resume point and active/frozen state.
+- `DECISIONS.md`: material unresolved questions and resolved choices.
+- `REVIEWS.md`: planning/replanning audit evidence.
+- `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
 
 This is intentionally small.
 
-Do not create one file per node unless project scale proves it necessary.
+Do not create one file per node and do not create another task database unless real usage proves a need.
 
 ---
 
-# 20. Planning versus execution
+# 20. Execution is the S&T tree itself
 
-The frozen S&T leaves are already the execution work definition.
+The frozen implementation-ready S&T leaves are already the execution work units.
 
-V1 deliberately avoids compiling them into a second task model.
+There is **no mandatory translation step** from S&T leaves into another task system.
 
-After freeze:
-- EXECUTION.yaml assigns leaf node IDs to numbered chats;
-- TREE remains the source for Strategy, Tactic, assumptions, dependencies, and success evidence;
-- EXECUTION stores only execution state/result;
-- Git/commits/PRs may still be used as normal implementation history, but they are not the framework's task source.
+In particular, the S&T Planner workflow does **not** require GitHub Issues.
 
-This preserves one chain of identity from planning to execution.
+The normal V1 flow is:
 
-Execution can falsify assumptions. When that happens, mark the affected execution node blocked and return the defect to planning rather than forcing reality to match the frozen plan.
+```
+frozen TREE.yaml
+→ allocate leaf node IDs in EXECUTION.yaml
+→ executor chat reads its node IDs
+→ executor reads the actual Strategy/Tactic directly from TREE.yaml
+→ execute
+→ verify success_evidence
+→ update state/result in EXECUTION.yaml
+```
+
+## 20.1 Source of truth during execution
+
+Keep ownership simple:
+
+| Concern | Source |
+|---|---|
+| Why the work exists | `TREE.yaml -> strategy` |
+| How the work is intended to be done | `TREE.yaml -> tactic` |
+| Planning rationale | assumptions / decisions |
+| Execution prerequisites | `TREE.yaml -> depends_on` |
+| Definition of success | `TREE.yaml -> success_evidence` |
+| Which chat owns the work | `EXECUTION.yaml` |
+| pending / in_progress / done / blocked | `EXECUTION.yaml` |
+| Short implementation/verification result | `EXECUTION.yaml -> result` |
+| Actual code history | normal Git commits/PRs when the project uses them |
+
+Do not copy Strategy/Tactic descriptions into EXECUTION.
+
+Do not recreate each leaf as a second task description.
+
+## 20.2 Practical executor workflow
+
+A numbered executor chat should:
+
+1. confirm the plan is frozen;
+2. read its assigned leaf IDs from `EXECUTION.yaml`;
+3. load those exact nodes from `TREE.yaml`;
+4. read only decisions/project context required by those nodes;
+5. check each node's `depends_on` leaves and confirm they are `done`;
+6. mark an available node `in_progress`;
+7. perform its Tactic;
+8. verify its `success_evidence`;
+9. mark it `done` and record a short result/reference.
+
+That is the execution-management loop.
+
+GitHub Issues may still be used by a target project for unrelated organizational reasons, but they are **not part of the S&T Planner methodology and must not be introduced merely to execute the S&T plan**.
+
+## 20.3 Why this matters
+
+Creating a second task object for every S&T leaf would duplicate:
+- identity;
+- scope;
+- rationale;
+- dependencies;
+- acceptance criteria;
+- status linkage.
+
+Direct execution from S&T node IDs keeps planning and implementation connected and reduces synchronization errors.
+
+Execution can still falsify assumptions. When that happens, mark the affected execution node blocked and return the defect to planning rather than improvising.
 
 ---
 
