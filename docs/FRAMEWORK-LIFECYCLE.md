@@ -13,7 +13,7 @@ FINAL WHOLE-PLAN REVIEW
   ↓
 FREEZE
   ↓
-CREATE EXECUTION TASKS
+ALLOCATE S&T LEAVES TO NUMBERED CHATS
   ↓
 EXECUTE
 ```
@@ -81,11 +81,18 @@ plan_state: active
 
 That is the only planning lifecycle state needed in V1.
 
-## 6. Create execution tasks
+## 6. Allocate execution
 
-Compile executable leaves into GitHub Issues or another ordinary task system.
+Create/populate `.planning/EXECUTION.yaml`.
 
-The planning repository remains the rationale; the task system tracks implementation work.
+Every implementation-ready leaf is assigned exactly once to a numbered executor chat.
+
+The tree remains the work definition. EXECUTION stores only:
+- chat allocation;
+- execution state;
+- short result/blocker reference.
+
+No second task system is required.
 
 ## Planning chats
 
