@@ -1,5 +1,11 @@
-Plan this with S&T Planner using the repository:
+Use S&T Planner from LirazShay/st-planner for the current target repository and plan:
 
 <WRITE THE GOAL HERE>
 
-This template is optional. If the target project's AGENTS.md contains the S&T Framework Rules, a natural request such as "תתכנן לי בשיטת S&T Planner לפי הריפו: ..." is enough.
+Fetch and follow LirazShay/st-planner/BOOTSTRAP.md first.
+
+This template is optional. A natural request such as:
+
+"תעבוד עם S&T Planner מ-LirazShay/st-planner ותתכנן לי לפי הריפו: ..."
+
+is enough.
