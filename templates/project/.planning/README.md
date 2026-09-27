@@ -2,6 +2,18 @@
 
 This directory contains the durable planning state and the minimal post-freeze execution allocation.
 
+## User-facing planning command
+
+Normal usage from a planning chat can be as short as:
+
+> תתכנן לי בשיטת S&T Planner לפי הריפו: <מה אני רוצה להשיג>
+
+or:
+
+> Plan this with S&T Planner using the repository: <desired outcome>
+
+The project `AGENTS.md` owns the automatic behavior behind this command. The user should not need to name these files or repeat the framework procedure.
+
 ## Planner read order
 
 1. `FRAMEWORK.md`
