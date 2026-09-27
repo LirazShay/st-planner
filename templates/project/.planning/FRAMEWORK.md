@@ -181,6 +181,6 @@ Do not duplicate approved-node lists in STATUS.
 
 Only approved, executable leaves may enter `implementation_scope`.
 
-Do not add a second boolean such as `implementation_allowed`; it creates contradictory states without adding information.
+Do not add a second permission boolean; it creates contradictory states without adding information.
 
 GitHub Issues or other task trackers are execution output. They are not the source of the S&T rationale.
