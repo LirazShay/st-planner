@@ -81,7 +81,11 @@ It is **not**:
 - a preferred sequence;
 - a general schedule.
 
-If two leaves can execute independently, do not invent a dependency.
+V1 dependency invariants:
+- reference existing implementation-ready leaf node IDs only;
+- no self-dependency;
+- no dependency cycles;
+- if two leaves can execute independently, do not invent a dependency.
 
 Do not decompose into trivial coding/clicking instructions.
 
