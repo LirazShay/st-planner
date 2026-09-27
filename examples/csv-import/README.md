@@ -39,4 +39,4 @@ A new AI reading the portable S&T framework plus these persisted files should co
 4. `0.2.1` is blocked by open decision `D-002`;
 5. no duplicate policy should be guessed;
 6. the next planning action is to resolve `D-002`;
-7. implementation outside `implementation_scope` remains blocked even though `implementation_allowed` is true.
+7. implementation is permitted only for node IDs listed in `implementation_scope`; everything else remains blocked.
