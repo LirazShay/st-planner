@@ -116,17 +116,19 @@ A fresh GPT should be able to read the repository state and identify:
 - whether the plan is active or frozen.
 
 
-## Gate 11 — Issue compilation
+## Gate 11 — Execution allocation
 
-After freeze and before numbered chat assignment, pass only when:
+After freeze, pass only when:
 
-- every implementation-ready frozen leaf appears in exactly one execution Issue by default;
-- any grouped Issue satisfies the documented grouping rules and lists every source S&T node;
-- no leaf was materially split during compilation; if splitting was required, planning was reopened instead;
-- every Issue outcome is derived from Strategy and planned approach from Tactic;
-- every relevant decision/constraint is referenced without copying irrelevant planning history;
-- every `depends_on` leaf relation became the correct Issue prerequisite;
-- every Issue includes objective acceptance evidence;
-- an executor can implement the Issue without making a new material planning decision.
+- every implementation-ready frozen leaf appears exactly once in `EXECUTION.yaml`;
+- no non-leaf or non-approved planning node is assigned as executable work;
+- every executor chat owns a coherent and manageable set of leaves;
+- allocation respects the `depends_on` graph;
+- no chat-level dependency graph duplicates TREE dependencies;
+- no single leaf is so large that the executor must materially re-plan it;
+- every node begins as `pending`;
+- execution state uses only pending / in_progress / done / blocked;
+- `done` requires verified success evidence;
+- an executor can begin from its chat number without needing the previous planning conversation.
 
-Compilation must be a projection of the frozen plan, not a new design phase.
+Execution allocation is a thin projection of the frozen tree, not a second planning model.
