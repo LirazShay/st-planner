@@ -206,6 +206,21 @@ When this opt-in mode is used:
 - add a small target-project validator that fails on duplicate IDs, missing mappings, or unexpected extras;
 - keep the validator target-specific unless repeated use proves a generic framework tool is justified.
 
+### Optional legacy migration completeness gate
+
+Use this pre-freeze gate only when the goal includes migration/extraction from a legacy system, repository, specification set, or other authoritative source. Do not run it for greenfield work.
+
+Before Final Planning Review:
+1. produce a fresh inventory of the relevant legacy source surface;
+2. compare that inventory against the extracted durable contracts and S&T coverage;
+3. classify every discrepancy instead of silently ignoring it;
+4. correct real omissions or record the justified exclusion/supersession;
+5. rerun the normal outside-in coverage audit after those corrections.
+
+The inventory may reuse an existing target-project artifact or a one-time reproducible query/report. Do not create a permanent framework artifact unless the project actually needs one.
+
+A discrepancy is not automatically a defect: the point is that every meaningful difference is accounted for before freeze.
+
 Use these challenge questions:
 
 1. **Goal traceability** — For every meaningful clause in the desired outcome and every hard constraint, where is it protected by the TREE, a material assumption, a decision, or success evidence?
