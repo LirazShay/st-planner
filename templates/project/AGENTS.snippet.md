@@ -18,12 +18,15 @@ On that trigger, automatically:
 8. Record meaningful reviews in `REVIEWS.md` and keep `.planning/STATUS.yaml` current.
 9. Do **not** implement target-project work while planning.
 10. Continue planning until the complete intended plan passes Final Planning Review.
-11. Set `.planning/STATUS.yaml -> plan_state: frozen` while keeping `.planning/STATUS.yaml -> implementation_authorized: false`.
-12. Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to numbered executor chats.
-13. Run `node .planning/validate-allocation.mjs --initial`; fix every failure before continuing. Add `--serial-chats` only when the target explicitly uses serial numbered chats.
-14. Run the mandatory repository-only fresh-chat verification from `.planning/EXECUTOR_HANDOFF.md` and record its result in `REVIEWS.md`.
-15. Fix any handoff/allocation/context-routing defect the simulation exposes and rerun the failed case.
-16. Only after both gates pass set `.planning/STATUS.yaml -> implementation_authorized: true`. Freeze/allocation alone never authorize implementation.
+11. Record the reviewed baseline evidence in `.planning/REVIEWS.md`.
+12. Verify that material planning files (`.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`) have not drifted from that reviewed baseline. In Git workflows prefer `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>`; after a merge/rebase/integration that creates a later frozen ref, verify again with `--frozen-ref <ref>`. If no stable Git ref exists, record equivalent evidence.
+13. If drift exists, keep planning active, review the changed baseline again, and do not freeze.
+14. Set `.planning/STATUS.yaml -> plan_state: frozen` while keeping `.planning/STATUS.yaml -> implementation_authorized: false`.
+15. Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to numbered executor chats.
+16. Run `node .planning/validate-allocation.mjs --initial`; fix every failure before continuing. Add `--serial-chats` only when the target explicitly uses serial numbered chats.
+17. Run the mandatory repository-only fresh-chat verification from `.planning/EXECUTOR_HANDOFF.md` and record its result in `REVIEWS.md`.
+18. Fix any handoff/allocation/context-routing defect the simulation exposes and rerun the failed case.
+19. Only after freeze no-drift, allocation validation, and fresh-chat handoff gates pass set `.planning/STATUS.yaml -> implementation_authorized: true`. Freeze/allocation alone never authorize implementation.
 
 Unless the user explicitly asks to stop earlier or work one stage per message, complete this planning workflow autonomously in the same planning conversation.
 
@@ -40,7 +43,7 @@ For meaningful work:
 5. Validate required children as necessary individually and sufficient together.
 6. Keep material open questions in `.planning/DECISIONS.md`.
 7. Continue until the complete intended S&T is implementation-ready.
-8. Run Final Planning Review before freezing.
+8. Run Final Planning Review before freezing, record the reviewed baseline evidence, and prove no material GOAL/TREE/DECISIONS drift before treating that baseline as frozen. Recheck after merge/rebase/integration when the frozen ref changes.
 9. Do not implement while `.planning/STATUS.yaml -> plan_state: active`.
 10. Do not implement merely because `.planning/STATUS.yaml -> plan_state: frozen`; execution also requires `.planning/STATUS.yaml -> implementation_authorized: true`.
 11. After explicit implementation authorization, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
@@ -52,5 +55,5 @@ For meaningful work:
 17. Mark a node `done` only after its `success_evidence` is verified.
 18. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `.planning/STATUS.yaml -> plan_state: active` and `.planning/STATUS.yaml -> implementation_authorized: false`, and stop starting new execution work.
 19. Reopen only the smallest affected S&T area; preserve `done` work only when it remains valid under the corrected plan.
-20. After focused review, repair only affected EXECUTION entries and freeze again; run allocation validation in `--resume` mode, then rerun the mandatory fresh-chat verification before re-authorization. Git history is sufficient version history.
+20. After focused review, record the corrected reviewed baseline, pass freeze no-drift verification again, repair only affected EXECUTION entries, and freeze that verified baseline; then run allocation validation in `--resume` mode and rerun the mandatory fresh-chat verification before re-authorization. Git history is sufficient version history.
 21. Prefer one planning chat; use repository state for durability and optional continuation.

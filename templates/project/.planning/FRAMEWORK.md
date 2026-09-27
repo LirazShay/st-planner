@@ -167,7 +167,7 @@ Do not hand partially planned leaves to implementation.
 
 When the whole intended tree is ready, run Final Planning Review across the complete plan.
 
-Only after it passes:
+Only after it passes **and the reviewed baseline passes freeze no-drift verification**:
 
 ```yaml
 plan_state: frozen
@@ -181,7 +181,34 @@ plan_state: active
 implementation_authorized: false
 ```
 
-Freeze means the planning baseline is closed for ordinary editing. It does **not** mean executors may start.
+### Freeze no-drift gate
+
+Final Planning Review approves a specific baseline, not whatever files happen to exist later.
+
+Record reviewed-baseline evidence in `REVIEWS.md`. The default material baseline is:
+- `.planning/GOAL.md`;
+- `.planning/TREE.yaml`;
+- `.planning/DECISIONS.md`.
+
+If the Final Review explicitly covers another durable contract whose drift would change the plan, include it as an additional checked file rather than expanding the default globally.
+
+When Git refs are available, prefer:
+
+```text
+node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref>
+```
+
+This compares the reviewed commit to the current working tree. If a merge/rebase/integration step later produces the actual frozen commit/ref, verify that result too:
+
+```text
+node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref> --frozen-ref <frozen-ref>
+```
+
+A workflow that cannot provide a stable Git ref must record equivalent reproducible evidence in REVIEWS.
+
+Any material drift means the prior Final Planning Review is stale. Keep/return `.planning/STATUS.yaml -> plan_state: active`, review the changed baseline again, and record new baseline evidence. Never waive drift merely because the change looks small.
+
+Freeze means the reviewed planning baseline is closed for ordinary editing. It does **not** mean executors may start.
 
 ## 12. Keep state simple
 
@@ -195,7 +222,7 @@ Prefer one planning conversation. Repository state exists so continuation is pos
 
 ## 13. Execution handoff
 
-After freeze, prepare execution directly from the S&T tree, but keep implementation unauthorized until handoff is complete.
+After freeze, first confirm no intervening merge/rebase/integration changed the reviewed baseline. Then prepare execution directly from the S&T tree, but keep implementation unauthorized until handoff is complete.
 
 **Do not create GitHub Issues merely to execute the S&T plan.**
 The implementation-ready leaves in `TREE.yaml` are already the work units.
