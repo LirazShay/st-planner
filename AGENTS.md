@@ -94,7 +94,16 @@ When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
 - record a short result/reference;
 - set `blocked` with a short reason if a real planning/execution blocker prevents progress.
 
-If execution exposes a material planning defect, do not improvise. Mark the affected node blocked and return the defect to planning.
+If execution exposes a material planning defect:
+- do not improvise;
+- mark the affected execution node `blocked` with a short factual reason;
+- set `STATUS.yaml -> plan_state: active`;
+- stop starting new execution work;
+- reopen only the smallest affected S&T area;
+- preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
+- after focused re-review, repair only affected EXECUTION assignments/states and set `plan_state: frozen` again.
+
+Do not create plan-version machinery; Git history and REVIEWS are enough.
 
 ## KISS
 
