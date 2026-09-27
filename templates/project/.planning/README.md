@@ -4,13 +4,14 @@ This directory is the durable S&T planning memory for this project.
 
 ## Read order for a fresh AI session
 
-1. `STATUS.yaml`
-2. `GOAL.md`
-3. the active part of `TREE.yaml`
-4. `DECISIONS.md` only when referenced or needed
-5. `REVIEWS.md` only when referenced or needed
+1. `FRAMEWORK.md` — read once at the start of a fresh session; it contains the portable S&T rules.
+2. `STATUS.yaml`
+3. `GOAL.md`
+4. the active part of `TREE.yaml`
+5. `DECISIONS.md` only when referenced or needed
+6. `REVIEWS.md` only when referenced or needed
 
-The S&T method and review rules come from the S&T Planner framework.
+This directory is self-contained for V1. The central S&T Planner repository contains deeper documentation but is not required to resume ordinary planning.
 
 ## Rules
 
