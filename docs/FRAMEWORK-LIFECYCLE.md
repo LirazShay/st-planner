@@ -1,216 +1,140 @@
 # S&T Framework Lifecycle
 
-S&T Planner is not only a planning method. It is a control loop that carries a goal from intent to verified outcome and keeps the rationale recoverable across AI sessions.
-
-The framework should work with any capable GPT/AI agent that can read and update the project state. GitHub is the preferred durable host for V1, but the lifecycle is deliberately tool-agnostic.
-
-## The control loop
+The framework has **two strictly separated programs**:
 
 ```
-CONNECT
-  ↓
-UNDERSTAND
-  ↓
-PLAN
-  ↓
-CRITIQUE
-  ↓
-RELEASE
-  ↓
-EXECUTE
-  ↓
-VERIFY
-  ↓
-LEARN / REPLAN
-  └──────────────→ PLAN
+PLANNING PROGRAM
+  understand
+  → build the complete S&T
+  → challenge every branch
+  → resolve material decisions
+  → full-tree review
+  → freeze the plan
+  → compile execution work packages
+
+                 HARD GATE
+
+EXECUTION PROGRAM
+  executor chat gets one work package
+  → performs only that responsibility
+  → verifies against planned acceptance evidence
+  → records result
+  → stops or hands back an exception
 ```
 
-At any point a new chat may replace the current chat. The repository state must be enough to resume the loop.
+There is no normal path from an unfinished planning branch directly into implementation.
 
----
+## Program A — Planning
 
-## 1. CONNECT
+Planning is a project in its own right and may span many GPT chats.
 
-Goal: make a fresh AI session operate under the same planning/execution contract without relying on prior chat history.
+Each planner chat:
 
-The AI reads:
+1. connects to the same durable planning state;
+2. continues the recorded planning action;
+3. expands or critiques the S&T;
+4. resolves or exposes material questions;
+5. updates the repository planning artifacts;
+6. ends with a durable handoff to the next planner chat.
 
-1. repository `AGENTS.md` when present;
-2. `.planning/README.md`;
-3. `.planning/FRAMEWORK.md`;
-4. `.planning/STATUS.yaml`;
-5. `.planning/GOAL.md`;
-6. only the relevant part of `.planning/TREE.yaml`;
-7. referenced decisions, reviews, and execution outcomes only when needed.
+Planner chats may inspect project code/files when needed to understand current reality, but they **do not implement the target project**.
 
-Connection is successful when the AI can state:
-
-- the stable goal boundary;
-- the current focus;
-- the material blocker, if any;
-- the exact next action;
-- the exact implementation scope;
-- the last relevant review/execution outcome.
-
-Do not dump the entire repository into context.
-
----
-
-## 2. UNDERSTAND
-
-Goal: establish a stable problem boundary before selecting a solution.
-
-Persist:
-
-- desired outcome;
-- established current reality;
-- constraints;
-- non-goals.
-
-Material unresolved questions become D-entries in `DECISIONS.md`.
-
-Do not hide uncertainty in chat.
-
----
-
-## 3. PLAN
-
-Goal: construct the S&T logic from outcome to executable leaves.
-
-For every active step establish:
-
-- Strategy;
-- Tactic;
-- Parallel assumptions;
-- Necessary assumptions for child-to-parent logic;
-- Sufficiency assumptions for parent groups;
-- Success evidence;
-- Children.
-
-The number and depth of nodes emerge from the logic, not from a predetermined phase count.
-
----
-
-## 4. CRITIQUE
-
-Goal: try to break the plan before reality does.
-
-Run independent passes for:
-
-- Strategy/Tactic validity;
-- necessity;
-- sufficiency;
-- assumption honesty;
-- KISS;
-- executability;
-- tree consistency;
-- fresh-session continuity.
-
-A review result belongs in `REVIEWS.md`.
-
-If a review exposes a material unresolved question, create/reference a D-entry instead of burying the issue inside review prose.
-
----
-
-## 5. RELEASE
-
-Goal: expose only a safe, useful near-term execution horizon.
-
-Only approved executable leaves may enter:
-
-```yaml
-implementation_scope:
-  - "node-id"
-```
-
-A project does **not** need every future branch fully decomposed before useful work begins.
-
-Release is permission, not completion.
-
----
-
-## 6. EXECUTE
-
-Goal: perform the released work using whatever executor is appropriate.
-
-Execution can be:
-
-- GPT editing code/files;
-- GitHub Issues + pull requests;
-- browser/tool actions;
-- a human task;
-- another agent;
-- a non-software real-world action.
-
-The framework does not prescribe one executor.
-
-Each execution effort must retain the S&T node ID so the work remains traceable to its rationale.
-
-Do not silently broaden scope beyond the released node.
-
----
-
-## 7. VERIFY
-
-Goal: test reality against the node's `success_evidence`.
-
-After execution, classify the result:
-
-- **verified** — evidence demonstrates the node strategy;
-- **failed** — evidence shows the strategy was not achieved;
-- **partial** — useful result exists, but the success evidence is not yet satisfied.
-
-Record the outcome in `EXECUTION.md`.
-
-Do not mark success because the tactic was performed. Verify the Strategy outcome.
-
----
-
-## 8. LEARN / REPLAN
-
-Execution creates facts that planning could not know in advance.
-
-If evidence contradicts an assumption or reveals a missing condition:
-
-1. record the observed fact in the execution outcome;
-2. identify affected S&T nodes;
-3. reopen only the smallest affected planning branch;
-4. update decisions when needed;
-5. re-run review upward until the affected logic is valid;
-6. release the next safe execution horizon.
-
-The plan serves reality; reality does not serve the plan.
-
----
-
-# Separation of concerns
-
-The durable files have distinct ownership:
+### Planning artifacts
 
 - `GOAL.md` — stable boundary.
-- `TREE.yaml` — planning logic and node planning status.
-- `DECISIONS.md` — material unresolved questions and resolutions.
-- `REVIEWS.md` — planning audit history.
-- `EXECUTION.md` — observed execution/verification outcomes.
-- `STATUS.yaml` — resume pointer and currently released implementation scope.
+- `TREE.yaml` — complete S&T logic.
+- `DECISIONS.md` — material unresolved questions and their resolutions.
+- `REVIEWS.md` — planning review history.
+- `STATUS.yaml` — planning resume pointer.
+- `EXECUTION-PLAN.yaml` — absent or draft until final planning; becomes authoritative only after final freeze.
 
-External systems such as GitHub Issues, PRs, CI, project boards, or other tools may execute work, but they do not replace the S&T rationale.
+## Planning completion gate
 
----
+Planning is not complete because some leaves are executable.
 
-# Core invariant
+The transition to execution is allowed only when the **whole intended plan** is ready.
 
-Every transition must preserve traceability:
+Required conditions:
+
+- the desired outcome and constraints are stable;
+- every active S&T branch needed for the intended project scope has been decomposed to the required execution granularity;
+- every active node has valid Strategy/Tactic logic;
+- every required child passes necessity;
+- every sibling group passes sufficiency;
+- material assumptions are explicit;
+- all material planning decisions that affect execution are resolved;
+- the complete tree passes structural, KISS, consistency, and fresh-session reviews;
+- execution ordering/dependencies needed for handoff are understood;
+- work can be partitioned into executor responsibilities without leaving design decisions to executor chats;
+- a **Final Planning Review** passes for the whole plan.
+
+Only then:
+
+1. freeze the planning baseline;
+2. compile the approved S&T into `EXECUTION-PLAN.yaml`;
+3. change `STATUS.yaml -> stage` from `planning` to `execution`.
+
+## Program B — Execution
+
+Execution starts only from the frozen plan.
+
+Execution is deliberately distributed.
+
+Each executor chat receives **one explicit work package** (or an explicitly compatible group of packages) containing:
+
+- responsibility / outcome;
+- source S&T node IDs;
+- allowed scope;
+- required inputs/context;
+- dependencies/preconditions;
+- implementation instructions or constraints already decided by planning;
+- verification evidence;
+- forbidden/out-of-scope work;
+- handoff/reporting requirements.
+
+The executor chat does not redesign the S&T.
+
+Its job is to perform the responsibility that planning already defined.
+
+## Execution exception rule
+
+If an executor discovers that the frozen plan is impossible, contradictory, incomplete, or requires a material decision that was not planned:
+
+1. stop the affected work;
+2. record the observed fact and affected work package;
+3. mark the package blocked;
+4. return the issue to the planning authority.
+
+The executor does **not** silently redesign the plan.
+
+A planner chat then decides whether the frozen planning baseline must be reopened and reviewed.
+
+## Handoff model
+
+### Planner-to-planner
+
+The next planner chat receives the framework + planning state and continues the next planning action.
+
+### Planner-to-executor
+
+This happens only after final freeze. The execution plan is the contract.
+
+### Executor-to-executor
+
+Executor chats may depend on outputs of earlier work packages, but responsibility boundaries are defined in the frozen execution plan.
+
+### Executor-to-planner
+
+Only for exceptions that invalidate or expose a gap in the frozen plan.
+
+## Core invariant
 
 ```
-Goal
-→ Strategy
-→ Tactic
-→ Executable leaf
-→ Execution
-→ Evidence
-→ Observed reality
-→ Updated plan (when needed)
+Plan completely
+→ review completely
+→ freeze
+→ compile responsibilities
+→ execute according to the frozen plan
 ```
 
-A fresh AI session should be able to reconstruct that chain without private chain-of-thought or prior chat history.
+Do not mix planning and implementation in the same unfinished planning flow.
