@@ -1,6 +1,6 @@
 # Execution Handoff
 
-S&T Planner executes the frozen plan directly from S&T node IDs; no separate task layer is needed.
+S&T Planner executes an explicitly authorized frozen plan directly from S&T node IDs; no separate task layer is needed.
 
 The S&T leaves are already the planned work units.
 
