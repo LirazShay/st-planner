@@ -1,17 +1,12 @@
 version: 1
 
 mode: DEEP
-phase: goal_definition
 
 current_node: "0"
-
-approved_nodes: []
 
 blockers: []
 
 next_action: "Complete GOAL.md and validate the planning boundary"
-
-implementation_allowed: false
 
 implementation_scope: []
 
