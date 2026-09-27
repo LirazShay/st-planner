@@ -43,9 +43,10 @@ When invoked from another repository:
 4. If the target repository does **not** already contain `.planning/`, copy the ten planning/framework files above into target `.planning/` using the same filenames.
 5. Merge `templates/project/AGENTS.snippet.md` into the target repository's existing `AGENTS.md`. Preserve the target repository's existing instructions. If no `AGENTS.md` exists, create one containing the snippet.
 6. If the target repository already contains an S&T Planner `.planning/`, do not overwrite live planning state. Use the installed state as-is unless the user explicitly asks to upgrade/reinstall the framework.
-7. After bootstrap, continue **in the same conversation** as the planning agent. Do not stop merely because installation completed.
-8. Determine the requested goal from the user's command and target repository context.
-9. Follow the installed S&T Framework Rules automatically:
+7. Treat `.planning/STATUS.yaml` as the only S&T Planner-owned lifecycle/status file. If the target repository also has `STATUS.yaml`, phase/state files, or workstream status, preserve them unless the target's own instructions explicitly require a coordinated integration update.
+8. After bootstrap, continue **in the same conversation** as the planning agent. Do not stop merely because installation completed.
+9. Determine the requested goal from the user's command and target repository context.
+10. Follow the installed S&T Framework Rules automatically:
    - use target-repository context progressively;
    - build/update GOAL, TREE, DECISIONS, REVIEWS, and STATUS;
    - do not implement target-project work while planning;
@@ -56,7 +57,7 @@ When invoked from another repository:
    - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification;
    - record the verification in REVIEWS;
    - explicitly authorize implementation only after that gate passes.
-10. Do not ask the user to repeat framework instructions. Ask only for a missing project goal if neither the request nor the target repository makes it unambiguous.
+11. Do not ask the user to repeat framework instructions. Ask only for a missing project goal if neither the request nor the target repository makes it unambiguous.
 
 ## Safety against accidental overwrite
 
