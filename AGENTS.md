@@ -134,16 +134,16 @@ A review should actively search for:
 - over-engineering;
 - leaves that are not actually executable.
 
-## 11. Time, support, and shared dependencies
+## 11. Special cases: keep V1 simple
 
-Basic S&T decomposition is logical rather than chronological.
+Multiple parents, supporting steps, and time dependency are acknowledged but not fully modeled in V1.
 
-Represent separately:
-- dependencies/order constraints;
-- supporting steps that improve probability or magnitude but are not strictly necessary;
-- nodes that contribute to multiple parents.
+For now:
+- never call a merely helpful step "necessary";
+- record unusual shared-parent cases as an open planning note instead of inventing a graph model;
+- record important ordering as a simple dependency note rather than distorting the S&T hierarchy.
 
-Do not falsely label a helpful step as logically necessary merely to fit it into the tree.
+Do not add machinery for these cases until real use demonstrates that it is needed.
 
 ## 12. Compiling into work
 
