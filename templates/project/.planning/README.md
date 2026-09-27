@@ -17,7 +17,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 ## Planner read order
 
 1. `FRAMEWORK.md`
-2. `STATUS.yaml`
+2. `.planning/STATUS.yaml`
 3. `GOAL.md`
 4. relevant `TREE.yaml` nodes
 5. `DECISIONS.md` when needed
@@ -27,7 +27,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 
 1. project `AGENTS.md` and its routing/source-of-truth rules
 2. `EXECUTOR_HANDOFF.md`
-3. `STATUS.yaml` — require both `plan_state: frozen` and `implementation_authorized: true`
+3. `.planning/STATUS.yaml` — require both `plan_state: frozen` and `implementation_authorized: true`
 4. `EXECUTION.yaml`
 5. only assigned `TREE.yaml` nodes
 6. dependency states from EXECUTION
