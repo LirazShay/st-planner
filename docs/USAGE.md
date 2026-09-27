@@ -34,7 +34,9 @@ This is optional continuation, not the default workflow.
 
 ## After planning
 
-Once `plan_state: frozen`, create GitHub Issues/tasks from implementation-ready leaves.
+Once `plan_state: frozen`, compile GitHub Issues from implementation-ready leaves using `docs/ISSUE-COMPILATION.md` and `templates/EXECUTION-ISSUE.md`.
+
+Default to one leaf → one Issue. If Issue creation reveals that a leaf must be materially split, reopen planning instead of designing the split during execution handoff.
 
 Then populate `.planning/CHAT-ASSIGNMENTS.yaml` with the chat-to-Issue mapping.
 
