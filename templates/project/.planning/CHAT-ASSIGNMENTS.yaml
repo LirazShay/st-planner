@@ -8,7 +8,8 @@ version: 1
 # A new executor chat can say only "I am chat 1" (or 2, 3, ...)
 # and deterministically discover what work to pull from GitHub.
 #
-# Do not duplicate task details here. GitHub Issues remain the execution source.
+# Do not duplicate task details or dependency status here.
+# GitHub Issues remain the execution source.
 # TREE.yaml remains the planning rationale.
 
 assignments: {}
@@ -23,17 +24,14 @@ assignments: {}
 #     snt_nodes:
 #       - "1.2.1"
 #       - "1.2.2"
-#     depends_on_chats: []
 #
 #   "2":
 #     issues:
 #       - 103
 #     snt_nodes:
 #       - "1.3.1"
-#     depends_on_chats:
-#       - "1"
 #
-# Dependency rule:
-# A chat dependency is satisfied when all GitHub Issues assigned to that
-# prerequisite chat are complete/closed (or otherwise explicitly marked done
-# by the project's normal task workflow).
+# Start rule:
+# A chat reads its assigned Issues and checks the prerequisites recorded there.
+# If any assigned Issue is blocked by an incomplete prerequisite Issue,
+# the chat reports that dependency and does not invent alternate work.
