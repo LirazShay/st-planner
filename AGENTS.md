@@ -69,17 +69,19 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan, create GitHub Issues/tasks from executable leaves, and map those Issues to numbered executor chats in `.planning/CHAT-ASSIGNMENTS.yaml`.
+Then freeze the plan, compile GitHub Issues/tasks from implementation-ready leaves using the repository's Issue-compilation rules, and map those Issues to numbered executor chats in `.planning/CHAT-ASSIGNMENTS.yaml`.
 
 ## Execution handoff
 
-Each execution task should include:
-- source S&T node ID(s);
-- responsibility/outcome;
-- scope;
-- relevant decisions/constraints;
-- dependencies;
-- success/acceptance evidence.
+Issue compilation rules:
+- default one implementation-ready leaf → one Issue;
+- group only coherent leaves with compatible prerequisites and jointly verifiable evidence;
+- if a leaf must be materially split, reopen planning;
+- preserve S&T node IDs;
+- derive outcome from Strategy and planned approach from Tactic;
+- copy only relevant constraints/decisions;
+- translate `depends_on` into Issue prerequisites;
+- include objective success/acceptance evidence.
 
 Executor chats implement the task; they do not redesign the plan.
 
