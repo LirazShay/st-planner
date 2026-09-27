@@ -90,4 +90,19 @@ Create GitHub Issues/tasks from executable leaves.
 
 Every task keeps its S&T node ID and enough context for execution.
 
+Then group the Issues into coherent numbered executor-chat assignments in `.planning/CHAT-ASSIGNMENTS.yaml`.
+
+The grouping should:
+- keep related responsibility together;
+- respect dependencies;
+- allow parallel chats where dependencies permit;
+- avoid forcing executor chats to make new material planning decisions.
+
+The assignment map contains only:
+- Issue numbers;
+- source S&T node IDs;
+- prerequisite chat numbers.
+
+Task details and execution status remain in GitHub.
+
 The planning framework does not become an execution engine.
