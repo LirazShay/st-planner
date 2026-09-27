@@ -26,7 +26,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 ## Executor read order
 
 1. project `AGENTS.md`
-2. `STATUS.yaml`
+2. `STATUS.yaml` — require both `plan_state: frozen` and `implementation_authorized: true`
 3. `EXECUTION.yaml`
 4. only assigned `TREE.yaml` nodes
 5. referenced decisions/context when needed
@@ -37,7 +37,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - TREE — S&T logic, planning status, dependencies, success evidence.
 - DECISIONS — material open questions and decisions.
 - REVIEWS — planning review history.
-- STATUS — small planning resume pointer and active/frozen state.
+- STATUS — small planning resume pointer, active/frozen planning state, and explicit implementation-authorization gate.
 - EXECUTION — after freeze only: numbered chat allocation + execution state/result for leaf node IDs.
 
 ## Important
@@ -46,6 +46,9 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - New planning chats are optional continuation only.
 - Do not implement while `plan_state: active`.
 - The whole intended plan must pass Final Planning Review before `plan_state: frozen`.
+- `plan_state: frozen` does **not** authorize implementation.
+- Keep `implementation_authorized: false` while post-freeze allocation/handoff checks are still being completed.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
+- Execution may begin only after the required handoff checks pass and `implementation_authorized: true` is set explicitly.
 - Do not duplicate Strategy/Tactic/task descriptions in EXECUTION.
 - Execution dependencies remain in TREE -> depends_on.
