@@ -1,36 +1,42 @@
 # Worked Example — Safe CSV Import
 
-This example demonstrates the S&T Planner on a small but realistic software change.
+This example demonstrates the S&T Planner on a small but realistic software change, including a fresh-session handoff.
 
 ## Scenario
 
 A backend service must let users import customer records from CSV files safely and predictably.
 
-The example intentionally shows **partial planning**:
+## Current example state
 
-- the root has been decomposed;
-- branch `0.1` has been decomposed to executable leaves;
-- that branch passed review;
-- implementation is allowed only for that approved horizon;
-- the next planning action is to decompose `0.2`.
+- The root has been decomposed.
+- Branch `0.1` is decomposed to executable leaves and has passed review.
+- A simulated fresh session successfully recovered the state and continued into branch `0.2`.
+- Branch `0.2` was decomposed into admissibility definition, candidate evaluation, and persistence enforcement.
+- The fresh session correctly discovered that duplicate-customer behavior is a material unknown and created open decision `D-002` instead of inventing a rule.
+- Implementation remains allowed only for the previously approved horizon: `0.1.1` and `0.1.2`.
+- The next planning action is to resolve `D-002`, then review `0.2.1`.
 
-This demonstrates that a project does not need every distant branch fully decomposed before useful work can begin.
+This demonstrates two important properties:
+
+1. a project can execute an approved near-term horizon without fully planning distant branches;
+2. a fresh session can continue from repository state and stop when it reaches a real product/domain decision that is not present in the persisted context.
 
 ## Files
 
 - `GOAL.md` — outcome, current reality, constraints, non-goals and evidence.
 - `TREE.yaml` — S&T structure and assumptions.
 - `STATUS.yaml` — exact resume point for a fresh session.
-- `DECISIONS.md` — one concrete alternative decision.
-- `REVIEWS.md` — review evidence for the released branch.
+- `DECISIONS.md` — decided and open alternatives.
+- `REVIEWS.md` — logical reviews plus the handoff test result.
 
 ## Fresh-session exercise
 
-A fresh AI should be able to read only these files and correctly conclude:
+A new AI reading the portable S&T framework plus these persisted files should conclude:
 
-1. the overall goal;
-2. why the four root children exist;
-3. that `0.1.1` and `0.1.2` are executable;
-4. that implementation is allowed for those two leaves;
-5. that the next planning task is `0.2`;
-6. that implementation outside the approved horizon is still blocked.
+1. the overall goal is safe and predictable customer CSV import;
+2. `0.1.1` and `0.1.2` are the only currently approved implementation nodes;
+3. `0.2` has a sensible decomposition but is not approved;
+4. `0.2.1` is blocked by open decision `D-002`;
+5. no duplicate policy should be guessed;
+6. the next planning action is to resolve `D-002`;
+7. implementation outside `implementation_scope` remains blocked even though `implementation_allowed` is true.
