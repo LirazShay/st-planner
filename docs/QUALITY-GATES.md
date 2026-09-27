@@ -19,7 +19,7 @@ For each active node:
 - Strategy states an objective, not an activity.
 - Tactic states an action, not the same sentence rewritten as a verb.
 - Parallel assumptions explain why the tactic is a valid way to achieve the strategy.
-- Evidence tests the strategy rather than merely proving that work occurred.
+- Success evidence tests the strategy rather than merely proving that work occurred.
 
 ## Gate 3 — Necessity
 
@@ -77,7 +77,19 @@ It must identify:
 - objective completion evidence;
 - blocking dependencies, if any.
 
-## Gate 8 — Fresh-session continuity
+## Gate 8 — Tree-state consistency
+
+Pass when:
+
+- every child reference resolves to a node;
+- every non-root V1 node has one logical parent;
+- the tree is acyclic;
+- node statuses use only draft / blocked / approved;
+- blocked status is applied only to the node actually blocked;
+- approved status is not treated as recursive approval of descendants;
+- approved nodes have concrete success evidence.
+
+## Gate 9 — Fresh-session continuity
 
 A project passes when a new AI session, using only repository state, can correctly state:
 
@@ -88,11 +100,11 @@ A project passes when a new AI session, using only repository state, can correct
 5. the exact implementation scope;
 6. which relevant nodes are draft, blocked, or approved.
 
-## Gate 9 — Execution release
+## Gate 10 — Execution release
 
 Implementation may begin for the approved horizon when:
 
-- Gates 1–8 pass for that horizon;
+- Gates 1–9 pass for that horizon;
 - unresolved future questions cannot invalidate the next work;
 - the exact approved executable leaves appear in `STATUS.yaml -> implementation_scope`.
 
