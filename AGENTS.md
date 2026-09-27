@@ -77,15 +77,19 @@ Planning is complete only when the **whole intended plan**:
 - has no unresolved material decision that execution would have to invent;
 - passes necessity and sufficiency checks;
 - passes KISS and structural review;
-- passes a Final Planning Review.
+- passes a Final Planning Review;
+- has recorded reviewed-baseline evidence and passed freeze no-drift verification.
 
-Then freeze the plan while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
+For Git workflows, prefer `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` before freeze, and if merge/rebase/integration creates a later frozen ref, verify again with `--frozen-ref <ref>`. If a stable Git ref is unavailable, record equivalent evidence in REVIEWS. Any material GOAL/TREE/DECISIONS drift invalidates the Final Planning Review and requires a new review.
+
+Then freeze the verified reviewed baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 ## Execution handoff
 
 After freeze:
 
 - keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff verification passes;
+- before allocation, confirm the frozen baseline still matches the recorded Final Review baseline; rerun freeze verification after any intervening merge/rebase/integration;
 - create/populate `.planning/EXECUTION.yaml`;
 - assign every implementation-ready leaf to exactly one numbered chat;
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
