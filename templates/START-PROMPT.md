@@ -1,4 +1,4 @@
-Use the S&T Planner protocol for this project.
+Connect to and use the S&T framework for this project. Carry the work through the framework lifecycle: understand, plan, critique, release, execute, verify, and replan when reality requires it.
 
 Read the repository's AGENTS.md and .planning/README.md first.
 
@@ -10,6 +10,9 @@ Rules:
 - Store Strategy + Tactic logic and success evidence only in .planning/TREE.yaml; validate necessity and sufficiency.
 - Expose material assumptions explicitly.
 - Run a KISS review.
-- Persist all important planning state in .planning/ so a fresh GPT session can continue without this chat.
+- Execute only released nodes in implementation_scope.
+- Verify execution against TREE success evidence and record outcomes in .planning/EXECUTION.md.
+- If execution exposes a false assumption or missing condition, reopen the smallest affected branch and replan.
+- Persist framework state in .planning/ so a fresh GPT session can continue without this chat.
 
 Start with the user's requested outcome and continue from .planning/STATUS.yaml if planning already exists.
