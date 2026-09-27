@@ -105,16 +105,16 @@ Before freezing:
 
 Only a pass here allows `plan_state: frozen`. Freeze does not authorize implementation; `implementation_authorized` remains false through post-freeze handoff.
 
-## Fresh-chat continuity check
+## Fresh planning-chat continuity check
 
-Optional but recommended:
-A fresh GPT should be able to read the repository state and identify:
+For planning continuation, a fresh GPT should be able to read repository state and identify:
 - the goal;
 - current planning location;
 - blockers;
 - next planning action;
 - whether the plan is active or frozen.
 
+This is separate from the mandatory **executor** handoff gate below.
 
 ## Gate 11 — Execution allocation
 
@@ -133,10 +133,35 @@ After freeze, with `implementation_authorized: false`, pass only when:
 
 Execution allocation is a thin projection of the frozen tree, not a second planning model.
 
-Passing allocation is necessary but does not itself authorize execution. After all required post-freeze handoff checks pass, explicitly set `STATUS.yaml -> implementation_authorized: true`.
+Passing allocation is necessary but does not itself authorize execution.
 
+## Gate 12 — Mandatory fresh-chat executor handoff
 
-## Gate 12 — Re-freeze after an execution-discovered defect
+Before implementation authorization, follow `.planning/EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only.
+
+Pass only when representative simulations cover:
+- first available executor;
+- dependency-blocked early executor;
+- mid-plan executor with multiple dependencies;
+- final closure executor.
+
+For each case, the fresh executor must correctly determine:
+- authorization state;
+- assigned nodes;
+- prerequisite states;
+- first runnable node or that none is runnable;
+- exact contract/project context to load next;
+- factual blocker when it cannot proceed.
+
+Use actual allocated chats/nodes when possible. If the allocation is too small to contain one literal shape, simulate the condition against the closest real assignment without changing durable EXECUTION state and record that adaptation.
+
+Record the gate result in `REVIEWS.md`.
+
+Any failure keeps `implementation_authorized: false`. Fix the smallest handoff/allocation/context-routing defect and rerun the failed case.
+
+Only a pass here allows `STATUS.yaml -> implementation_authorized: true`.
+
+## Gate 13 — Re-freeze after an execution-discovered defect
 
 When a frozen plan is reopened, first set `implementation_authorized: false`, then re-freeze only when:
 
@@ -151,6 +176,6 @@ When a frozen plan is reopened, first set `implementation_authorized: false`, th
 - new implementation-ready leaves appear exactly once in EXECUTION;
 - unaffected valid work was not unnecessarily reset.
 
-Re-freeze alone does not restore execution permission. Required handoff checks must pass again before `implementation_authorized: true` is restored.
+Re-freeze alone does not restore execution permission. Gate 12 must pass again and be recorded before `implementation_authorized: true` is restored.
 
 Do not require a new global plan version. Git history and REVIEWS provide the audit trail.
