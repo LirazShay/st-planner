@@ -7,12 +7,16 @@
 - constraints are explicit;
 - non-goals prevent scope drift.
 
-## Gate 2 — Node validity
+## Gate 2 — Node and relationship validity
 
 For each active node:
 - Strategy states an objective;
 - Tactic states an action;
-- Parallel assumptions genuinely justify the Strategy/Tactic relationship;
+- Parallel assumptions genuinely justify this node's Tactic → Strategy relationship;
+- every non-root child's Necessary assumptions justify that child → parent relationship;
+- every parent with children has Sufficiency assumptions that justify the children-as-a-group → parent relationship;
+- root has no Necessary assumptions;
+- leaves normally have no Sufficiency assumptions;
 - success evidence tests the Strategy.
 
 ## Gate 3 — Necessity
