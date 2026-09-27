@@ -132,3 +132,21 @@ After freeze, pass only when:
 - an executor can begin from its chat number without needing the previous planning conversation.
 
 Execution allocation is a thin projection of the frozen tree, not a second planning model.
+
+
+## Gate 12 — Re-freeze after an execution-discovered defect
+
+When a frozen plan is reopened, re-freeze only when:
+
+- the material defect is represented and corrected in TREE/DECISIONS;
+- affected Necessity/Sufficiency/parallel logic has been re-reviewed;
+- review upward shows the impact is contained;
+- affected whole-plan coverage remains valid;
+- affected `depends_on` relationships are valid and acyclic;
+- each previously `done` affected node was explicitly checked for continued validity;
+- invalidated completed nodes were reset to `pending` or removed if obsolete;
+- obsolete execution leaf IDs were removed;
+- new implementation-ready leaves appear exactly once in EXECUTION;
+- unaffected valid work was not unnecessarily reset.
+
+Do not require a new global plan version. Git history and REVIEWS provide the audit trail.
