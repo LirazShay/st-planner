@@ -1,8 +1,8 @@
-# S&T Planning Rules
+# S&T Framework Rules
 
 This project uses the S&T Planner framework.
 
-Before meaningful implementation:
+For meaningful work:
 
 1. Read `.planning/README.md` and `.planning/FRAMEWORK.md`.
 2. Resume from `.planning/STATUS.yaml`.
@@ -11,6 +11,8 @@ Before meaningful implementation:
 5. Separate facts, assumptions, decisions and unknowns.
 6. Run a KISS review before approving an execution horizon.
 7. Implement only node IDs explicitly listed in `.planning/STATUS.yaml -> implementation_scope`; an empty list blocks all implementation.
-8. Keep `.planning/` updated so a fresh AI session can continue without chat history.
+8. Verify executed nodes against their `TREE.yaml -> success_evidence` and record outcomes in `.planning/EXECUTION.md`.
+9. If execution falsifies an assumption or reveals a missing condition, reopen the smallest affected branch and replan.
+10. Keep `.planning/` updated so a fresh AI session can continue without chat history.
 
 If this repository already has an `AGENTS.md`, merge these rules into it rather than replacing existing project instructions.
