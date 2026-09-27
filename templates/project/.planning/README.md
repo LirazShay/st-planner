@@ -10,6 +10,7 @@ This directory is the durable S&T planning memory for this project.
 4. the active part of `TREE.yaml`
 5. `DECISIONS.md` only when referenced or needed
 6. `REVIEWS.md` only when referenced or needed
+7. `EXECUTION.md` only when referenced or when continuing/validating execution
 
 This directory is self-contained for V1. The central S&T Planner repository contains deeper documentation but is not required to resume ordinary planning.
 
@@ -21,7 +22,8 @@ This directory is self-contained for V1. The central S&T Planner repository cont
 - GOAL owns the stable boundary only.
 - TREE owns S&T logic, node status, and success evidence.
 - DECISIONS owns material unresolved questions and their resolutions.
-- REVIEWS owns audit history only.
+- REVIEWS owns planning audit history only.
+- EXECUTION owns observed execution/verification outcomes and facts learned from doing the work.
 - STATUS owns only the resume pointer and implementation scope.
 - Update planning state after material decisions or reviews.
 - Keep these files concise; store each fact in one authoritative place.
