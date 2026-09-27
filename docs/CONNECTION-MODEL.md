@@ -1,121 +1,113 @@
-# Connecting Any GPT/Chat to S&T Planner
+# Connecting GPT Chats to the S&T Framework
 
-The framework should not depend on a specific ChatGPT feature. Connection is an interface contract: the AI receives the portable framework rules plus the durable project state.
+A chat connects to the framework in one of two explicit roles:
 
-## Preferred V1: embedded project framework
+- **PLANNER**
+- **EXECUTOR**
 
-Copy the portable framework into every target project:
+The role determines what the chat is allowed to do.
 
+# 1. Planner connection
+
+Use during the Planning Program.
+
+A planner chat should receive repository access when possible and start with:
+
+> Connect as a PLANNER to this project's S&T framework. Resume the durable planning state. Do not implement the target project. Continue only the recorded planning/review work and persist the handoff for the next planner chat.
+
+Read order:
+
+1. project `AGENTS.md`;
+2. `.planning/README.md`;
+3. `.planning/FRAMEWORK.md`;
+4. `.planning/STATUS.yaml`;
+5. `.planning/GOAL.md`;
+6. relevant portions of `TREE.yaml`;
+7. referenced D/R entries;
+8. relevant project source/context only as needed.
+
+A planner chat may:
+- research/inspect current reality;
+- design;
+- decompose S&T;
+- critique;
+- resolve planning decisions;
+- update planning artifacts.
+
+A planner chat must not:
+- implement target project work;
+- create an execution shortcut from a partially planned branch;
+- hand an unreviewed leaf directly to implementation.
+
+# 2. Executor connection
+
+Use only after:
+
+```yaml
+stage: execution
 ```
-project/
-├── AGENTS.md
-└── .planning/
-    ├── README.md
-    ├── FRAMEWORK.md
-    ├── GOAL.md
-    ├── TREE.yaml
-    ├── DECISIONS.md
-    ├── REVIEWS.md
-    ├── EXECUTION.md
-    └── STATUS.yaml
-```
 
-Why this is the preferred V1:
+and after `EXECUTION-PLAN.yaml` is frozen.
 
-- works in a fresh chat;
-- survives model/session changes;
-- versioned with the project;
-- no plugin runtime required;
-- easy to inspect and debug;
-- the project remains usable even if the central framework repository is unavailable.
+An executor chat is started with a specific package ID:
 
-The central `st-planner` repository is the framework source. Each project carries a small portable kernel.
+> Connect as an EXECUTOR for work package WP-XXX. Read the frozen S&T planning context and this package. Perform only this responsibility, verify it using the package evidence, and record the execution result. Do not redesign the plan. If a material planning gap appears, stop and return it as a planning exception.
 
----
+An executor reads:
 
-## Connection mode A — GPT has repository access
+1. project `AGENTS.md`;
+2. framework execution rules;
+3. the assigned work package;
+4. only the relevant frozen S&T nodes/decisions;
+5. required project files for execution.
 
-Start with one short instruction:
+It should not need to read the whole planning history.
 
-> Connect to this project's S&T framework. Read AGENTS.md and .planning/README.md, resume from STATUS, and follow the framework lifecycle through planning, execution, verification, and replanning. Do not rely on previous chat history.
+# 3. Why the roles are separate
 
-The AI should then discover the remaining read order from the project itself.
+Planner chats optimize for:
+- logical completeness;
+- necessity/sufficiency;
+- architecture/decisions;
+- global consistency.
 
-This is the best operating mode.
+Executor chats optimize for:
+- faithful implementation;
+- bounded responsibility;
+- verification;
+- clean handoff.
 
----
+Mixing the roles encourages premature coding and forces executor chats to improvise missing design decisions.
 
-## Connection mode B — GPT can read files but not GitHub directly
+# 4. Product adapters
 
-Provide/export the project's `.planning/` directory plus relevant project files.
+The framework should not depend on a specific ChatGPT feature.
 
-Use the same connection instruction.
+Possible adapters:
+- repository-aware ChatGPT;
+- a future ChatGPT plugin/connector;
+- CLI;
+- GitHub App;
+- IDE agent;
+- another AI system.
 
-When the session finishes, persist changed planning files back to the project repository.
-
----
-
-## Connection mode C — plain chat with no project/file access
-
-This is a degraded mode.
-
-Provide:
-
-- `FRAMEWORK.md`;
-- current `STATUS.yaml`;
-- `GOAL.md`;
-- relevant TREE branch;
-- referenced D/R/E entries.
-
-The chat can still follow the logic, but durable handoff requires the resulting state to be written back somewhere persistent.
-
-Do not treat the chat transcript itself as durable framework state.
-
----
-
-## Future integration: one-click connector/plugin
-
-A future integration may automate:
-
-- framework initialization;
-- reading only the needed context;
+An adapter may automate:
+- role connection;
+- minimal context loading;
 - state validation;
-- writing state;
-- opening/closing execution tasks;
-- handoff between chats.
+- creating executor chats/work packages;
+- writing handoff results.
 
-The plugin must be an **adapter**, not the source of planning truth.
+The adapter does not own the plan. The repository artifacts remain authoritative.
 
-The portable files remain the canonical model so the framework is not locked to one GPT product or integration.
+# 5. Plain chat fallback
 
----
+Without repository/file access:
 
-# Connection handshake
+Planner:
+- provide FRAMEWORK, STATUS, GOAL, relevant TREE/DECISIONS/REVIEWS.
 
-On a fresh session, the agent should internally establish:
+Executor:
+- provide framework execution rules + assigned frozen work package + its referenced planning context.
 
-1. **Framework present?** If not, initialize/attach it before substantial work.
-2. **Existing project state?** Resume it; do not start a second plan.
-3. **Goal boundary valid?** If not, repair it.
-4. **Current blocker?** Resolve/expose it before inventing work.
-5. **Implementation scope?** Never execute outside it.
-6. **Next action?** Perform the next lifecycle action, not a random useful-looking task.
-
-A concise user-facing acknowledgement may be:
-
-> S&T framework connected. I recovered the current state and will continue from the recorded next action.
-
-Do not require the user to understand the internal file layout.
-
----
-
-# Framework portability rule
-
-The framework must be usable by:
-
-- a new GPT chat;
-- a different GPT model;
-- another AI agent;
-- a human reviewer.
-
-Therefore project state must contain conclusions, rationale, assumptions, evidence, and decisions — **not hidden chain-of-thought**.
+The transcript itself is never the authoritative project state.
