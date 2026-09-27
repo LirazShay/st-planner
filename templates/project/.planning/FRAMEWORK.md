@@ -65,6 +65,21 @@ Do not trust "the update call succeeded" as proof that the resulting text is cor
 
 This is editing safety guidance, not a requirement to introduce a new transformation tool.
 
+## 0.4 Target-specific repository workflow
+
+S&T Planner does not impose GitHub Flow, feature branches, pull requests, merge methods, or post-merge verification universally.
+
+Before changing the target repository, discover its existing repository-engineering contract from project instructions, CI/release docs, branch protections, or established workflow.
+
+If the target defines branch/PR/merge rules:
+- follow them for planning-file changes and implementation work;
+- preserve required verification before merge;
+- perform any required post-merge/main verification.
+
+If the target does not define such rules, do not invent branch/PR ceremony merely because the framework repository uses it.
+
+Repository workflow is target-owned. S&T Planner supplies planning/execution semantics, not a universal Git hosting process.
+
 ## 1. Strategy + Tactic
 
 Every node contains:
