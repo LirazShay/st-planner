@@ -103,7 +103,7 @@ Before freezing:
 - confirm all material decisions that affect implementation are resolved;
 - run one final KISS pass.
 
-Only a pass here allows `plan_state: frozen`.
+Only a pass here allows `plan_state: frozen`. Freeze does not authorize implementation; `implementation_authorized` remains false through post-freeze handoff.
 
 ## Fresh-chat continuity check
 
@@ -118,7 +118,7 @@ A fresh GPT should be able to read the repository state and identify:
 
 ## Gate 11 — Execution allocation
 
-After freeze, pass only when:
+After freeze, with `implementation_authorized: false`, pass only when:
 
 - every implementation-ready frozen leaf appears exactly once in `EXECUTION.yaml`;
 - no non-leaf or non-approved planning node is assigned as executable work;
@@ -133,10 +133,12 @@ After freeze, pass only when:
 
 Execution allocation is a thin projection of the frozen tree, not a second planning model.
 
+Passing allocation is necessary but does not itself authorize execution. After all required post-freeze handoff checks pass, explicitly set `STATUS.yaml -> implementation_authorized: true`.
+
 
 ## Gate 12 — Re-freeze after an execution-discovered defect
 
-When a frozen plan is reopened, re-freeze only when:
+When a frozen plan is reopened, first set `implementation_authorized: false`, then re-freeze only when:
 
 - the material defect is represented and corrected in TREE/DECISIONS;
 - affected Necessity/Sufficiency/parallel logic has been re-reviewed;
@@ -148,5 +150,7 @@ When a frozen plan is reopened, re-freeze only when:
 - obsolete execution leaf IDs were removed;
 - new implementation-ready leaves appear exactly once in EXECUTION;
 - unaffected valid work was not unnecessarily reset.
+
+Re-freeze alone does not restore execution permission. Required handoff checks must pass again before `implementation_authorized: true` is restored.
 
 Do not require a new global plan version. Git history and REVIEWS provide the audit trail.
