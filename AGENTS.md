@@ -6,7 +6,7 @@ This repository builds a reusable S&T planning framework for GPT.
 
 If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, and allocate implementation-ready leaves in `EXECUTION.yaml`.
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, allocate implementation-ready leaves in `EXECUTION.yaml`, and explicitly authorize implementation only after the required post-freeze handoff checks.
 
 Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
 
@@ -77,12 +77,13 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan and allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`.
+Then freeze the plan while keeping `implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, complete the required handoff checks, and only then set `implementation_authorized: true`.
 
 ## Execution handoff
 
 After freeze:
 
+- keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff is complete;
 - create/populate `.planning/EXECUTION.yaml`;
 - assign every implementation-ready leaf to exactly one numbered chat;
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
@@ -91,7 +92,8 @@ After freeze:
 
 When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
 
-- confirm the plan is frozen;
+- confirm `.planning/STATUS.yaml -> plan_state: frozen`;
+- confirm `.planning/STATUS.yaml -> implementation_authorized: true`;
 - read `EXECUTION.yaml`;
 - find chat N;
 - read only its assigned S&T nodes plus necessary decisions/context;
@@ -105,11 +107,13 @@ When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
 If execution exposes a material planning defect:
 - do not improvise;
 - mark the affected execution node `blocked` with a short factual reason;
-- set `STATUS.yaml -> plan_state: active`;
+- set `.planning/STATUS.yaml -> plan_state: active`;
+- set `.planning/STATUS.yaml -> implementation_authorized: false`;
 - stop starting new execution work;
 - reopen only the smallest affected S&T area;
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
-- after focused re-review, repair only affected EXECUTION assignments/states and set `plan_state: frozen` again.
+- after focused re-review, repair only affected EXECUTION assignments/states and set `plan_state: frozen` again;
+- do not resume execution until required handoff checks are complete and `implementation_authorized: true` is explicitly restored.
 
 Do not create plan-version machinery; Git history and REVIEWS are enough.
 
