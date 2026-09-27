@@ -1,98 +1,78 @@
 # S&T Planner
 
-A reusable planning framework for GPT and other AI agents, based on Strategy & Tactics (S&T) logic from the Theory of Constraints.
+A small reusable framework that helps GPT plan complex work with Strategy & Tactics logic instead of producing an arbitrary checklist.
 
-The goal is broader: **any capable GPT/chat should be able to use one consistent S&T framework to build a complete logical plan first, freeze it only after full review, and only then let separate executor chats implement bounded responsibilities from that frozen plan.**
+## What it does
 
-## Status
+The framework guides GPT through:
 
-**v0.2 — lifecycle framework in validation.** The planning/handoff core is usable and has passed fresh-session checks. The framework now also covers connection, execution, verification, and feedback-driven replanning; those lifecycle additions are being acceptance-tested before the framework is treated as complete.
+```
+Goal
+→ S&T tree
+→ necessity / sufficiency checks
+→ repeated critique
+→ final whole-plan review
+→ frozen implementation-ready plan
+→ GitHub Issues / execution tasks
+```
 
-This repository is the framework source. A real project carries a small portable kernel and durable lifecycle state in `.planning/`. The chat/model is replaceable; the framework state is not.
+The **planning is the product**. Execution starts only after the complete intended plan has passed final review.
 
-## Core idea
+## KISS operating model
 
-A plan is not a numbered task list. It is a logical tree.
+Default:
+- use one planning chat from start to finish;
+- persist the plan in the repository while working;
+- move to another planning chat only if needed;
+- after the plan is final, turn executable leaves into GitHub Issues/tasks;
+- execution chats work from those tasks and the referenced S&T nodes.
 
-For every step:
+No server, database, plugin runtime, state machine, or execution engine is required.
 
-- **Strategy** — the objective / “what for?”
-- **Tactic** — the action / “how?”
-- **Parallel assumptions** — why this tactic is appropriate and sufficient for this strategy
-- **Necessary assumptions** — why a lower step is necessary for its parent
-- **Sufficiency assumptions** — why the lower group is sufficient together
+## Core project files
 
-When going down a level, ask: **How exactly must the parent tactic be performed?**
+Copy `templates/project/.planning/` into a target repository:
 
-When going up a level, ask: **Why do we need to achieve this strategy?**
+- `FRAMEWORK.md` — portable S&T rules
+- `GOAL.md` — stable goal boundary
+- `TREE.yaml` — S&T plan
+- `DECISIONS.md` — material open questions and decisions
+- `REVIEWS.md` — planning reviews
+- `STATUS.yaml` — small resume pointer
 
-## Quick start
+Also merge `templates/project/AGENTS.snippet.md` into the project's `AGENTS.md`.
 
-For a new project:
+Start planning with `templates/START-PROMPT.md`.
 
-1. Copy `templates/project/.planning/` into the target repository.
-2. Merge `templates/project/AGENTS.snippet.md` into the target repository's `AGENTS.md`.
-3. Start GPT with `templates/START-PROMPT.md`.
+## When planning is complete
 
-The copied `.planning/FRAMEWORK.md` is a self-contained S&T kernel, so ordinary planning does not depend on this repository or on previous chat history.
+The entire intended tree must be implementation-ready and pass Final Planning Review.
 
-Then provide the goal in normal language.
+Only then:
+1. freeze the plan;
+2. create execution tasks/Issues from executable leaves;
+3. give each executor chat one bounded task or a small compatible group;
+4. keep the S&T node ID on the task for traceability.
 
-The default workflow is:
+If execution later discovers a real planning defect, return that defect to planning and reopen only the affected part.
 
-1. one planner chat connects to the framework;
-2. it establishes the stable goal boundary;
-3. it constructs the complete intended S&T tree;
-4. it repeatedly critiques and corrects the plan;
-5. it runs a final whole-tree review;
-6. only then it freezes the planning baseline;
-7. the framework compiles the frozen plan into execution work packages;
-8. separate executor chats implement those packages;
-9. execution evidence is recorded and material planning exceptions are returned to a planner.
+## Main documentation
 
-Planning may continue in another chat if necessary, but the framework does not split planning into multiple chats by default.
-
-## Repository structure
-
-- `AGENTS.md` — mandatory operating rules for AI agents
-- `docs/SNT-METHODOLOGY.md` — expanded S&T methodology
-- `docs/AI-PLANNING-PROTOCOL.md` — deterministic workflow for AI planning
-- `docs/QUALITY-GATES.md` — review gates and completion criteria
-- `docs/FRAMEWORK-LIFECYCLE.md` — full connect → plan → execute → verify → replan loop
-- `docs/CONNECTION-MODEL.md` — how any GPT/chat attaches to the framework
-- `docs/EXECUTION-PROTOCOL.md` — execution, verification, and feedback rules
-- `docs/PLANNER-SNT.md` — S&T tree for the framework itself
-- `templates/project/.planning/` — self-contained planning state and portable S&T kernel copied into a target project
-- `templates/START-PROMPT.md` — planner bootstrap
-- `templates/EXECUTOR-PROMPT.md` — executor bootstrap after planning freeze
-- `docs/USAGE.md` — exact adoption and resume instructions
-- `examples/` — guidance for future worked examples
-
-## Modes
-
-### QUICK
-
-For small, low-risk work. Uses the same logic with fewer written assumptions.
-
-### DEEP
-
-For projects, architecture, migrations, ambiguous goals, or costly/reversible decisions. Persists the complete tree and runs all review gates.
-
-The mode affects documentation depth, **not logical rigor**.
-
-## Source and attribution
-
-The core S&T concepts are based on *Strategy and Tactics* by Eli Goldratt, Rami Goldratt and Eli Abramov, originally released for public study at Washington State University. The original source is referenced in `docs/SNT-METHODOLOGY.md`.
-
-This repository does **not** reproduce the original paper. It provides an independently written, extended operational guide for AI-assisted planning.
+- `docs/SNT-METHODOLOGY.md` — expanded S&T method
+- `docs/AI-PLANNING-PROTOCOL.md` — how GPT plans
+- `docs/QUALITY-GATES.md` — how GPT critiques the plan
+- `docs/FRAMEWORK-LIFECYCLE.md` — simple planning lifecycle
+- `docs/EXECUTION-HANDOFF.md` — minimal post-planning handoff
+- `docs/PLANNER-SNT.md` — S&T of this framework itself
+- `docs/USAGE.md` — how to use it in another project
 
 ## Design principles
 
 - Logic before tooling.
 - Necessary individually, sufficient together.
-- One strategy/tactic pair per step.
-- Do not invent a fixed number of phases in advance.
-- Separate facts, assumptions, decisions and unknowns.
-- Git is the durable memory; chat history is not.
-- Issues are compiled output of an approved plan, not the plan itself.
-- Prefer KISS over speculative completeness.
+- The tree determines the number of steps.
+- One source of truth per fact.
+- One planning chat by default.
+- Git is durable memory, not workflow bureaucracy.
+- Execution is downstream of a completed plan.
+- Prefer KISS.
