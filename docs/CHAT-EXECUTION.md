@@ -94,8 +94,8 @@ If the executor finds a material missing/contradictory planning decision:
 1. stop only the affected work;
 2. set the affected node to `blocked`;
 3. write a short factual blocker in `result`;
-4. set `STATUS.yaml -> plan_state: active`;
-5. set `STATUS.yaml -> implementation_authorized: false`;
+4. set `.planning/STATUS.yaml -> plan_state: active`;
+5. set `.planning/STATUS.yaml -> implementation_authorized: false`;
 6. do not continue other execution until planning is re-frozen, the mandatory fresh-chat handoff verification passes again and is recorded, and authorization is explicitly restored.
 
 A planner then reopens the smallest affected S&T area.
