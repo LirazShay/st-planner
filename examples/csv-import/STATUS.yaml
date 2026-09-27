@@ -1,9 +1,9 @@
 version: 1
 
 mode: DEEP
-phase: decomposition
+phase: decision
 
-current_node: "0.2"
+current_node: "0.2.1"
 
 approved_nodes:
   - "0"
@@ -16,12 +16,16 @@ approved_execution_horizon:
   - "0.1.2"
 
 blockers:
-  - "Branches 0.2, 0.3 and 0.4 are not yet sufficiently decomposed for implementation"
+  - "D-002 duplicate-customer policy is unresolved and blocks approval of node 0.2.1"
+  - "Nodes 0.2.2 and 0.2.3 cannot be approved until the admissibility policy is complete"
+  - "Branches 0.3 and 0.4 are not yet sufficiently decomposed for implementation"
 
-next_action: "Decompose node 0.2 by determining the independently necessary actions that prevent invalid or unsafe candidate data from reaching persistence"
+next_action: "Resolve decision D-002: define duplicate-customer behavior for CSV import; then review node 0.2.1 for executability"
 
 implementation_allowed: true
 
-implementation_scope: "Only nodes 0.1.1 and 0.1.2"
+implementation_scope:
+  - "0.1.1"
+  - "0.1.2"
 
-last_review: "R-001"
+last_review: "R-002"
