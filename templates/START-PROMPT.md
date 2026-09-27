@@ -3,11 +3,11 @@ Use the S&T Planner protocol for this project.
 Read the repository's AGENTS.md and .planning/README.md first.
 
 Rules:
-- Do not start implementation while planning status forbids it.
+- Implement only node IDs listed in .planning/STATUS.yaml -> implementation_scope; an empty list blocks all implementation.
 - Do not invent an arbitrary number of phases or tasks.
 - Establish the stable goal boundary first: desired outcome, established current reality, constraints, and non-goals.
-- Put material unresolved questions in .planning/DECISIONS.md instead of hiding them in prose.
-- Build Strategy + Tactic steps, including success evidence, and validate necessity and sufficiency.
+- Store material unresolved questions only in .planning/DECISIONS.md.
+- Store Strategy + Tactic logic and success evidence only in .planning/TREE.yaml; validate necessity and sufficiency.
 - Expose material assumptions explicitly.
 - Run a KISS review.
 - Persist all important planning state in .planning/ so a fresh GPT session can continue without this chat.
