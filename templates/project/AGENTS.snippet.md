@@ -15,15 +15,15 @@ On that trigger, automatically:
 5. Update `GOAL.md`.
 6. Build the complete S&T tree in `TREE.yaml`, recording material unresolved questions/choices in `DECISIONS.md`.
 7. Review/correct the plan as required by the framework, including necessity, sufficiency, KISS, implementation readiness, and whole-plan completeness.
-8. Record meaningful reviews in `REVIEWS.md` and keep `STATUS.yaml` current.
+8. Record meaningful reviews in `REVIEWS.md` and keep `.planning/STATUS.yaml` current.
 9. Do **not** implement target-project work while planning.
 10. Continue planning until the complete intended plan passes Final Planning Review.
-11. Set `plan_state: frozen` while keeping `implementation_authorized: false`.
+11. Set `.planning/STATUS.yaml -> plan_state: frozen` while keeping `.planning/STATUS.yaml -> implementation_authorized: false`.
 12. Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to numbered executor chats.
 13. Run `node .planning/validate-allocation.mjs --initial`; fix every failure before continuing. Add `--serial-chats` only when the target explicitly uses serial numbered chats.
 14. Run the mandatory repository-only fresh-chat verification from `.planning/EXECUTOR_HANDOFF.md` and record its result in `REVIEWS.md`.
 15. Fix any handoff/allocation/context-routing defect the simulation exposes and rerun the failed case.
-16. Only after both gates pass set `implementation_authorized: true`. Freeze/allocation alone never authorize implementation.
+16. Only after both gates pass set `.planning/STATUS.yaml -> implementation_authorized: true`. Freeze/allocation alone never authorize implementation.
 
 Unless the user explicitly asks to stop earlier or work one stage per message, complete this planning workflow autonomously in the same planning conversation.
 
@@ -41,16 +41,16 @@ For meaningful work:
 6. Keep material open questions in `.planning/DECISIONS.md`.
 7. Continue until the complete intended S&T is implementation-ready.
 8. Run Final Planning Review before freezing.
-9. Do not implement while `plan_state: active`.
-10. Do not implement merely because `plan_state: frozen`; execution also requires `implementation_authorized: true`.
+9. Do not implement while `.planning/STATUS.yaml -> plan_state: active`.
+10. Do not implement merely because `.planning/STATUS.yaml -> plan_state: frozen`; execution also requires `.planning/STATUS.yaml -> implementation_authorized: true`.
 11. After explicit implementation authorization, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
 12. Allocate every implementation-ready leaf exactly once in `.planning/EXECUTION.yaml`.
 13. Before first authorization, run `node .planning/validate-allocation.mjs --initial`; before re-authorization after replanning, run it with `--resume`. Any validator failure keeps authorization false.
 14. After allocation validation passes, run and record the mandatory fresh-chat verification defined by `.planning/EXECUTOR_HANDOFF.md`; any failure keeps authorization false.
 15. Do not copy task descriptions into EXECUTION or EXECUTOR_HANDOFF; node IDs point to TREE.
-16. If the user says "I am chat N" / "אני צ'אט מספר N", read `.planning/EXECUTOR_HANDOFF.md` and require both `plan_state: frozen` and `implementation_authorized: true`; then load chat N from EXECUTION, read only its assigned S&T nodes/context, check TREE dependencies against EXECUTION states, and execute only available assigned nodes.
+16. If the user says "I am chat N" / "אני צ'אט מספר N", read `.planning/EXECUTOR_HANDOFF.md` and require both `.planning/STATUS.yaml -> plan_state: frozen` and `.planning/STATUS.yaml -> implementation_authorized: true`; then load chat N from EXECUTION, read only its assigned S&T nodes/context, check TREE dependencies against EXECUTION states, and execute only available assigned nodes.
 17. Mark a node `done` only after its `success_evidence` is verified.
-18. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `plan_state: active` and `implementation_authorized: false`, and stop starting new execution work.
+18. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `.planning/STATUS.yaml -> plan_state: active` and `.planning/STATUS.yaml -> implementation_authorized: false`, and stop starting new execution work.
 19. Reopen only the smallest affected S&T area; preserve `done` work only when it remains valid under the corrected plan.
 20. After focused review, repair only affected EXECUTION entries and freeze again; run allocation validation in `--resume` mode, then rerun the mandatory fresh-chat verification before re-authorization. Git history is sufficient version history.
 21. Prefer one planning chat; use repository state for durability and optional continuation.
