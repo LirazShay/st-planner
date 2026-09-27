@@ -604,7 +604,7 @@ necessary_assumptions:
 
 sufficiency_assumptions: []
 
-evidence:
+success_evidence:
   - "A fresh session reads only repository state and identifies the correct next action"
 
 children:
@@ -615,6 +615,21 @@ status: approved
 ```
 
 The schema may evolve, but additions must justify their cost.
+
+### V1 tree invariants
+
+- `root` must reference an existing node.
+- Every ID in `children` must reference an existing node.
+- In V1, every non-root node has exactly one logical parent.
+- The child graph must be acyclic.
+- Node status is local: `approved` means that node's own logic and immediate decomposition passed review; it does not approve the full subtree.
+- `blocked` is used only when that node itself cannot advance because of a specific blocker; blocking does not cascade automatically.
+- Only `draft`, `blocked`, and `approved` are valid node statuses.
+- Approved nodes have explicit Strategy, Tactic, material assumptions, and success evidence.
+- A parent with children records why those children are sufficient together.
+- A non-root child records why it is necessary for its parent.
+
+Keep facts/unknowns in GOAL, alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS rather than growing TREE into a general-purpose database.
 
 ---
 
