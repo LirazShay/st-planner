@@ -37,8 +37,9 @@ When invoked from another repository:
    - `templates/project/.planning/REVIEWS.md`
    - `templates/project/.planning/STATUS.yaml`
    - `templates/project/.planning/EXECUTION.yaml`
+   - `templates/project/.planning/EXECUTOR_HANDOFF.md`
    - `templates/project/AGENTS.snippet.md`
-4. If the target repository does **not** already contain `.planning/`, copy the eight planning files above into target `.planning/` using the same filenames.
+4. If the target repository does **not** already contain `.planning/`, copy the nine planning files above into target `.planning/` using the same filenames.
 5. Merge `templates/project/AGENTS.snippet.md` into the target repository's existing `AGENTS.md`. Preserve the target repository's existing instructions. If no `AGENTS.md` exists, create one containing the snippet.
 6. If the target repository already contains an S&T Planner `.planning/`, do not overwrite live planning state. Use the installed state as-is unless the user explicitly asks to upgrade/reinstall the framework.
 7. After bootstrap, continue **in the same conversation** as the planning agent. Do not stop merely because installation completed.
@@ -50,15 +51,16 @@ When invoked from another repository:
    - continue until the complete intended plan passes Final Planning Review;
    - freeze the plan with implementation still unauthorized;
    - populate EXECUTION with numbered executor-chat assignments;
-   - complete the required post-freeze handoff checks;
-   - explicitly authorize implementation only after those checks pass.
+   - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification;
+   - record the verification in REVIEWS;
+   - explicitly authorize implementation only after that gate passes.
 10. Do not ask the user to repeat framework instructions. Ask only for a missing project goal if neither the request nor the target repository makes it unambiguous.
 
 ## Safety against accidental overwrite
 
 Bootstrap installs framework files only when `.planning/` is absent.
 
-An existing S&T planning state is project data. Never replace GOAL/TREE/DECISIONS/REVIEWS/STATUS/EXECUTION from the source templates during ordinary reuse.
+An existing S&T planning state is project data. Never replace GOAL/TREE/DECISIONS/REVIEWS/STATUS/EXECUTION/EXECUTOR_HANDOFF from the source templates during ordinary reuse.
 
 ## Normal execution after planning
 
