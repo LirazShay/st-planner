@@ -2,6 +2,28 @@
 
 This is the minimum planning method a fresh GPT needs.
 
+## 0. Connect to an existing project without context dumping
+
+Before building S&T, understand only the current reality needed for this goal.
+
+If the repository already has `AGENTS.md`, workstream routing, status files, context-loading rules, specs, or other source-of-truth conventions, **use them**. The S&T framework does not replace project-native context management.
+
+Progressive disclosure rule:
+
+1. read the project's normal AI entry point;
+2. identify the relevant workstream/component for the requested goal;
+3. read its current status/context;
+4. read directly relevant code/docs/tests/specs as planning questions require them;
+5. load history or unrelated areas only when a concrete uncertainty requires it.
+
+Do not recursively scan the repository by default.
+
+The test for loading more context is:
+
+> Could this information materially change GOAL, TREE, DECISIONS, or a review?
+
+If not, do not preload it.
+
 ## 1. Strategy + Tactic
 
 Every node contains:
