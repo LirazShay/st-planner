@@ -571,7 +571,7 @@ Purpose:
 
 - `GOAL.md`: stable problem/outcome boundary.
 - `TREE.yaml`: the actual S&T work model — rationale, decomposition, dependencies, and success evidence.
-- `STATUS.yaml`: minimal planning resume point and active/frozen state.
+- `STATUS.yaml`: minimal planning resume point, active/frozen planning state, and separate implementation-authorization gate.
 - `DECISIONS.md`: material unresolved questions and resolved choices.
 - `REVIEWS.md`: planning/replanning audit evidence.
 - `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
@@ -593,8 +593,10 @@ In particular, the S&T Planner workflow does **not** require GitHub Issues.
 The normal V1 flow is:
 
 ```
-frozen TREE.yaml
+frozen TREE.yaml + implementation_authorized: false
 → allocate leaf node IDs in EXECUTION.yaml
+→ complete required post-freeze handoff checks
+→ explicitly set implementation_authorized: true
 → executor chat reads its node IDs
 → executor reads the actual Strategy/Tactic directly from TREE.yaml
 → execute
@@ -627,14 +629,15 @@ Do not recreate each leaf as a second task description.
 A numbered executor chat should:
 
 1. confirm the plan is frozen;
-2. read its assigned leaf IDs from `EXECUTION.yaml`;
-3. load those exact nodes from `TREE.yaml`;
-4. read only decisions/project context required by those nodes;
-5. check each node's `depends_on` leaves and confirm they are `done`;
-6. mark an available node `in_progress`;
-7. perform its Tactic;
-8. verify its `success_evidence`;
-9. mark it `done` and record a short result/reference.
+2. confirm `implementation_authorized: true`;
+3. read its assigned leaf IDs from `EXECUTION.yaml`;
+4. load those exact nodes from `TREE.yaml`;
+5. read only decisions/project context required by those nodes;
+6. check each node's `depends_on` leaves and confirm they are `done`;
+7. mark an available node `in_progress`;
+8. perform its Tactic;
+9. verify its `success_evidence`;
+10. mark it `done` and record a short result/reference.
 
 That is the execution-management loop.
 
@@ -652,7 +655,7 @@ Creating a second task object for every S&T leaf would duplicate:
 
 Direct execution from S&T node IDs keeps planning and implementation connected and reduces synchronization errors.
 
-Execution can still falsify assumptions. When that happens, mark the affected execution node blocked and return the defect to planning rather than improvising.
+Execution can still falsify assumptions. When that happens, mark the affected execution node blocked, set `implementation_authorized: false`, and return the defect to planning rather than improvising.
 
 ---
 
@@ -777,4 +780,4 @@ The plan is good enough when:
 - a fresh session can continue without private chat context if needed;
 - additional decomposition would not materially improve execution.
 
-That is the point at which the plan can be frozen and execution tasks can be generated.
+That is the point at which the plan can be frozen and execution allocation can be generated. Freeze still does not authorize implementation; authorization is a separate post-handoff gate.
