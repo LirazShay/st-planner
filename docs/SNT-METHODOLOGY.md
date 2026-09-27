@@ -554,34 +554,29 @@ Execution can also falsify assumptions. When that happens, update the plan rathe
 
 ---
 
-# 20. Quick vs Deep mode
+# 20. Adaptive planning depth
 
-## QUICK mode
+V1 has **no QUICK/DEEP mode**.
 
-Use for:
-- localized changes;
-- low-cost reversible work;
-- obvious objective and constraints.
+The S&T logic is always the same. The tree simply grows only as deep as the problem requires.
 
-Persist:
-- goal;
-- compact tree;
-- key assumptions;
-- next action.
+For a small, obvious, reversible change:
+- the tree may stay shallow;
+- few assumptions may need written explanation;
+- review may be short.
 
-## DEEP mode
+For an ambiguous, costly, architectural, or long-lived project:
+- the tree will naturally become deeper;
+- more decisions and assumptions will be material;
+- review will naturally be broader.
 
-Use for:
-- architecture;
-- cross-team work;
-- ambiguous goals;
-- migrations;
-- costly or difficult-to-reverse choices;
-- long-lived projects.
+Do not ask the user or GPT to choose a planning mode.
 
-Persist the full review trail.
+Use one stopping rule:
 
-The logic is the same in both modes. Only the amount of written evidence differs.
+> Continue decomposing only while additional decomposition materially improves implementation readiness or logical confidence.
+
+This removes configuration while preserving rigor.
 
 ---
 
