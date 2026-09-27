@@ -82,3 +82,18 @@ If a single leaf is too large for one chat, the planning granularity is wrong; r
 A chat is effectively complete when all nodes assigned to it are `done`.
 
 The file does not need a duplicated chat-level status.
+
+
+## Planning defect discovered by an executor
+
+If the executor finds a material missing/contradictory planning decision:
+
+1. stop only the affected work;
+2. set the affected node to `blocked`;
+3. write a short factual blocker in `result`;
+4. set `STATUS.yaml -> plan_state: active`;
+5. do not continue other execution until planning is frozen again.
+
+A planner then reopens the smallest affected S&T area.
+
+After re-freeze, the same or another numbered chat resumes from the updated EXECUTION file. Unaffected valid completed nodes remain done.
