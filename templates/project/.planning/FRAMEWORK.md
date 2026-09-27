@@ -191,7 +191,15 @@ Prefer one planning conversation. Repository state exists so continuation is pos
 
 ## 13. Execution handoff
 
-After freeze, do not translate the S&T tree into another task system.
+After freeze, execute directly from the S&T tree.
+
+**Do not create GitHub Issues merely to execute the S&T plan.**
+The implementation-ready leaves in `TREE.yaml` are already the work units.
+
+Use management files only:
+
+- `TREE.yaml` — work definition, rationale, dependencies, success evidence.
+- `EXECUTION.yaml` — chat allocation, execution state, short result.
 
 Create/populate `EXECUTION.yaml`.
 
