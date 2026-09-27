@@ -115,6 +115,7 @@ After meaningful planning or execution work, update the durable state before end
 - What is the next planning action?
 - Which exact nodes, if any, may be implemented?
 - What is the latest relevant review?
+- What is the latest relevant execution outcome?
 
 Read node approval from `TREE.yaml`; read decisions from `DECISIONS.md`; read review history from `REVIEWS.md`.
 
@@ -175,7 +176,7 @@ When reality contradicts an assumption:
 
 ## 14. Definition of a planning-complete project
 
-Planning is complete enough for execution when:
+A planning horizon is complete enough for execution when:
 - the stable goal boundary is explicit in GOAL;
 - relevant node success evidence is explicit in TREE;
 - relevant constraints and non-goals are explicit;
@@ -188,3 +189,15 @@ Planning is complete enough for execution when:
 - status is durable and understandable by a fresh session.
 
 Do not claim certainty beyond the evidence.
+
+
+## 15. Overall outcome completion
+
+The overall project is complete only when the root Strategy's success evidence is observed in reality.
+
+Do not infer completion from:
+- all planned tasks being attempted;
+- all issues being closed;
+- all leaves having approved planning status.
+
+Use execution evidence. Record the final relevant E-entry and ensure no unresolved decision invalidates the claimed root outcome.
