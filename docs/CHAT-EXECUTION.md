@@ -2,7 +2,7 @@
 
 After the complete S&T plan is frozen, implementation-ready leaves are allocated directly to numbered chats in `.planning/EXECUTION.yaml`.
 
-No GitHub Issue layer is required.
+No separate task layer is required.
 
 ## Starting a chat
 
@@ -68,10 +68,12 @@ Group work using these priorities:
 
 1. keep closely related nodes/context together;
 2. preserve dependency order;
-3. keep each chat to a manageable amount of work;
-4. then balance load across chats where practical.
+3. keep each chat to a manageable amount of work/context;
+4. then balance independent work across chats where practical.
 
-There is no fixed number of nodes per chat and no requirement to create one chat per node.
+Use leaf count only as a rough workload signal; consider the actual tactic/scope as well.
+
+There is no fixed number of nodes per chat. Prefer the fewest executor chats that remain practical and coherent.
 
 If a single leaf is too large for one chat, the planning granularity is wrong; reopen that leaf and decompose it.
 
