@@ -1,31 +1,27 @@
 # Goal
 
+This file owns the stable planning boundary. Do not store open questions, decisions, review findings, or S&T decomposition here.
+
 ## Desired outcome
 
-<!-- What must be true when this project/change is successful? -->
+<!-- What must be true when this project/change succeeds? -->
 
 TBD
 
 ## Current reality
 
-<!-- Only facts that materially affect the plan. -->
-
-- TBD
-
-## Success evidence
-
-<!-- Observable evidence that the desired outcome exists. -->
+<!-- Only established facts that materially affect the plan. -->
 
 - TBD
 
 ## Constraints
 
+<!-- Hard boundaries the plan must respect. -->
+
 - TBD
 
 ## Non-goals
 
-- TBD
-
-## Material unknowns
+<!-- Explicitly excluded scope. -->
 
 - TBD
