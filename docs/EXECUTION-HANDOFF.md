@@ -33,3 +33,18 @@ GitHub already provides:
 - history.
 
 The S&T framework should not duplicate those features.
+
+
+## Numbered executor chats
+
+After Issues are created, optionally group them in:
+
+`.planning/CHAT-ASSIGNMENTS.yaml`
+
+This supports the generic workflow:
+
+> I am chat 1.
+
+The executor then reads the assignment for chat 1, checks dependencies, pulls the listed GitHub Issues, reads their referenced S&T context, and performs only that work.
+
+The assignment map is intentionally thin. It does not duplicate Issue descriptions or create another execution tracker.
