@@ -564,7 +564,8 @@ The recommended target-project state is:
 ├── STATUS.yaml
 ├── DECISIONS.md
 ├── REVIEWS.md
-└── EXECUTION.yaml
+├── EXECUTION.yaml
+└── EXECUTOR_HANDOFF.md
 ```
 
 Purpose:
@@ -575,6 +576,7 @@ Purpose:
 - `DECISIONS.md`: material unresolved questions and resolved choices.
 - `REVIEWS.md`: planning/replanning audit evidence.
 - `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
+- `EXECUTOR_HANDOFF.md`: stable repository-only fresh-executor bootstrap, context-routing rules, and mandatory handoff-verification contract; it never duplicates task content.
 
 This is intentionally small.
 
@@ -595,9 +597,11 @@ The normal V1 flow is:
 ```
 frozen TREE.yaml + implementation_authorized: false
 → allocate leaf node IDs in EXECUTION.yaml
-→ complete required post-freeze handoff checks
+→ simulate mandatory fresh executors via EXECUTOR_HANDOFF.md
+→ record handoff verification in REVIEWS.md
+→ fix/recheck any failed case
 → explicitly set implementation_authorized: true
-→ executor chat reads its node IDs
+→ executor chat reads EXECUTOR_HANDOFF.md and its node IDs
 → executor reads the actual Strategy/Tactic directly from TREE.yaml
 → execute
 → verify success_evidence
@@ -628,16 +632,17 @@ Do not recreate each leaf as a second task description.
 
 A numbered executor chat should:
 
-1. confirm the plan is frozen;
-2. confirm `implementation_authorized: true`;
-3. read its assigned leaf IDs from `EXECUTION.yaml`;
-4. load those exact nodes from `TREE.yaml`;
-5. read only decisions/project context required by those nodes;
-6. check each node's `depends_on` leaves and confirm they are `done`;
-7. mark an available node `in_progress`;
-8. perform its Tactic;
-9. verify its `success_evidence`;
-10. mark it `done` and record a short result/reference.
+1. read target `AGENTS.md` and `.planning/EXECUTOR_HANDOFF.md`;
+2. confirm the plan is frozen;
+3. confirm `implementation_authorized: true`;
+4. read its assigned leaf IDs from `EXECUTION.yaml`;
+5. load those exact nodes from `TREE.yaml`;
+6. check each node's `depends_on` leaves and their EXECUTION states;
+7. use handoff/context-routing rules to read only decisions/project context required by runnable nodes;
+8. mark an available node `in_progress`;
+9. perform its Tactic;
+10. verify its `success_evidence`;
+11. mark it `done` and record a short result/reference.
 
 That is the execution-management loop.
 
@@ -777,7 +782,7 @@ The plan is good enough when:
 - important alternatives are decided or intentionally left open;
 - all intended execution leaves are implementation-ready;
 - the complete intended tree has passed Final Planning Review;
-- a fresh session can continue without private chat context if needed;
+- repository-only fresh-executor simulations have proven that authorization, assignment, dependencies, context routing, and blockers are recoverable without planning-chat memory;
 - additional decomposition would not materially improve execution.
 
 That is the point at which the plan can be frozen and execution allocation can be generated. Freeze still does not authorize implementation; authorization is a separate post-handoff gate.
