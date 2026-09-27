@@ -158,9 +158,10 @@ Before ending meaningful planning work, update STATUS so another session can ide
 
 Keep one source of truth for each kind of state:
 
-- `TREE.yaml` owns S&T structure and node planning status.
-- `DECISIONS.md` owns open/decided alternatives.
-- `REVIEWS.md` owns review history.
+- `GOAL.md` owns the stable boundary: desired outcome, established current reality, constraints, and non-goals.
+- `TREE.yaml` owns S&T structure, node planning status, and success evidence.
+- `DECISIONS.md` owns every material unresolved question and its resolution, whether resolved by a choice, research, or an external fact.
+- `REVIEWS.md` owns audit history only: checks, findings, and corrections. Reviews reference D-IDs instead of owning open questions.
 - `STATUS.yaml` is only the resume pointer: mode, current node, blockers, next action, implementation scope, and latest relevant review.
 
 Each TREE node uses the minimal V1 schema:
@@ -174,7 +175,7 @@ Each TREE node uses the minimal V1 schema:
 - `success_evidence`
 - `children`
 
-Do not add catch-all node metadata unless real use proves it necessary. Facts and unknowns belong in GOAL, alternatives in DECISIONS, review history in REVIEWS, and resume state in STATUS.
+Do not add catch-all node metadata unless real use proves it necessary. Stable facts belong in GOAL; material unresolved questions and alternatives belong in DECISIONS; review history belongs in REVIEWS; resume state belongs in STATUS.
 
 Node planning status uses only:
 
