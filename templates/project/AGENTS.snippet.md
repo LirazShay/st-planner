@@ -41,7 +41,7 @@ For meaningful work:
 8. Run Final Planning Review before freezing.
 9. Do not implement while `plan_state: active`.
 10. Do not implement merely because `plan_state: frozen`; execution also requires `implementation_authorized: true`.
-11. After freeze, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
+11. After explicit implementation authorization, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
 12. Allocate every implementation-ready leaf exactly once in `.planning/EXECUTION.yaml`.
 13. Complete required handoff checks, then explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
 14. Do not copy task descriptions into EXECUTION; node IDs point to TREE.
