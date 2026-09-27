@@ -24,6 +24,20 @@ The test for loading more context is:
 
 If not, do not preload it.
 
+## 0.1 Long-running work progress orientation
+
+When planning/implementation becomes long, tool-heavy, or spans many checks, keep the user oriented with concise progress updates at meaningful boundaries.
+
+Useful updates say:
+- what is being checked now;
+- what is already complete;
+- what remains before this stage can close;
+- any meaningful discovery or blocker.
+
+Do not narrate every tool call, repeat the same status, or turn updates into a second task log.
+
+If the user requested one stage per message, progress updates stay within that stage and do not advance to a new stage by themselves.
+
 ## 1. Strategy + Tactic
 
 Every node contains:
