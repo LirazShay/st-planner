@@ -2,6 +2,14 @@
 
 This repository builds a reusable S&T planning framework for GPT.
 
+## One-command planning trigger
+
+If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
+
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, and allocate implementation-ready leaves in `EXECUTION.yaml`.
+
+Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
+
 ## Core rule
 
 For meaningful work, **plan completely before implementation**.
