@@ -4,7 +4,9 @@
 
 This document turns Strategy & Tactics (S&T) logic into an operational planning method for GPT and other AI agents.
 
-It is intentionally more explicit than the original introductory paper: it preserves the core logical structure and adds practical rules for uncertainty, evidence, review, persistence, execution handoff, KISS, time dependencies, supporting work, shared dependencies, and AI failure modes.
+It is intentionally more explicit than the original introductory paper: it preserves the core logical structure and adds practical rules for uncertainty, evidence, review, persistence, execution handoff, KISS, and AI failure modes.
+
+Complex extensions mentioned by the source — such as multiple parents, supporting steps, and time dependency — are **not fully designed in V1**. They are recorded as special cases so the planner does not distort the core S&T logic. Their richer treatment is deferred until the basic method has been proven useful.
 
 ## Source basis
 
@@ -325,64 +327,17 @@ Once a tactic is selected, the active tree follows it. Preserve rejected alterna
 
 ---
 
-# 12. Supporting steps
+# 12. Special cases deferred in V1
 
-The original material notes that some steps can improve probability or magnitude without being strictly necessary.
+The original material notes additional cases such as supporting steps, multiple parents, and time dependency. They are real planning concerns, but they are **not part of the V1 core model**.
 
-Do not corrupt necessity logic by labeling them necessary.
+The V1 rule is deliberately simple:
 
-Represent them separately as supporting work:
+- If a step is merely helpful but not necessary, do not force it into the required S&T tree. Record it in notes for later review.
+- If one step appears to belong to more than one parent, do not invent a graph model yet. Record the ambiguity and keep the clearest single-parent representation until the case is reviewed.
+- If execution order matters, record a plain-text dependency note. Do not redesign the S&T hierarchy to represent chronology.
 
-```yaml
-kind: supporting
-supports: ["2.3"]
-expected_effect: "reduces onboarding errors"
-```
-
-Examples:
-- extra documentation;
-- observability beyond minimum acceptance;
-- convenience automation;
-- performance headroom not required for initial success.
-
-A supporting step may later become necessary if constraints change.
-
----
-
-# 13. Multiple parents
-
-One step can contribute to more than one higher step.
-
-Avoid duplicating the same work just to preserve a visual tree.
-
-Represent a shared node once and reference multiple parent relationships when the semantics are genuinely shared.
-
-Review each parent relationship separately: the same child may be necessary for one parent and merely supporting for another.
-
-This turns the simple tree into a directed acyclic planning graph when needed. Keep the simpler tree unless the shared dependency is real.
-
----
-
-# 14. Time and ordering
-
-Logical decomposition does not automatically express chronology.
-
-Two children can both be necessary even if one must be performed first.
-
-Store ordering separately:
-
-```yaml
-depends_on:
-  - "1.2"
-```
-
-Do not use hierarchy to fake schedule dependencies.
-
-Distinguish:
-- **logical parent** — why the work exists;
-- **execution dependency** — what must happen first.
-
-This distinction prevents distorted trees.
+These cases must not be "solved" prematurely. If they become common in real projects, design their representation as a separate, evidence-driven stage.
 
 ---
 
@@ -481,7 +436,7 @@ Run authoring and review as separate mental passes.
 - Every active node has Strategy + Tactic.
 - IDs and parent links are valid.
 - Active decompositions normally have 2+ children.
-- Shared dependencies are explicit.
+- Deferred special cases are not disguised as ordinary required children.
 
 ## Pass B — Necessity
 For each child:
@@ -621,8 +576,6 @@ children:
   - "1.2.1"
   - "1.2.2"
 
-depends_on: []
-supports: []
 status: approved
 ```
 
