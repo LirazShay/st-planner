@@ -20,8 +20,9 @@ On that trigger, automatically:
 10. Continue planning until the complete intended plan passes Final Planning Review.
 11. Set `plan_state: frozen` while keeping `implementation_authorized: false`.
 12. Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to numbered executor chats.
-13. Complete the required post-freeze handoff checks.
-14. Only then set `implementation_authorized: true`. Freeze alone never authorizes implementation.
+13. Run the mandatory repository-only fresh-chat verification from `.planning/EXECUTOR_HANDOFF.md` and record its result in `REVIEWS.md`.
+14. Fix any handoff/allocation/context-routing defect the simulation exposes and rerun the failed case.
+15. Only after the gate passes set `implementation_authorized: true`. Freeze/allocation alone never authorize implementation.
 
 Unless the user explicitly asks to stop earlier or work one stage per message, complete this planning workflow autonomously in the same planning conversation.
 
@@ -43,11 +44,11 @@ For meaningful work:
 10. Do not implement merely because `plan_state: frozen`; execution also requires `implementation_authorized: true`.
 11. After explicit implementation authorization, execute directly from S&T leaves; do not create GitHub Issues merely to represent S&T work.
 12. Allocate every implementation-ready leaf exactly once in `.planning/EXECUTION.yaml`.
-13. Complete required handoff checks, then explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
-14. Do not copy task descriptions into EXECUTION; node IDs point to TREE.
-15. If the user says "I am chat N" / "אני צ'אט מספר N", first require both `plan_state: frozen` and `implementation_authorized: true`; then load chat N from EXECUTION, read only its assigned S&T nodes/context, check TREE dependencies against EXECUTION states, and execute only available assigned nodes.
+13. Before authorization, run and record the mandatory fresh-chat verification defined by `.planning/EXECUTOR_HANDOFF.md`; any failure keeps authorization false.
+14. Do not copy task descriptions into EXECUTION or EXECUTOR_HANDOFF; node IDs point to TREE.
+15. If the user says "I am chat N" / "אני צ'אט מספר N", read `.planning/EXECUTOR_HANDOFF.md` and require both `plan_state: frozen` and `implementation_authorized: true`; then load chat N from EXECUTION, read only its assigned S&T nodes/context, check TREE dependencies against EXECUTION states, and execute only available assigned nodes.
 16. Mark a node `done` only after its `success_evidence` is verified.
 17. If a material planning defect appears during execution, mark the affected node blocked with a factual reason, set `plan_state: active` and `implementation_authorized: false`, and stop starting new execution work.
 18. Reopen only the smallest affected S&T area; preserve `done` work only when it remains valid under the corrected plan.
-19. After focused review, repair only affected EXECUTION entries and freeze again; re-authorization is explicit, never implied by re-freeze. Git history is sufficient version history.
+19. After focused review, repair only affected EXECUTION entries and freeze again; rerun the mandatory fresh-chat verification before re-authorization. Git history is sufficient version history.
 20. Prefer one planning chat; use repository state for durability and optional continuation.
