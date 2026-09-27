@@ -16,7 +16,6 @@ Provide a small portable S&T planning framework stored with the project, with ex
 
 **Success evidence**
 - A GPT can start from a goal and build a complete reviewed S&T tree.
-- The baseline frozen for execution can be proven to be the baseline that passed Final Planning Review.
 - A fresh GPT can resume planning from repository state when necessary.
 - A fresh executor can prove, before authorization, that it can recover its assignment, dependencies, next context, and blockers from repository state only.
 - Final leaves are detailed enough to become implementation tasks without new material design decisions.
@@ -38,7 +37,7 @@ Provide a small portable S&T planning framework stored with the project, with ex
 
 ### 0.4 — Planning reaches implementation-ready depth before execution
 
-**Tactic:** require the whole intended tree to pass Final Planning Review, record evidence identifying that reviewed baseline, and prove no material drift before freezing it.
+**Tactic:** require the whole intended tree to pass Final Planning Review before freezing.
 
 ### 0.5 — The final plan can be executed without duplicating the work model
 
