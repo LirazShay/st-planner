@@ -154,22 +154,33 @@ The durable state is this directory:
 
 Before ending meaningful planning work, update STATUS so another session can identify the next action.
 
+### Minimal state ownership
+
+Keep one source of truth for each kind of state:
+
+- `TREE.yaml` owns S&T structure and node planning status.
+- `DECISIONS.md` owns open/decided alternatives.
+- `REVIEWS.md` owns review history.
+- `STATUS.yaml` is only the resume pointer: mode, current node, blockers, next action, implementation scope, and latest relevant review.
+
+Node planning status uses only:
+
+- `draft` — not yet approved;
+- `blocked` — cannot currently advance because an explicit blocker exists;
+- `approved` — the node's planning logic passed the relevant gates.
+
+Do not duplicate approved-node lists in STATUS.
+
 ## 13. Implementation gate
 
-Do not implement while:
+`implementation_scope` is the single source of truth for execution permission:
 
-```yaml
-implementation_allowed: false
-```
+- `implementation_scope: []` → no implementation is permitted.
+- A non-empty list → implementation is permitted **only** for those node IDs.
+- Everything outside that list remains blocked.
 
-When the next execution horizon passes the logical, KISS, and executability reviews, set it to true **and explicitly list the approved node IDs in `implementation_scope`**.
+Only approved, executable leaves may enter `implementation_scope`.
 
-A fresh session must interpret permission as:
-
-- `implementation_allowed: false` → no implementation.
-- `implementation_allowed: true` → implementation is allowed **only** for nodes listed in `implementation_scope`.
-- Everything outside that scope remains blocked.
-
-Never treat the boolean alone as global permission.
+Do not add a second boolean such as `implementation_allowed`; it creates contradictory states without adding information.
 
 GitHub Issues or other task trackers are execution output. They are not the source of the S&T rationale.
