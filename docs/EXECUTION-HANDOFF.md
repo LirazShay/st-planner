@@ -114,6 +114,6 @@ Already completed work is preserved when its Strategy, success evidence, and pro
 
 If previously completed work is invalidated, reset only that work to `pending` (or remove an obsolete node) rather than restarting all execution.
 
-After focused review passes, repair the affected EXECUTION allocation and freeze again while still unauthorized; run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable), then rerun and record the mandatory fresh-chat handoff gate before explicitly restoring authorization.
+After focused review passes, record the corrected reviewed baseline, pass freeze no-drift verification again, repair the affected EXECUTION allocation, and freeze only that verified corrected baseline while still unauthorized; run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when applicable), then rerun and record the mandatory fresh-chat handoff gate before explicitly restoring authorization.
 
 Git history is sufficient version history for V1.
