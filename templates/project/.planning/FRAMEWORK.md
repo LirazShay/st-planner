@@ -69,6 +69,20 @@ There is no QUICK/DEEP mode. Small problems naturally produce small trees; diffi
 
 Stop when an executor would not need another material design/product decision.
 
+For an implementation-ready leaf, also record any real execution prerequisites in `depends_on` using S&T node IDs.
+
+`depends_on` means only:
+
+> This node's execution cannot correctly begin until those node outcomes exist.
+
+It is **not**:
+- the S&T parent/child relationship;
+- priority;
+- a preferred sequence;
+- a general schedule.
+
+If two leaves can execute independently, do not invent a dependency.
+
 Do not decompose into trivial coding/clicking instructions.
 
 ## 8. Node planning status
@@ -157,10 +171,11 @@ Then map those Issues into numbered executor chats in `CHAT-ASSIGNMENTS.yaml`.
 
 The map is intentionally tiny:
 - Issue numbers;
-- referenced S&T node IDs;
-- prerequisite chat numbers.
+- referenced S&T node IDs.
 
-The task details remain in GitHub.
+Execution dependencies come from the frozen S&T leaves and are copied into the generated GitHub Issues. Chat-to-chat blocking is derived from those Issue dependencies after grouping; it is not a second manually maintained dependency model.
+
+The task details and execution dependency status remain in GitHub.
 
 A chat that says "I am chat N" / "אני צ'אט מספר N" reads that assignment, checks prerequisites, pulls only its Issues, and executes only that scope.
 
