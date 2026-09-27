@@ -34,25 +34,25 @@ This is optional continuation, not the default workflow.
 
 ## After planning
 
-Once `plan_state: frozen`, compile GitHub Issues from implementation-ready leaves using `docs/ISSUE-COMPILATION.md` and `templates/EXECUTION-ISSUE.md`.
+Once `plan_state: frozen`:
 
-Default to one leaf → one Issue. If Issue creation reveals that a leaf must be materially split, reopen planning instead of designing the split during execution handoff.
+1. create/populate `.planning/EXECUTION.yaml`;
+2. assign every implementation-ready leaf exactly once to a numbered executor chat;
+3. initialize each node as `pending`.
 
-Then populate `.planning/CHAT-ASSIGNMENTS.yaml` with the chat-to-Issue mapping.
+Do not create a duplicate task description. Each executor reads its assigned node directly from `TREE.yaml`.
 
-Each execution task should contain:
-- S&T node ID;
-- responsibility/outcome;
-- scope;
-- dependencies;
-- relevant decisions/constraints;
-- acceptance evidence.
-
-An executor chat can then start with only a number, for example:
+A new executor chat can then start with:
 
 > I am chat 2.
 
-It reads `CHAT-ASSIGNMENTS.yaml`, pulls its assigned GitHub Issues, checks prerequisite chats, and works from those Issues plus referenced planning context.
+or:
+
+> אני צ'אט מספר 2
+
+It reads `EXECUTION.yaml`, finds chat 2, reads those S&T nodes, checks their `depends_on` prerequisites, and executes only unblocked assigned work.
+
+Chat count is determined from the actual amount/context of work; there is no fixed node count per chat.
 
 ## If implementation exposes a planning defect
 
