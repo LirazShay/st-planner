@@ -11,9 +11,9 @@ nodes:
     parallel_assumptions:
       - "TBD"
 
-    necessary_assumption: null
+    necessary_assumptions: []
 
-    sufficiency_assumption: null
+    sufficiency_assumptions: []
 
     evidence:
       - "TBD"
