@@ -6,13 +6,13 @@ This repository defines a reusable planning protocol. When an AI agent works her
 
 For meaningful work, do not jump from a request directly to implementation.
 
-First establish:
+First establish the stable boundary:
 - desired outcome;
-- current reality;
+- established current reality;
 - constraints;
-- non-goals;
-- success evidence;
-- important unknowns.
+- non-goals.
+
+Put material unresolved questions in `DECISIONS.md`. Put success evidence on the relevant S&T node in `TREE.yaml`.
 
 Small and obvious work may use QUICK mode. Ambiguous, expensive, architectural, cross-cutting, or multi-step work uses DEEP mode.
 
@@ -175,7 +175,8 @@ When reality contradicts an assumption:
 ## 14. Definition of a planning-complete project
 
 Planning is complete enough for execution when:
-- the goal and success evidence are explicit;
+- the stable goal boundary is explicit in GOAL;
+- relevant node success evidence is explicit in TREE;
 - relevant constraints and non-goals are explicit;
 - each active step has Strategy + Tactic;
 - material assumptions are exposed;
