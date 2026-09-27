@@ -70,6 +70,9 @@ For each final leaf:
 - relevant decisions are resolved;
 - required inputs are known;
 - every real execution prerequisite is recorded in `depends_on`;
+- every `depends_on` reference resolves to an existing implementation-ready leaf;
+- no leaf depends on itself;
+- the execution-dependency graph is acyclic;
 - no dependency is invented merely to express preference or priority;
 - success evidence is objective;
 - no material design decision is left for the executor.
