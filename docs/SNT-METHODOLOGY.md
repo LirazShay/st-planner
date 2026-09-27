@@ -566,7 +566,8 @@ The recommended target-project state is:
 ├── REVIEWS.md
 ├── EXECUTION.yaml
 ├── EXECUTOR_HANDOFF.md
-└── validate-allocation.mjs
+├── validate-allocation.mjs
+└── verify-freeze-baseline.mjs
 ```
 
 Purpose:
@@ -579,6 +580,7 @@ Purpose:
 - `EXECUTION.yaml`: post-freeze management only — numbered chat allocation plus execution state/result for S&T leaf IDs.
 - `EXECUTOR_HANDOFF.md`: stable repository-only fresh-executor bootstrap, context-routing rules, and mandatory handoff-verification contract; it never duplicates task content.
 - `validate-allocation.mjs`: zero-dependency helper that mechanically validates the frozen TREE → EXECUTION projection before authorization; it stores no state.
+- `verify-freeze-baseline.mjs`: zero-dependency Git helper for proving that the material baseline frozen after Final Planning Review is the baseline that was actually reviewed; it stores no state.
 
 This is intentionally small.
 
@@ -597,7 +599,12 @@ In particular, the S&T Planner workflow does **not** require GitHub Issues.
 The normal V1 flow is:
 
 ```
-frozen TREE.yaml + .planning/STATUS.yaml -> implementation_authorized: false
+Final Planning Review of a specific baseline
+→ record reviewed-baseline evidence
+→ prove no material GOAL/TREE/DECISIONS drift
+→ freeze that reviewed baseline
+→ if integration changes the frozen ref, prove no-drift again
+→ frozen TREE.yaml + .planning/STATUS.yaml -> implementation_authorized: false
 → allocate leaf node IDs in EXECUTION.yaml
 → mechanically validate allocation
 → simulate mandatory fresh executors via EXECUTOR_HANDOFF.md
@@ -662,6 +669,8 @@ Creating a second task object for every S&T leaf would duplicate:
 - status linkage.
 
 Direct execution from S&T node IDs keeps planning and implementation connected and reduces synchronization errors.
+
+Before freeze, a Final Planning Review approves a specific material baseline rather than a moving set of files. When a Git ref is available, `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` should prove that GOAL/TREE/DECISIONS have not changed; use `--frozen-ref` to verify a later merge/rebase/integration result. Without stable Git refs, record equivalent reproducible evidence in REVIEWS. Any material drift invalidates the prior Final Review.
 
 Before first authorization, `node .planning/validate-allocation.mjs --initial` mechanically proves the allocation shape. Use `--resume` after execution/replanning so valid completed work may remain completed. `--serial-chats` is optional and applies only when a target explicitly treats chat numbers as execution order; ordinary parallel-capable allocation must not infer serial order from numbering alone.
 
@@ -787,6 +796,7 @@ The plan is good enough when:
 - important alternatives are decided or intentionally left open;
 - all intended execution leaves are implementation-ready;
 - the complete intended tree has passed Final Planning Review;
+- the frozen material baseline is proven identical to the reviewed baseline, or equivalent no-drift evidence is recorded;
 - repository-only fresh-executor simulations have proven that authorization, assignment, dependencies, context routing, and blockers are recoverable without planning-chat memory;
 - additional decomposition would not materially improve execution.
 
