@@ -368,7 +368,8 @@ Normally this appears only on implementation-ready leaves.
 It means the referenced node outcome is a real prerequisite for executing this node. It does not mean "do this first because it seems convenient."
 
 Rules:
-- reference S&T node IDs;
+- reference existing implementation-ready leaf S&T node IDs;
+- dependencies are execution prerequisites between leaves, not parent/child logic;
 - no self-dependency;
 - dependencies must be acyclic;
 - omit the field content when no prerequisite exists;
