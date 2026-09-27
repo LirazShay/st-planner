@@ -1,42 +1,42 @@
 # Worked Example — Safe CSV Import
 
-This example demonstrates the S&T Planner on a small but realistic software change, including a fresh-session handoff.
+This example demonstrates S&T planning on a small software change.
 
 ## Scenario
 
 A backend service must let users import customer records from CSV files safely and predictably.
 
-## Current example state
+## Current planning state
 
-- The root has been decomposed.
-- Branch `0.1` is decomposed to executable leaves and has passed review.
-- A simulated fresh session successfully recovered the state and continued into branch `0.2`.
-- Branch `0.2` was decomposed into admissibility definition, candidate evaluation, and persistence enforcement.
-- The fresh session correctly discovered that duplicate-customer behavior is a material unknown and created open decision `D-002` instead of inventing a rule.
-- Implementation remains allowed only for the previously approved horizon: `0.1.1` and `0.1.2`.
-- The next planning action is to resolve `D-002`, then review `0.2.1`.
+- The root is decomposed.
+- Branch `0.1` has passed local review.
+- Branch `0.2` has been decomposed.
+- `0.2.1` is blocked by open decision `D-002` about duplicate-customer behavior.
+- Branches `0.3` and `0.4` still require deeper planning.
+- The overall plan is therefore still `active`.
+- **Nothing from this example is released for implementation yet.**
 
-This demonstrates two important properties:
+This demonstrates an important rule:
 
-1. a project can execute an approved near-term horizon without fully planning distant branches;
-2. a fresh session can continue from repository state and stop when it reaches a real product/domain decision that is not present in the persisted context.
+> A locally approved/executable branch does not authorize implementation while the complete intended plan is still being built.
+
+## Optional fresh-chat continuation
+
+The example also proves that, if planning ever must move to a new chat, repository state is enough to recover:
+
+- the goal;
+- the current S&T area;
+- the open material decision;
+- the next planning action.
+
+That capability is a fallback, not a requirement to split planning across chats.
 
 ## Files
 
-- `GOAL.md` — stable outcome boundary: desired outcome, current reality, constraints and non-goals.
-- `TREE.yaml` — S&T structure, assumptions, node status and success evidence.
-- `STATUS.yaml` — exact resume point for a fresh session.
-- `DECISIONS.md` — material open questions and their resolutions.
-- `REVIEWS.md` — audit history, including the handoff test result.
+- `GOAL.md` — stable goal boundary.
+- `TREE.yaml` — S&T structure, assumptions, local planning status, and success evidence.
+- `DECISIONS.md` — material open questions and decisions.
+- `REVIEWS.md` — planning review history.
+- `STATUS.yaml` — current planning pointer.
 
-## Fresh-session exercise
-
-A new AI reading the portable S&T framework plus these persisted files should conclude:
-
-1. the overall goal is safe and predictable customer CSV import;
-2. `0.1.1` and `0.1.2` are the only currently approved implementation nodes;
-3. `0.2` itself is approved because its own Strategy/Tactic and immediate decomposition passed review;
-4. that approval does not cascade: `0.2.1` is still blocked by open decision `D-002`;
-5. no duplicate policy should be guessed;
-6. the next planning action is to resolve `D-002`;
-7. implementation is permitted only for node IDs listed in `implementation_scope`; everything else remains blocked.
+The example should reach implementation only after the remaining branches are completed and a Final Planning Review passes for the whole tree.
