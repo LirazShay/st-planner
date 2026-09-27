@@ -2,22 +2,33 @@
 
 A small reusable framework that helps GPT plan complex work with Strategy & Tactics logic instead of producing an arbitrary checklist.
 
-## Quick start
+## Quick start — from any other repository
 
-Install once in a target repository:
+The target repository does **not** need S&T Planner installed beforehand.
 
-1. Copy `templates/project/.planning/` to `.planning/`.
-2. Merge `templates/project/AGENTS.snippet.md` into the target repository's `AGENTS.md`.
+Open a chat that is working on the target repository and say:
 
-After that, normal usage is one sentence:
+> **תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה לבנות/לשנות>**
 
-> **תתכנן לי בשיטת S&T Planner לפי הריפו: <מה אני רוצה לבנות/לשנות>**
+That's the normal entry point.
 
-That's it.
+The agent should:
 
-The agent is responsible for reading the repository correctly, building and reviewing the full S&T plan, persisting the planning files, freezing only when the plan is ready, and preparing `EXECUTION.yaml`.
+1. fetch `LirazShay/st-planner/BOOTSTRAP.md`;
+2. follow its bootstrap contract;
+3. copy the required `.planning/` framework files into the current target repository;
+4. merge the S&T rules into the target `AGENTS.md` without deleting existing project rules;
+5. continue immediately into planning in the same chat.
 
-`templates/START-PROMPT.md` remains only as an optional copy/paste example; it is not required.
+You do not manually install files and you do not need to paste the framework workflow.
+
+After planning is frozen, executor chats in the target repository can simply say:
+
+> **אני צ'אט מספר 1**
+
+### Already installed?
+
+If the target repository already has S&T Planner state, the bootstrap must not overwrite live planning files. It simply uses the existing installation unless you explicitly ask to upgrade it.
 
 ## What it does
 
@@ -48,7 +59,7 @@ No server, database, plugin runtime, state machine, or execution engine is requi
 
 ## Core project files
 
-Copy `templates/project/.planning/` into a target repository:
+The external bootstrap copies these from `templates/project/.planning/` into the target repository:
 
 - `FRAMEWORK.md` — portable S&T rules
 - `GOAL.md` — stable goal boundary
@@ -58,9 +69,9 @@ Copy `templates/project/.planning/` into a target repository:
 - `STATUS.yaml` — small resume pointer
 - `EXECUTION.yaml` — after freeze, maps numbered executor chats directly to S&T leaves and tracks execution state
 
-Also merge `templates/project/AGENTS.snippet.md` into the project's `AGENTS.md`.
+The bootstrap also merges `templates/project/AGENTS.snippet.md` into the target project's `AGENTS.md`.
 
-After installation, start planning with a natural S&T Planner request; no special starter prompt is required.
+For the exact external installation behavior, `BOOTSTRAP.md` is authoritative.
 
 ## When planning is complete
 
