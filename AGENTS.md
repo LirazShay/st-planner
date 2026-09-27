@@ -69,7 +69,7 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan and create GitHub Issues/tasks from executable leaves.
+Then freeze the plan, create GitHub Issues/tasks from executable leaves, and map those Issues to numbered executor chats in `.planning/CHAT-ASSIGNMENTS.yaml`.
 
 ## Execution handoff
 
@@ -82,6 +82,16 @@ Each execution task should include:
 - success/acceptance evidence.
 
 Executor chats implement the task; they do not redesign the plan.
+
+If the user identifies an executor as "chat N" (for example "אני צ'אט מספר 2"), the agent must:
+- confirm the plan is frozen;
+- read `CHAT-ASSIGNMENTS.yaml`;
+- find assignment N;
+- check prerequisite chats by their assigned GitHub Issues;
+- pull only N's assigned Issues and referenced S&T context;
+- execute only that scope.
+
+If N is missing or a prerequisite is incomplete, do not invent or steal work.
 
 If execution exposes a material planning defect, return it to planning rather than silently improvising.
 
