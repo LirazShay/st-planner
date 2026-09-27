@@ -2,6 +2,10 @@ version: 1
 
 plan_state: active
 
+# Freeze and implementation authorization are deliberately separate.
+# A frozen plan is still not executable until this becomes true.
+implementation_authorized: false
+
 current_node: "0"
 
 blockers: []
