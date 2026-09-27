@@ -4,16 +4,20 @@ A small reusable framework that helps GPT plan complex work with Strategy & Tact
 
 ## Quick start
 
-For a target repository:
+Install once in a target repository:
 
 1. Copy `templates/project/.planning/` to `.planning/`.
 2. Merge `templates/project/AGENTS.snippet.md` into the target repository's `AGENTS.md`.
-3. Open one planning chat and paste `templates/START-PROMPT.md`, replacing `<WRITE THE GOAL HERE>` with the actual desired outcome.
-4. Let that chat build/review the complete S&T plan and persist it in `.planning/`.
-5. After the plan is frozen, the framework fills `.planning/EXECUTION.yaml`.
-6. Open executor chats and say only, for example: **"אני צ'אט מספר 1"**.
 
-That is the intended normal workflow.
+After that, normal usage is one sentence:
+
+> **תתכנן לי בשיטת S&T Planner לפי הריפו: <מה אני רוצה לבנות/לשנות>**
+
+That's it.
+
+The agent is responsible for reading the repository correctly, building and reviewing the full S&T plan, persisting the planning files, freezing only when the plan is ready, and preparing `EXECUTION.yaml`.
+
+`templates/START-PROMPT.md` remains only as an optional copy/paste example; it is not required.
 
 ## What it does
 
