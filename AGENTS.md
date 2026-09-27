@@ -85,13 +85,13 @@ After freeze:
 
 - keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff verification passes;
 - create/populate `.planning/EXECUTION.yaml`;
-- run the four representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`;
-- record the result in `.planning/REVIEWS.md`;
-- fix and rerun any failed simulation before authorization;
 - assign every implementation-ready leaf to exactly one numbered chat;
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
 - keep execution prerequisites only in `TREE.yaml -> depends_on`;
-- use execution states only in EXECUTION: `pending / in_progress / done / blocked`.
+- use execution states only in EXECUTION: `pending / in_progress / done / blocked`;
+- after allocation is complete, run the four representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`;
+- record the result in `.planning/REVIEWS.md`;
+- fix and rerun any failed simulation before authorization.
 
 When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
 
