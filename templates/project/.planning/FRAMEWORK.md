@@ -185,6 +185,22 @@ Do not erase durable history, decision rationale, version compatibility notes, o
 
 Do not recursively scan unrelated documentation. Check the contracts actually used by the plan.
 
+### Stale decision / investigation cleanup
+
+Before freeze, verify that the planning state does not still claim an issue is unresolved after the plan has already resolved it.
+
+Check:
+- every `open` entry in `DECISIONS.md` is still materially unresolved;
+- resolved choices are marked `resolved` and record their actual resolution;
+- replaced questions are marked `superseded`;
+- live markers such as `INVESTIGATE`, `TBD`, `OPEN`, or equivalent classifications in planning/contracts are either still genuinely unresolved or removed/reclassified.
+
+A genuinely unresolved material question blocks freeze and must remain represented by an open D-entry (and by a blocked TREE node when it blocks a node).
+
+Do not flag definitions, legends, examples, historical notes, or quoted source material merely because they contain words such as `TBD` or `INVESTIGATE`.
+
+Do not scan unrelated repository content. Check `DECISIONS.md` and the durable planning/contracts actually used by this plan.
+
 When the whole intended tree is ready, run Final Planning Review across the complete plan.
 
 Only after it passes **and the reviewed baseline passes freeze no-drift verification**:
