@@ -109,6 +109,8 @@ Planning is deep enough when the next meaningful execution horizon is composed o
 
 Mark approved nodes accordingly.
 
+When implementation is released, `implementation_scope` must enumerate the exact approved executable node IDs. `implementation_allowed: true` never grants permission outside that list.
+
 ## 8. Persist session state
 
 Before ending a planning session, update `.planning/STATUS.yaml`.
