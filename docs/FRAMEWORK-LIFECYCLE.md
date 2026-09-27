@@ -15,6 +15,8 @@ FREEZE
   ↓
 ALLOCATE S&T LEAVES TO NUMBERED CHATS
   ↓
+MECHANICAL ALLOCATION VALIDATION
+  ↓
 MANDATORY FRESH-CHAT HANDOFF VERIFICATION
   ↓
 AUTHORIZE IMPLEMENTATION
@@ -100,11 +102,13 @@ The tree remains the work definition. EXECUTION stores only:
 
 No second task system is required.
 
-## 7. Verify fresh-chat handoff and authorize implementation
+## 7. Validate allocation, verify fresh-chat handoff, and authorize implementation
 
 Freeze and allocation still leave implementation unauthorized.
 
-Follow `.planning/EXECUTOR_HANDOFF.md` and simulate repository-only fresh executors for the required representative cases. Record the result in `.planning/REVIEWS.md`. Any failure must be corrected and rechecked while authorization remains false.
+First run `node .planning/validate-allocation.mjs --initial`. Any mechanical allocation failure must be corrected before continuing. Use `--serial-chats` only when the target explicitly defines numbered chats as serial.
+
+Then follow `.planning/EXECUTOR_HANDOFF.md` and simulate repository-only fresh executors for the required representative cases. Record the result in `.planning/REVIEWS.md`. Any failure must be corrected and rechecked while authorization remains false.
 
 Only after that gate passes:
 
