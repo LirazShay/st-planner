@@ -45,7 +45,7 @@ Use the existing installation unless the user explicitly requests an upgrade/rei
 
 One planning chat is preferred.
 
-If continuation in another chat becomes necessary, the repository state is sufficient. The new planner reads the target project's AGENTS and `.planning/` state and continues from STATUS.
+If continuation in another chat becomes necessary, the repository state is sufficient. The new planner reads the target project's AGENTS and `.planning/` state and continues from `.planning/STATUS.yaml`.
 
 ## Execution
 
