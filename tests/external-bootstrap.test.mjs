@@ -21,14 +21,15 @@ function planningBundleFiles() {
 
 function bootstrapListedPlanningFiles() {
   const text = fs.readFileSync(bootstrapPath, "utf8");
-  const matches = [
+  return [
     ...text.matchAll(/templates\/project\/\.planning\/([A-Za-z0-9._-]+)/g),
-  ];
-  return [...new Set(matches.map((match) => match[1]))].sort();
+  ].map((match) => match[1]);
 }
 
 test("external bootstrap lists the complete planning bundle exactly once", () => {
-  assert.deepEqual(bootstrapListedPlanningFiles(), planningBundleFiles());
+  const listed = bootstrapListedPlanningFiles();
+  assert.equal(listed.length, new Set(listed).size);
+  assert.deepEqual([...listed].sort(), planningBundleFiles());
 });
 
 test("planning bundle can be copied into a fresh target and helper CLIs start", () => {
