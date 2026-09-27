@@ -1,6 +1,6 @@
 # AGENTS.md — S&T Planner Operating Contract
 
-This repository defines a reusable S&T lifecycle framework. When an AI agent works here, or uses this framework for another project, these rules govern planning, execution, verification, replanning, and handoff unless the user explicitly overrides them.
+This repository defines a reusable S&T framework with two separated roles: planning first, execution only after a full-plan freeze. When an AI agent works here, it must know whether it is acting as PLANNER or EXECUTOR.
 
 ## 1. Planning before implementation
 
@@ -148,19 +148,25 @@ For now:
 
 Do not add machinery for these cases until real use demonstrates that it is needed.
 
-## 12. Releasing and executing work
+## 12. Planning completion and execution handoff
 
 Do not treat GitHub Issues as the source of truth while the logic is still changing.
 
-After the relevant plan is approved:
-1. place only approved executable leaves into `implementation_scope`;
-2. retain each task/action's S&T node ID;
-3. execute without silently broadening scope;
-4. verify the Strategy against its `success_evidence`;
-5. record the result in `EXECUTION.md` as verified / failed / partial;
-6. feed new facts or falsified assumptions back into the smallest affected planning branch.
+During planning, do not implement target-project work and do not release partially planned leaves.
 
-Issues, PRs, tools, and humans are execution adapters; the S&T model remains the rationale.
+Planning completes only after the entire intended S&T:
+- is decomposed to the required execution granularity;
+- has all material decisions resolved;
+- passes the full review suite;
+- passes a Final Planning Review.
+
+Only then:
+1. freeze the planning baseline;
+2. compile `EXECUTION-PLAN.yaml`;
+3. transition STATUS from `stage: planning` to `stage: execution`;
+4. start separate EXECUTOR chats from bounded work packages.
+
+A single planner chat is the default. Planner-to-planner continuation exists only when needed for context, interruption, recovery, or deliberate independent review.
 
 ## 13. Change control
 
