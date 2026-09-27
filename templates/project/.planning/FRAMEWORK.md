@@ -29,7 +29,7 @@ V1 deliberately does **not** add a separate edge object or duplicate `parent` fi
 
 This placement keeps the tree compact while preserving the S&T logic.
 
-## 2. Go down by asking "How?"
+## 3. Go down by asking "How?"
 
 For the parent tactic ask:
 
@@ -39,7 +39,7 @@ Each child should represent an independently necessary part of performing the pa
 
 A one-child decomposition is usually just rewording.
 
-## 3. Necessity
+## 4. Necessity
 
 For every child:
 
@@ -47,7 +47,7 @@ For every child:
 
 If yes, challenge its place in the required tree.
 
-## 4. Sufficiency
+## 5. Sufficiency
 
 For every parent:
 
@@ -55,7 +55,7 @@ For every parent:
 
 If something is missing, the group is incomplete.
 
-## 5. Alternatives and unknowns
+## 6. Alternatives and unknowns
 
 Do not represent alternatives as simultaneous necessary children.
 
@@ -63,7 +63,7 @@ Material unresolved questions belong in `DECISIONS.md`.
 
 Do not guess important unknowns.
 
-## 6. Stop at implementation-ready leaves
+## 7. Stop at implementation-ready leaves
 
 There is no QUICK/DEEP mode. Small problems naturally produce small trees; difficult problems naturally produce deeper trees.
 
@@ -71,7 +71,7 @@ Stop when an executor would not need another material design/product decision.
 
 Do not decompose into trivial coding/clicking instructions.
 
-## 7. Node planning status
+## 8. Node planning status
 
 Use exactly three local planning statuses:
 
@@ -88,7 +88,7 @@ KISS rules:
 - Status is local. A blocked descendant does not automatically change its parent from approved to blocked.
 - Local approval never authorizes implementation before the whole plan is frozen.
 
-## 8. Review as you build
+## 9. Review as you build
 
 Check:
 - Strategy/Tactic validity;
@@ -100,7 +100,7 @@ Check:
 
 Local approval means planning logic is sound locally. It does not authorize implementation.
 
-## 9. Finish the entire plan before execution
+## 10. Finish the entire plan before execution
 
 Do not hand partially planned leaves to implementation.
 
@@ -118,7 +118,7 @@ Before that:
 plan_state: active
 ```
 
-## 10. Keep state simple
+## 11. Keep state simple
 
 - `GOAL.md` — stable boundary.
 - `TREE.yaml` — S&T plan.
@@ -128,7 +128,7 @@ plan_state: active
 
 Prefer one planning conversation. Repository state exists so continuation is possible when needed.
 
-## 11. Execution handoff
+## 12. Execution handoff
 
 After freeze, convert implementation-ready leaves into ordinary GitHub Issues/tasks.
 
