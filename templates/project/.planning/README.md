@@ -39,7 +39,7 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 - TREE — S&T logic, planning status, dependencies, success evidence.
 - DECISIONS — material open questions and decisions.
 - REVIEWS — planning review history.
-- STATUS — small planning resume pointer, active/frozen planning state, and explicit implementation-authorization gate.
+- .planning/STATUS.yaml — S&T Planner-owned small planning resume pointer, active/frozen planning state, and explicit implementation-authorization gate.
 - EXECUTION — after freeze only: numbered chat allocation + execution state/result for leaf node IDs.
 - EXECUTOR_HANDOFF — stable fresh-executor bootstrap/read-order and handoff verification contract; never task content.
 - validate-allocation.mjs — portable mechanical validator for TREE/EXECUTION allocation invariants; framework tooling, not project state.
@@ -48,14 +48,15 @@ The project `AGENTS.md` owns the automatic behavior behind this command. The use
 
 - One planning chat is preferred.
 - New planning chats are optional continuation only.
-- Do not implement while `plan_state: active`.
-- The whole intended plan must pass Final Planning Review before `plan_state: frozen`.
-- `plan_state: frozen` does **not** authorize implementation.
-- Keep `implementation_authorized: false` while post-freeze allocation/handoff checks are still being completed.
+- Do not implement while `.planning/STATUS.yaml -> plan_state: active`.
+- The whole intended plan must pass Final Planning Review before `.planning/STATUS.yaml -> plan_state: frozen`.
+- `.planning/STATUS.yaml -> plan_state: frozen` does **not** authorize implementation.
+- Keep `.planning/STATUS.yaml -> implementation_authorized: false` while post-freeze allocation/handoff checks are still being completed.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
 - Before first authorization run `node .planning/validate-allocation.mjs --initial`. Any failure blocks authorization.
 - Use `--serial-chats` only when the target explicitly treats numbered chats as a serial execution order.
 - After replanning with preserved execution state, validate with `--resume`.
-- Execution may begin only after allocation validation passes, the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF passes and is recorded in REVIEWS, and `implementation_authorized: true` is set explicitly.
+- Execution may begin only after allocation validation passes, the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF passes and is recorded in REVIEWS, and `.planning/STATUS.yaml -> implementation_authorized: true` is set explicitly.
+- A target repository's root `STATUS.yaml`, phase, release state, or workstream status is target-owned and is never an alias for `.planning/STATUS.yaml`.
 - Do not duplicate Strategy/Tactic/task descriptions in EXECUTION.
 - Execution dependencies remain in TREE -> depends_on.
