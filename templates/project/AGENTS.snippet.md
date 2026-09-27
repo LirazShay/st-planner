@@ -61,4 +61,5 @@ For meaningful work:
 21. For a meaningful unexpected failure, capture technical root cause, reasoning/process cause, escape cause, local fix + regression proof, and the smallest reusable prevention. Skip this ceremony for normal TDD red states, trivial typos, and expected validation failures.
 22. When CI/workflow validation logic becomes non-trivial, put it in a small versioned helper script and let the workflow call it; avoid large inline parsers/heredocs in YAML or shell.
 23. For programmatic repository text edits, use literal-safe replacement (for example a replacer function when inserted JavaScript text may contain `$`), require expected source text before replacing, and reread the rendered file or full diff before PR/merge.
-24. Prefer one planning chat; use repository state for durability and optional continuation.
+24. Follow the target repository's existing branch/PR/merge/post-merge verification rules when they exist. Do not impose GitHub Flow or PR ceremony when the target repository does not require it.
+25. Prefer one planning chat; use repository state for durability and optional continuation.
