@@ -35,8 +35,8 @@ A new AI reading the portable S&T framework plus these persisted files should co
 
 1. the overall goal is safe and predictable customer CSV import;
 2. `0.1.1` and `0.1.2` are the only currently approved implementation nodes;
-3. `0.2` has a sensible decomposition but is not approved;
-4. `0.2.1` is blocked by open decision `D-002`;
+3. `0.2` itself is approved because its own Strategy/Tactic and immediate decomposition passed review;
+4. that approval does not cascade: `0.2.1` is still blocked by open decision `D-002`;
 5. no duplicate policy should be guessed;
 6. the next planning action is to resolve `D-002`;
 7. implementation is permitted only for node IDs listed in `implementation_scope`; everything else remains blocked.
