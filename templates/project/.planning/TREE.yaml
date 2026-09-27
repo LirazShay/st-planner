@@ -1,0 +1,24 @@
+version: 1
+
+root: "0"
+
+nodes:
+  "0":
+    status: draft
+    strategy: "TBD"
+    tactic: "TBD"
+
+    parallel_assumptions:
+      - "TBD"
+
+    necessary_assumption: null
+
+    sufficiency_assumption: null
+
+    evidence:
+      - "TBD"
+
+    children: []
+
+notes:
+  special_cases: []
