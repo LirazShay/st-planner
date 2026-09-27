@@ -30,6 +30,25 @@ It is **not** the source of truth for open questions or current state. If a revi
 **Opened/referenced decisions:**
 - None / D-XXX
 
+## Final Planning Review freeze-baseline evidence
+
+When a review is the **Final Planning Review**, record enough evidence to prove that the baseline frozen afterward is the baseline that actually passed review.
+
+**Reviewed baseline:**
+- evidence: Git commit/ref/tree hash or equivalent immutable/reproducible evidence
+- default material files: `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`
+- additional material files, if the review explicitly covered them: None / paths
+
+**Freeze no-drift verification:**
+- method: `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` | provider compare | equivalent
+- compared reviewed baseline to: working tree | frozen ref/commit | equivalent
+- result: pass | changes-required
+- drift found: None / paths
+
+If any material baseline file changes after Final Planning Review, that review no longer authorizes freeze. Review the changed baseline again and record new baseline evidence.
+
+If a merge/rebase/integration step creates a different frozen ref after an earlier pass, repeat no-drift verification against that resulting ref before execution allocation/handoff.
+
 ## Post-allocation fresh-chat handoff review
 
 Before `implementation_authorized: true`, first require a passing allocation validator, then record a dedicated review that simulates repository-only fresh executors according to `EXECUTOR_HANDOFF.md`.
