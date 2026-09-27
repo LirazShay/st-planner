@@ -1,12 +1,12 @@
 # Numbered Executor Chats
 
-This is a small generic handoff layer for projects that will be implemented across multiple GPT chats.
+This is a small generic handoff layer for projects implemented across multiple GPT chats.
 
-It exists only **after planning is complete**.
+It exists only after planning is complete.
 
 ## Goal
 
-After the S&T plan is frozen and GitHub Issues have been created, the planner assigns those Issues to numbered executor chats.
+After the S&T plan is frozen and GitHub Issues are created, the planner groups those Issues into numbered executor chats.
 
 Then a new chat can begin with only:
 
@@ -14,19 +14,19 @@ Then a new chat can begin with only:
 
 or:
 
-> I am chat 2.
+> אני צ'אט מספר 2
 
-The framework lets it discover its responsibility from GitHub without the user re-explaining the work.
+and discover its work without the user re-explaining the project.
 
 ## Source of truth
 
-Keep responsibilities separated:
+Keep responsibilities separate:
 
-- `TREE.yaml` — why the work exists and the planning logic.
-- GitHub Issues — detailed execution tasks.
-- `CHAT-ASSIGNMENTS.yaml` — only the mapping from chat number to Issues/S&T nodes/dependencies.
+- `TREE.yaml` — planning rationale and leaf `depends_on` prerequisites.
+- GitHub Issues — detailed execution tasks, copied dependency relationships/status, discussion, PRs, and completion.
+- `CHAT-ASSIGNMENTS.yaml` — only chat number → Issue numbers + source S&T node IDs.
 
-Do not copy full Issue descriptions into `CHAT-ASSIGNMENTS.yaml`.
+Do not copy full Issue descriptions or a second dependency graph into `CHAT-ASSIGNMENTS.yaml`.
 
 ## Assignment format
 
@@ -39,78 +39,44 @@ assignments:
     snt_nodes:
       - "1.2.1"
       - "1.2.2"
-    depends_on_chats: []
 
   "2":
     issues:
       - 103
     snt_nodes:
       - "1.3.1"
-    depends_on_chats:
-      - "1"
 ```
 
-That is intentionally the whole V1 schema.
+That is the whole V1 schema.
 
 ## What "I am chat N" means
 
-When an executor chat identifies itself as chat N:
-
-1. Read the repository `AGENTS.md`.
+1. Read repository `AGENTS.md`.
 2. Confirm `.planning/STATUS.yaml -> plan_state: frozen`.
 3. Read `.planning/CHAT-ASSIGNMENTS.yaml`.
-4. Find assignment `N`.
-5. Check every `depends_on_chats` prerequisite.
-6. For each prerequisite chat, inspect its assigned GitHub Issues and confirm they are complete.
-7. Pull only the GitHub Issues assigned to chat N.
-8. Read only the referenced S&T nodes/decisions needed to understand those Issues.
-9. Execute only that assigned work.
-10. Use the normal GitHub Issue/PR workflow to report completion.
-
-If no assignment exists for N, do not invent work.
-
-If a prerequisite is incomplete, do not steal other work; report that chat N is blocked by the prerequisite.
+4. Find assignment N. If missing, do not invent work.
+5. Pull only the assigned GitHub Issues.
+6. Inspect the dependency/prerequisite information on those Issues.
+7. If an assigned Issue is blocked by an incomplete prerequisite, report the blocker and do not steal unrelated work.
+8. Read only the referenced S&T nodes/decisions/project files needed for those Issues.
+9. Execute only the assigned work.
+10. Use the normal GitHub Issue/PR workflow for completion.
 
 ## Parallel work
 
-Two chats may run in parallel when neither depends on the other.
+Parallelism is derived from Issue dependencies.
 
-Example:
+If chat 2's Issues have no unresolved prerequisites from chat 1's Issues, both chats may run.
 
-```yaml
-"2":
-  depends_on_chats: []
-
-"3":
-  depends_on_chats: []
-```
-
-Both may start after the plan is frozen.
-
-No scheduler is needed.
-
-## Why chat numbers instead of another task system?
-
-The number is only a convenient lookup key.
-
-GitHub still owns:
-- task descriptions;
-- status;
-- discussion;
-- PRs;
-- implementation history.
-
-The S&T framework only answers:
-
-> Which already-planned GitHub work belongs to this executor chat?
+No scheduler and no chat-level dependency graph are needed.
 
 ## Planning responsibility
 
-The planner creates `CHAT-ASSIGNMENTS.yaml` only after:
-- Final Planning Review passed;
-- `plan_state: frozen`;
-- execution Issues were created.
+After Final Planning Review:
+1. freeze the plan;
+2. create Issues from implementation-ready leaves;
+3. copy each leaf's `depends_on` relation into the corresponding Issue dependency/prerequisite information;
+4. group coherent Issues into numbered chats;
+5. write only the mapping to `CHAT-ASSIGNMENTS.yaml`.
 
-The planner decides how to group Issues into chats based on coherent responsibility and dependencies.
-
-Do not create one chat per Issue automatically. Grouping should minimize context switching while keeping responsibility clear.
+Do not create one chat per Issue automatically. Group related work when doing so preserves clear responsibility and valid dependency ordering.
