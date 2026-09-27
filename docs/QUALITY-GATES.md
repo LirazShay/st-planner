@@ -114,3 +114,19 @@ A fresh GPT should be able to read the repository state and identify:
 - blockers;
 - next planning action;
 - whether the plan is active or frozen.
+
+
+## Gate 11 — Issue compilation
+
+After freeze and before numbered chat assignment, pass only when:
+
+- every implementation-ready frozen leaf appears in exactly one execution Issue by default;
+- any grouped Issue satisfies the documented grouping rules and lists every source S&T node;
+- no leaf was materially split during compilation; if splitting was required, planning was reopened instead;
+- every Issue outcome is derived from Strategy and planned approach from Tactic;
+- every relevant decision/constraint is referenced without copying irrelevant planning history;
+- every `depends_on` leaf relation became the correct Issue prerequisite;
+- every Issue includes objective acceptance evidence;
+- an executor can implement the Issue without making a new material planning decision.
+
+Compilation must be a projection of the frozen plan, not a new design phase.
