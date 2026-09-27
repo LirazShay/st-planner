@@ -19,7 +19,7 @@ It is **not** the source of truth for open questions or current state. If a revi
 - KISS
 - executability
 - tree-state consistency
-- fresh-session continuity
+- planning fresh-session continuity
 
 ## Post-allocation fresh-chat handoff review
 
