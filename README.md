@@ -2,7 +2,7 @@
 
 A reusable planning framework for GPT and other AI agents, based on Strategy & Tactics (S&T) logic from the Theory of Constraints.
 
-The goal is broader: **any capable GPT/chat should be able to connect to the same framework, plan with S&T logic, execute only reviewed work, verify outcomes against evidence, learn from reality, and hand off cleanly to another fresh session.**
+The goal is broader: **any capable GPT/chat should be able to use one consistent S&T framework to build a complete logical plan first, freeze it only after full review, and only then let separate executor chats implement bounded responsibilities from that frozen plan.**
 
 ## Status
 
@@ -38,17 +38,19 @@ The copied `.planning/FRAMEWORK.md` is a self-contained S&T kernel, so ordinary 
 
 Then provide the goal in normal language.
 
-The AI should:
+The default workflow is:
 
-1. connect to the framework state;
-2. establish the stable goal boundary;
-3. construct and critique the S&T tree;
-4. release only approved executable leaves;
-5. execute within the released scope;
-6. verify outcomes against node success evidence;
-7. record execution evidence and new facts;
-8. replan the smallest affected branch when reality invalidates assumptions;
-9. persist enough state for the next fresh chat to continue.
+1. one planner chat connects to the framework;
+2. it establishes the stable goal boundary;
+3. it constructs the complete intended S&T tree;
+4. it repeatedly critiques and corrects the plan;
+5. it runs a final whole-tree review;
+6. only then it freezes the planning baseline;
+7. the framework compiles the frozen plan into execution work packages;
+8. separate executor chats implement those packages;
+9. execution evidence is recorded and material planning exceptions are returned to a planner.
+
+Planning may continue in another chat if necessary, but the framework does not split planning into multiple chats by default.
 
 ## Repository structure
 
@@ -61,7 +63,8 @@ The AI should:
 - `docs/EXECUTION-PROTOCOL.md` — execution, verification, and feedback rules
 - `docs/PLANNER-SNT.md` — S&T tree for the framework itself
 - `templates/project/.planning/` — self-contained planning state and portable S&T kernel copied into a target project
-- `templates/START-PROMPT.md` — first-message bootstrap for GPT
+- `templates/START-PROMPT.md` — planner bootstrap
+- `templates/EXECUTOR-PROMPT.md` — executor bootstrap after planning freeze
 - `docs/USAGE.md` — exact adoption and resume instructions
 - `examples/` — guidance for future worked examples
 
