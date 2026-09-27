@@ -1,6 +1,10 @@
 version: 1
 
 # Generated only after the complete S&T plan is frozen.
+# A populated allocation does NOT authorize execution by itself.
+# Executors may start only when STATUS.yaml has:
+#   plan_state: frozen
+#   implementation_authorized: true
 #
 # Each implementation-ready leaf must appear exactly once under one numbered chat.
 # TREE.yaml remains the planning source.
@@ -14,6 +18,7 @@ version: 1
 #
 # If blocked because the frozen plan itself is materially wrong/incomplete:
 # - set STATUS.yaml -> plan_state: active;
+# - set STATUS.yaml -> implementation_authorized: false;
 # - stop starting new execution work;
 # - replan/review the smallest affected S&T area;
 # - preserve done nodes only if still valid;
