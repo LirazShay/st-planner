@@ -13,6 +13,22 @@ Every node contains:
 - **Sufficiency assumptions** — why are the children enough together?
 - **Success evidence** — how will achievement be recognized?
 
+## 2. Where each assumption belongs
+
+Keep the three logical relationships distinct:
+
+- `parallel_assumptions` belong to the **node itself**: why this node's Tactic can achieve this node's Strategy.
+- `necessary_assumptions` belong to the **child → parent relationship**: why this child Strategy is necessary for its parent. Store them on the child.
+- `sufficiency_assumptions` belong to the **children-as-a-group → parent relationship**: why this parent's children are sufficient together. Store them on the parent.
+
+V1 deliberately does **not** add a separate edge object or duplicate `parent` field:
+- the parent is derived from the parent's `children` list;
+- every non-root node has exactly one logical parent;
+- the root has no necessary assumptions;
+- a leaf normally has no sufficiency assumptions because it has no children.
+
+This placement keeps the tree compact while preserving the S&T logic.
+
 ## 2. Go down by asking "How?"
 
 For the parent tactic ask:
@@ -72,7 +88,7 @@ KISS rules:
 - Status is local. A blocked descendant does not automatically change its parent from approved to blocked.
 - Local approval never authorizes implementation before the whole plan is frozen.
 
-## 7. Review as you build
+## 8. Review as you build
 
 Check:
 - Strategy/Tactic validity;
@@ -84,7 +100,7 @@ Check:
 
 Local approval means planning logic is sound locally. It does not authorize implementation.
 
-## 8. Finish the entire plan before execution
+## 9. Finish the entire plan before execution
 
 Do not hand partially planned leaves to implementation.
 
@@ -102,7 +118,7 @@ Before that:
 plan_state: active
 ```
 
-## 9. Keep state simple
+## 10. Keep state simple
 
 - `GOAL.md` — stable boundary.
 - `TREE.yaml` — S&T plan.
@@ -112,7 +128,7 @@ plan_state: active
 
 Prefer one planning conversation. Repository state exists so continuation is possible when needed.
 
-## 10. Execution handoff
+## 11. Execution handoff
 
 After freeze, convert implementation-ready leaves into ordinary GitHub Issues/tasks.
 
