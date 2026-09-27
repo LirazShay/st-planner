@@ -6,7 +6,7 @@ This repository builds a reusable S&T planning framework for GPT.
 
 If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, allocate implementation-ready leaves in `EXECUTION.yaml`, and explicitly authorize implementation only after the required post-freeze handoff checks.
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, freeze only after Final Planning Review, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after that gate passes.
 
 Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
 
@@ -77,14 +77,17 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then freeze the plan while keeping `implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, complete the required handoff checks, and only then set `implementation_authorized: true`.
+Then freeze the plan while keeping `implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `implementation_authorized: true`.
 
 ## Execution handoff
 
 After freeze:
 
-- keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff is complete;
+- keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff verification passes;
 - create/populate `.planning/EXECUTION.yaml`;
+- run the four representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`;
+- record the result in `.planning/REVIEWS.md`;
+- fix and rerun any failed simulation before authorization;
 - assign every implementation-ready leaf to exactly one numbered chat;
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
 - keep execution prerequisites only in `TREE.yaml -> depends_on`;
@@ -92,6 +95,7 @@ After freeze:
 
 When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
 
+- read `.planning/EXECUTOR_HANDOFF.md`;
 - confirm `.planning/STATUS.yaml -> plan_state: frozen`;
 - confirm `.planning/STATUS.yaml -> implementation_authorized: true`;
 - read `EXECUTION.yaml`;
@@ -113,7 +117,8 @@ If execution exposes a material planning defect:
 - reopen only the smallest affected S&T area;
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
 - after focused re-review, repair only affected EXECUTION assignments/states and set `plan_state: frozen` again;
-- do not resume execution until required handoff checks are complete and `implementation_authorized: true` is explicitly restored.
+- rerun and record the mandatory fresh-chat verification;
+- do not resume execution until that gate passes and `implementation_authorized: true` is explicitly restored.
 
 Do not create plan-version machinery; Git history and REVIEWS are enough.
 
