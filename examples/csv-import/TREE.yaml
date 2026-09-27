@@ -1,0 +1,129 @@
+version: 1
+
+root: "0"
+
+nodes:
+  "0":
+    status: approved
+    strategy: "Users can import supported customer CSV files safely and predictably"
+    tactic: "Process each upload through a bounded import workflow that interprets input, blocks invalid data, persists accepted records coherently, and reports a deterministic result"
+
+    parallel_assumptions:
+      - "The existing service can create customer records through reusable application logic"
+      - "Authentication and authorization already exist and do not need to be redesigned for this change"
+
+    necessary_assumptions: []
+
+    sufficiency_assumptions:
+      - "If supported input is interpreted consistently, invalid data is blocked before persistence, accepted data is persisted coherently, and the outcome is reported clearly, no additional import-specific capability is required for the stated goal"
+      - "Existing authentication, service availability, and customer-domain rules are already-satisfied conditions rather than new import work"
+
+    evidence:
+      - "Valid supported files create expected records; invalid files create none; the caller receives a deterministic result"
+
+    children:
+      - "0.1"
+      - "0.2"
+      - "0.3"
+      - "0.4"
+
+  "0.1":
+    status: approved
+    strategy: "Supported CSV input is recognized and interpreted consistently"
+    tactic: "Define one explicit import contract and parse uploads only according to that contract"
+
+    parallel_assumptions:
+      - "A single explicit contract prevents sessions or implementations from inventing different CSV interpretations"
+
+    necessary_assumptions:
+      - "Without deterministic interpretation, later validation and persistence cannot reliably know what data the user submitted"
+
+    sufficiency_assumptions:
+      - "An unambiguous contract plus a parser that applies it is sufficient to turn supported CSV text into structured candidate rows"
+
+    evidence:
+      - "The same supported file produces the same structured candidate rows and the same structural errors"
+
+    children:
+      - "0.1.1"
+      - "0.1.2"
+
+  "0.1.1":
+    status: approved
+    strategy: "The supported CSV shape is unambiguous"
+    tactic: "Specify required and optional columns, data types, encoding expectations, structural limits, and structural error rules"
+
+    parallel_assumptions:
+      - "The parser cannot behave deterministically unless supported input is defined before parsing behavior is implemented"
+
+    necessary_assumptions:
+      - "Without an explicit contract, the parser has no stable definition of supported versus unsupported input"
+
+    sufficiency_assumptions: []
+
+    evidence:
+      - "A reviewer can classify example files as supported or unsupported using the written contract alone"
+
+    children: []
+
+  "0.1.2":
+    status: approved
+    strategy: "Supported uploads are converted into structured candidate rows according to the contract"
+    tactic: "Implement a CSV parser that applies the defined contract and returns structured rows plus structural errors"
+
+    parallel_assumptions:
+      - "The existing customer creation logic needs structured candidate data rather than raw CSV text"
+
+    necessary_assumptions:
+      - "A contract alone does not transform uploaded bytes into data the import workflow can validate and persist"
+
+    sufficiency_assumptions: []
+
+    evidence:
+      - "Parser tests prove supported files become expected candidate rows and malformed files return structural errors"
+
+    children: []
+
+  "0.2":
+    status: draft
+    strategy: "Invalid or unsafe candidate data cannot reach customer persistence"
+    tactic: "TBD during next planning step"
+
+    parallel_assumptions: []
+    necessary_assumptions:
+      - "Without a validation barrier, malformed or domain-invalid data could create invalid customer records"
+    sufficiency_assumptions: []
+    evidence:
+      - "Invalid candidate data produces no customer write"
+    children: []
+
+  "0.3":
+    status: draft
+    strategy: "Accepted import data is persisted without an ambiguous partial outcome"
+    tactic: "TBD"
+
+    parallel_assumptions: []
+    necessary_assumptions:
+      - "Interpreting and validating data is insufficient unless accepted records are actually committed with a defined failure policy"
+    sufficiency_assumptions: []
+    evidence:
+      - "Persistence tests demonstrate the selected batch/failure semantics"
+    children: []
+
+  "0.4":
+    status: draft
+    strategy: "The caller can determine what the import did"
+    tactic: "TBD"
+
+    parallel_assumptions: []
+    necessary_assumptions:
+      - "A user cannot rely on an import whose accepted, rejected, or failed outcome is opaque"
+    sufficiency_assumptions: []
+    evidence:
+      - "The response identifies the overall result and row-level outcome required by the agreed contract"
+    children: []
+
+notes:
+  special_cases:
+    - "Maximum file size remains an unknown and may affect the contract branch"
+    - "Duplicate-customer semantics are deferred to branch 0.3 or 0.2 depending on the selected domain rule"
