@@ -48,7 +48,7 @@ When invoked from another repository:
 9. Determine the requested goal from the user's command and target repository context.
 10. Follow the installed S&T Framework Rules automatically:
    - use target-repository context progressively;
-   - build/update GOAL, TREE, DECISIONS, REVIEWS, and STATUS;
+   - build/update `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, and `.planning/STATUS.yaml`;
    - do not implement target-project work while planning;
    - continue until the complete intended plan passes Final Planning Review;
    - freeze the plan with implementation still unauthorized;
@@ -63,7 +63,7 @@ When invoked from another repository:
 
 Bootstrap installs framework files only when `.planning/` is absent.
 
-An existing S&T planning state is project data. Never replace GOAL/TREE/DECISIONS/REVIEWS/STATUS/EXECUTION/EXECUTOR_HANDOFF from the source templates during ordinary reuse. Treat `validate-allocation.mjs` as framework tooling; do not overwrite an installed copy unless the user explicitly requests an S&T Planner upgrade.
+An existing S&T planning state is project data. Never replace `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, `.planning/STATUS.yaml`, `.planning/EXECUTION.yaml`, or `.planning/EXECUTOR_HANDOFF.md` from the source templates during ordinary reuse. Treat `validate-allocation.mjs` as framework tooling; do not overwrite an installed copy unless the user explicitly requests an S&T Planner upgrade.
 
 ## Normal execution after planning
 
