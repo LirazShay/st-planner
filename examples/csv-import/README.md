@@ -18,7 +18,7 @@ A backend service must let users import customer records from CSV files safely a
 
 This demonstrates an important rule:
 
-> A locally approved/executable branch does not authorize implementation while the complete intended plan is still being built.
+> A locally approved/executable branch does not authorize implementation while the complete intended plan is still being built. Even after final freeze, explicit implementation authorization is still required after handoff.
 
 ## Optional fresh-chat continuation
 
@@ -37,6 +37,6 @@ That capability is a fallback, not a requirement to split planning across chats.
 - `TREE.yaml` — S&T structure, assumptions, local planning status, and success evidence.
 - `DECISIONS.md` — material open questions and decisions.
 - `REVIEWS.md` — planning review history.
-- `STATUS.yaml` — current planning pointer.
+- `STATUS.yaml` — current planning pointer plus explicit implementation-authorization gate.
 
-The example should reach implementation only after the remaining branches are completed and a Final Planning Review passes for the whole tree.
+The example should reach implementation only after the remaining branches are completed, a Final Planning Review passes for the whole tree, post-freeze handoff is complete, and implementation is explicitly authorized.
