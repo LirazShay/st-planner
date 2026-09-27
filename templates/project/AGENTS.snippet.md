@@ -30,6 +30,8 @@ On that trigger, automatically:
 
 Unless the user explicitly asks to stop earlier or work one stage per message, complete this planning workflow autonomously in the same planning conversation.
 
+For long/tool-heavy work, provide concise periodic progress updates at meaningful boundaries: what is being checked now, what is already complete, what remains before the current stage closes, and any meaningful discovery/blocker. Do not narrate every tool call or repeat status noise. If the user requested one stage per message, these updates do not advance the stage.
+
 If the user's request does not contain enough information to identify what should be planned and the repository has no single unambiguous active target, ask only for the missing goal—not for framework instructions.
 
 This project uses the S&T Planner framework.
