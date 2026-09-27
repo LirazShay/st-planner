@@ -2,6 +2,8 @@
 
 A small reusable framework that helps GPT plan complex work with Strategy & Tactics logic instead of producing an arbitrary checklist.
 
+> **License:** S&T Planner is proprietary, source-available software. Viewing the source for evaluation is permitted, but operational use requires a **paid commercial license** from the copyright holder. See [LICENSE](LICENSE).
+
 ## Quick start — from any other repository
 
 The target repository does **not** need S&T Planner installed beforehand.
