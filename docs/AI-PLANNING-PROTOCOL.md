@@ -96,9 +96,13 @@ Record the result in `REVIEWS.md`.
 ## 8. Freeze
 
 If Final Planning Review passes:
-- set `.planning/STATUS.yaml -> plan_state: frozen`;
-- keep `.planning/STATUS.yaml -> implementation_authorized: false`;
-- stop changing the baseline except for a documented later planning correction.
+1. record immutable/reproducible evidence for the reviewed baseline in `REVIEWS.md`;
+2. verify no material drift with `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` when Git refs are available, or record equivalent reproducible evidence;
+3. if drift exists, keep planning active and review the changed baseline again;
+4. set `.planning/STATUS.yaml -> plan_state: frozen` only for the verified reviewed baseline;
+5. keep `.planning/STATUS.yaml -> implementation_authorized: false`.
+
+If merge/rebase/integration later creates a different frozen ref, verify that resulting ref too before execution handoff.
 
 Freeze closes the planning baseline. It does not start implementation.
 
