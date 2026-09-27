@@ -6,18 +6,21 @@ The S&T leaves are already the planned work units.
 
 After Final Planning Review passes:
 
-1. freeze the plan;
-2. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
-3. collect every implementation-ready leaf;
-4. group the leaf node IDs into numbered executor chats;
-5. write the allocation to `.planning/EXECUTION.yaml`;
-6. initialize every assigned node as `pending`;
-7. run `node .planning/validate-allocation.mjs --initial` and fix every failure;
-8. if numbered chats are explicitly serial, rerun/add `--serial-chats`;
-9. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
-10. record the verification result in `.planning/REVIEWS.md`;
-11. fix and rerun any failed case;
-12. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after both gates pass.
+1. record the reviewed baseline evidence in `.planning/REVIEWS.md`;
+2. prove no material drift in `.planning/GOAL.md`, `.planning/TREE.yaml`, and `.planning/DECISIONS.md`;
+3. freeze only that reviewed baseline;
+4. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
+5. if merge/rebase/integration creates a later frozen ref, repeat no-drift verification against that result before allocation;
+6. collect every implementation-ready leaf;
+7. group the leaf node IDs into numbered executor chats;
+8. write the allocation to `.planning/EXECUTION.yaml`;
+9. initialize every assigned node as `pending`;
+10. run `node .planning/validate-allocation.mjs --initial` and fix every failure;
+11. if numbered chats are explicitly serial, rerun/add `--serial-chats`;
+12. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
+13. record the verification result in `.planning/REVIEWS.md`;
+14. fix and rerun any failed case;
+15. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after freeze no-drift, allocation validation, and fresh-chat gates pass.
 
 A frozen plan is a stable baseline, not permission to implement. `.planning/EXECUTOR_HANDOFF.md` is the portable entry contract for every new executor chat.
 
