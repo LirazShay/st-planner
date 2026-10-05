@@ -43,17 +43,19 @@ The agent:
 4. classifies any existing `.planning/` before writing so unrelated target data is never mistaken for an installed S&T Planner;
 5. copies the eleven S&T planning/framework files only for a permitted fresh install, using one source commit for the whole bundle;
 6. merges the S&T rules into target `AGENTS.md` once while preserving existing rules;
-7. verifies the installed bundle and then continues immediately in the same chat;
-8. determines the current planning boundary and desired outcome from the user's request plus repository reality;
-9. separates outcome/current reality/constraints from any proposed feature/tool/architecture;
-10. challenges material candidate tactics at the depth justified by the decision;
-11. builds, reviews, and persists the complete S&T plan;
-12. records the reviewed baseline and proves no material GOAL/TREE/DECISIONS drift before freeze;
-13. freezes only that verified baseline, with implementation still unauthorized;
-14. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
-15. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
-16. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
-17. records the verification in `.planning/REVIEWS.md`, fixes/rechecks failures, and explicitly authorizes implementation only after all gates pass.
+7. on an existing installation, reads `.planning/STATUS.yaml -> cycle_state` before changing current-cycle state;
+8. verifies installation/state setup and continues immediately in the same chat;
+9. determines the current planning boundary and desired outcome from the user's request plus repository reality;
+10. separates outcome/current reality/constraints from any proposed feature/tool/architecture;
+11. challenges material candidate tactics at the depth justified by the decision;
+12. builds, reviews, and persists the complete S&T plan;
+13. records the reviewed baseline and proves no material GOAL/TREE/DECISIONS drift before freeze;
+14. freezes only that verified baseline, with `cycle_state: active` and implementation still unauthorized;
+15. populates `.planning/EXECUTION.yaml` with numbered executor-chat assignments;
+16. runs `node .planning/validate-allocation.mjs --initial` and fixes every failure;
+17. uses `.planning/EXECUTOR_HANDOFF.md` to simulate the mandatory repository-only fresh executor cases;
+18. records the verification in `.planning/REVIEWS.md`, fixes/rechecks failures, and explicitly authorizes implementation only after all gates pass;
+19. after required execution is done, runs Cycle Closure Review and marks the cycle completed only when the integrated root/current-scope outcome is verified.
 
 The user does not manually copy files, choose tree depth, decide the number of chats, or explain the S&T procedure.
 
@@ -83,29 +85,103 @@ It should not turn the framework into a questionnaire.
 
 If the user explicitly states that a product/technical choice is fixed, the planner treats it as a constraint instead of repeatedly challenging it.
 
+## Reusing the same installation later
+
+S&T Planner is installed once. V1 allows **one active planning+execution cycle per repository**.
+
+`STATUS.yaml` distinguishes:
+
+```yaml
+cycle_state: active | completed | abandoned
+plan_state: active | frozen
+implementation_authorized: false | true
+```
+
+If `cycle_state: active`:
+- a request belonging to the same intended scope resumes/replans that cycle;
+- active planning state is never erased merely because another request arrived;
+- a genuinely independent new scope does not silently create parallel planning state.
+
+If the cycle is `completed` or `abandoned`, a later independent scope can start a new cycle after the terminal review/snapshot is durably preserved.
+
+A new-cycle transition keeps installed framework/tooling and the project `AGENTS.md` S&T rules, while reinitializing only:
+- `GOAL.md`;
+- `TREE.yaml`;
+- `DECISIONS.md`;
+- `REVIEWS.md`;
+- `STATUS.yaml`;
+- `EXECUTION.yaml`.
+
+The new cycle starts with:
+
+```yaml
+cycle_state: active
+plan_state: active
+implementation_authorized: false
+```
+
+Previous-cycle reasoning remains in Git/repository history. Cross-cycle truths belong in the target project's durable contracts, not in an accumulating archive of old TREE/DECISIONS files.
+
+No `.planning/archive/`, plan-version registry, or parallel active cycle directories are required by default.
+
+## Cycle completion versus freeze
+
+Freeze and cycle completion are different:
+
+- `plan_state: frozen` means the reviewed planning baseline is closed for ordinary editing;
+- it does **not** mean execution is authorized;
+- it does **not** mean the planning scope has been successfully delivered.
+
+Execution requires all three:
+
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: true
+```
+
+After all required leaves are `done`, the planner still runs Cycle Closure Review. Completion requires integrated root/current-scope evidence, no required execution blocker, and promotion of durable decisions/contracts needed by future cycles.
+
+Only then:
+
+```yaml
+cycle_state: completed
+implementation_authorized: false
+```
+
+If the scope is intentionally stopped without proving the root outcome, it becomes `abandoned`, not completed.
+
 ## Status ownership
 
 S&T Planner owns only `.planning/STATUS.yaml`. If the target repository also contains a root `STATUS.yaml`, release phase, workstream status, or another operational state file, that remains target-owned. Do not use it as an alias for S&T planning state and do not mutate it unless the target repository's own instructions explicitly require an integration update.
 
 ## Existing installation
 
-If the target repository already contains a recognizable S&T Planner installation, ordinary reuse is idempotent: do not overwrite installed `.planning/` files and do not append another S&T rules block to `AGENTS.md`.
+If the target repository already contains a recognizable S&T Planner installation, ordinary continuation is idempotent: do not reinstall framework files or append another S&T rules block to `AGENTS.md`.
 
 If `.planning/` belongs to another system, preserve it. Fresh S&T installation may share the directory only when none of the eleven S&T destination filenames conflict; otherwise report the exact conflict instead of overwriting target data.
 
-Use an existing S&T installation as-is unless the user explicitly requests an upgrade/reinstall.
+Use an existing installation as-is unless the user explicitly requests an upgrade/reinstall. Starting a valid later cycle is a lifecycle transition, not an upgrade/reinstall.
 
 ## Planning continuation
 
 One planning chat is preferred.
 
-If continuation in another chat becomes necessary, the repository state is sufficient. The new planner reads the target project's AGENTS and `.planning/` state and continues from `.planning/STATUS.yaml`.
+If continuation in another chat becomes necessary, repository state is sufficient. The new planner reads the target project's AGENTS and `.planning/` state and continues from `.planning/STATUS.yaml`.
 
-The new planner should be able to recover the current planning scope, desired outcome, current node, blockers, next action, and material Decisions without requiring the user to explain whether the scope is a project, feature, release, migration, or other change.
+The new planner should be able to recover the current cycle state, planning scope, desired outcome, current node, blockers, next action, and material Decisions without requiring the user to explain whether the scope is a project, feature, release, migration, or other change.
 
 ## Execution
 
-After planning is frozen, allocation/handoff is complete, and `.planning/STATUS.yaml -> implementation_authorized: true`, open an executor chat in the target repository and say:
+When STATUS contains:
+
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: true
+```
+
+open an executor chat in the target repository and say:
 
 > אני צ'אט מספר 1
 
@@ -115,17 +191,18 @@ Chat allocation follows implementation context, dependencies, and manageable wor
 
 ## If execution exposes a planning defect
 
-Keep it simple:
+Keep it inside the same active cycle:
 
 1. block the affected node with a short factual reason;
-2. set planning active again and revoke implementation authorization;
-3. reopen only the smallest affected S&T area;
-4. correct/review it, record the corrected reviewed baseline, and pass freeze no-drift verification again;
-5. freeze the verified corrected baseline and repair only affected EXECUTION entries;
-6. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
-7. rerun and record the mandatory fresh-chat handoff verification;
-8. explicitly re-authorize only after all gates pass;
-9. preserve valid completed work.
+2. keep `cycle_state: active`;
+3. set planning active again and revoke implementation authorization;
+4. reopen only the smallest affected S&T area;
+5. correct/review it, record the corrected reviewed baseline, and pass freeze no-drift verification again;
+6. freeze the verified corrected baseline and repair only affected EXECUTION entries;
+7. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
+8. rerun and record the mandatory fresh-chat handoff verification;
+9. explicitly re-authorize only after all gates pass;
+10. preserve valid completed work.
 
 ## Authoritative external entry point
 
