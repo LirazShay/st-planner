@@ -19,9 +19,10 @@ The scope may be a project, release, feature, migration, refactor, architecture 
 The planner should keep the user-facing transition equally simple. Once the plan is frozen, allocation/handoff checks pass, and implementation is authorized, tell the user explicitly:
 - that planning is ready for execution;
 - how many executor chats were allocated;
-- the exact next action: open a new chat in the same target repository and say `אני צ'אט מספר 1` (or `I am chat 1`).
+- which executor chat(s) are runnable now based on `depends_on` and current EXECUTION states;
+- the exact next action: open a new chat in the same target repository and say `אני צ'אט מספר N` (or `I am chat N`) for one of those runnable chat IDs.
 
-Do not make the user inspect `STATUS.yaml` or `EXECUTION.yaml` to discover whether planning is ready or what to do next.
+Do not hard-code Chat 1 unless Chat 1 is actually runnable. If several chats can start in parallel, tell the user which ones can be opened independently. Do not make the user inspect `STATUS.yaml` or `EXECUTION.yaml` to discover whether planning is ready, which chat can start, or what to do next.
 
 After Cycle Closure Review reaches `completed`, tell the user explicitly that this scope is closed and that a later scope can be requested with the normal short S&T Planner command. If the cycle becomes `abandoned`, say that it was closed without claiming the planned outcome succeeded.
 
