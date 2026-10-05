@@ -8,18 +8,21 @@ It explains **how to resume execution from repository state only**. It does not 
 
 Before reading implementation details, read `.planning/STATUS.yaml`.
 
-Execution is allowed only when both values in **`.planning/STATUS.yaml`** are true:
+Execution is allowed only when all three values in **`.planning/STATUS.yaml`** are satisfied:
 
 ```yaml
+cycle_state: active
 plan_state: frozen
 implementation_authorized: true
 ```
 
-If either condition is false:
+If any condition is false:
 
 - do not start or mark any node `in_progress`;
 - do not improvise missing planning;
 - report the repository-visible reason execution is unavailable.
+
+A `completed` or `abandoned` cycle is terminal and cannot execute even if stale planning/execution data remains in the repository. Terminal cycles must have `implementation_authorized: false`.
 
 ## Fresh executor read order
 
@@ -53,7 +56,7 @@ The target repository remains authoritative for its own implementation rules and
 Use this order:
 
 1. target `AGENTS.md` / project routing rules;
-2. the assigned S&T node and any decisions it references;
+2. the assigned S&T node, the ancestor reasoning needed to understand why it exists, and materially relevant decisions;
 3. directly relevant target specs/code/tests;
 4. history or unrelated areas only when a concrete uncertainty requires them.
 
@@ -79,10 +82,11 @@ If implementation reveals a material planning gap or contradiction:
 
 1. stop the affected node;
 2. mark it `blocked` with a short factual reason in `.planning/EXECUTION.yaml`;
-3. set `.planning/STATUS.yaml -> plan_state: active`;
-4. set `.planning/STATUS.yaml -> implementation_authorized: false`;
-5. stop starting new execution work;
-6. return the smallest affected S&T area to planning.
+3. keep `.planning/STATUS.yaml -> cycle_state: active`;
+4. set `.planning/STATUS.yaml -> plan_state: active`;
+5. set `.planning/STATUS.yaml -> implementation_authorized: false`;
+6. stop starting new execution work;
+7. return the smallest affected S&T area to planning.
 
 Do not redesign the plan inside an executor chat.
 
@@ -111,6 +115,7 @@ Use actual chats/nodes from the allocation when they exist. If a small allocatio
 
 For every simulation, the fresh executor must be able to determine:
 
+- whether the cycle is active;
 - whether implementation is authorized;
 - which nodes belong to the chat;
 - prerequisite states;
