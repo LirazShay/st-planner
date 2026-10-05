@@ -23,6 +23,14 @@ Open a chat that is working on the target repository and say:
 
 > **תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג/לבנות/לשנות>**
 
+**That is all the user needs to do.** The rest of this README explains what the framework does internally; using it does not require learning the files, lifecycle, tree schema, review gates, or execution machinery.
+
+After S&T Planner is already installed in that repository, later planning requests can be even shorter, for example:
+
+> **תכנן לי עם S&T Planner לפי הריפו: <הפיצ'ר / הריליס / השינוי הבא>**
+
+By default, the planner investigates the repository, evaluates tradeoffs, and makes responsible planner-owned product/technical choices itself. The user does **not** need to add "decide yourself" or approve every alternative. The planner asks only when a genuinely user-owned material preference/constraint is missing or no responsible choice can be derived from the available evidence; when it must ask, it minimizes and batches the question and gives a recommendation when useful.
+
 That single request is the normal user interface.
 
 Examples:
