@@ -12,15 +12,25 @@ The target repository does not need S&T Planner installed beforehand.
 
 A request such as:
 
-> תעבוד עם S&T Planner מ-LirazShay/st-planner ותתכנן לי לפי הריפו: <המטרה>
+> תעבוד עם S&T Planner מ-LirazShay/st-planner ותתכנן לי לפי הריפו: <מה אני רוצה להשיג/לבנות/לשנות>
 
 or:
 
-> Use S&T Planner from LirazShay/st-planner and plan this from the current repository: <goal>
+> Use S&T Planner from LirazShay/st-planner and plan this from the current repository: <desired outcome/change>
 
 is enough.
 
-The user does not need to copy files, explain the framework, or paste another prompt.
+The requested planning scope may be a whole project/initiative or a meaningful scope inside an existing system, such as a release, feature, migration, refactor, architectural change, or other substantial change. The user does not need to classify the scope.
+
+Examples include:
+- planning one feature inside an existing system;
+- planning a release containing several feature subtrees;
+- planning a migration/refactor;
+- planning a technical change proposed in solution form, such as adding Redis or moving to WebSocket.
+
+A user-proposed feature/tool/technology/architecture is normally a **candidate tactic**, not automatically the desired outcome. Treat it as fixed only when the user explicitly makes it a constraint/decision or an existing durable target-project contract already does so.
+
+The user does not need to copy files, explain the framework, choose tree depth, or paste another prompt.
 
 Automatic bootstrap requires an agent that can read this public source repository and write to the target repository. If target write access is unavailable, do not pretend installation succeeded.
 
@@ -60,22 +70,32 @@ When invoked from another repository:
    - for a fresh install, installed framework/tooling files match the single source commit selected in step 3.
 8. Treat `.planning/STATUS.yaml` as the only S&T Planner-owned lifecycle/status file. If the target repository also has `STATUS.yaml`, phase/state files, or workstream status, preserve them unless the target's own instructions explicitly require a coordinated integration update.
 9. After bootstrap/reuse, continue **in the same conversation** as the planning agent. Do not stop merely because installation completed.
-10. Determine the requested goal from the user's command and target repository context.
-11. Follow the installed S&T Framework Rules automatically:
+10. Determine the current planning boundary and required outcome from the user's command plus target-repository context. Do not silently widen a feature/change request into a whole-product plan.
+11. Separate:
+   - required outcome;
+   - established current reality;
+   - hard constraints / already-fixed decisions;
+   - proposed feature/tool/technology/architecture.
+12. If the request starts from a proposed solution, climb upward until the outcome that makes the solution worth considering is understood. Do not challenge a genuinely fixed constraint merely to create artificial alternatives.
+13. Follow the installed S&T Framework Rules automatically:
    - use target-repository context progressively;
    - build/update `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, and `.planning/STATUS.yaml`;
+   - challenge every material root/lower-level Tactic at the depth justified by its impact, including materially plausible alternatives and invalidating assumptions;
+   - use one S&T node model for project/release/feature/migration/technical scopes; do not introduce special Feature/Release schema or default discipline-folder branches;
+   - keep ordinary local reasoning in TREE assumptions and only material unresolved choices/unknowns in DECISIONS;
+   - use necessity/sufficiency to determine children and continue until leaves are both decision-complete and practical for executor chats;
    - do not implement target-project work while planning;
-   - continue until the complete intended plan passes Final Planning Review;
+   - continue until the complete intended planning scope passes Final Planning Review;
    - record the reviewed baseline evidence in REVIEWS;
    - verify no material GOAL/TREE/DECISIONS drift from that reviewed baseline;
    - freeze only that reviewed baseline with implementation still unauthorized;
    - if merge/rebase/integration changes the frozen ref afterward, repeat no-drift verification before handoff;
-   - populate EXECUTION with numbered executor-chat assignments;
+   - populate EXECUTION with numbered executor-chat assignments based on implementation context/dependencies/workload rather than blindly on feature subtree boundaries;
    - run `node .planning/validate-allocation.mjs --initial` and fix any allocation failure;
    - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification;
    - record the verification in REVIEWS;
    - explicitly authorize implementation only after that gate passes.
-12. Do not ask the user to repeat framework instructions. Ask only for a missing project goal if neither the request nor the target repository makes it unambiguous.
+14. Investigate repository context/evidence before asking the user. Ask only for a missing outcome/boundary or a material fact/choice that cannot be established reliably and can change the plan. Do not ask the user to repeat framework instructions.
 
 ## Safety against accidental overwrite
 
@@ -91,4 +111,4 @@ Once planning is frozen, execution allocation/handoff is complete, and `.plannin
 
 > אני צ'אט מספר 1
 
-The installed target-project rules define how that chat resumes its assigned S&T nodes.
+The installed target-project rules define how that chat resumes its assigned S&T nodes. The executor does not need the user to restate the project/feature/release context; repository state must provide the assigned nodes, relevant ancestor/Decision context, dependencies, and next runnable work.
