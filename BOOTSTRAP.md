@@ -55,7 +55,7 @@ When invoked from another repository:
    - `templates/project/AGENTS.snippet.md`
 4. Inspect the target before writing:
    - if `.planning/` is absent, this is a fresh install;
-   - if `.planning/FRAMEWORK.md` identifies the Portable S&T Planning Kernel and `.planning/STATUS.yaml` exists, treat S&T Planner as already installed and do not overwrite its installed files during ordinary reuse;
+   - if `.planning/FRAMEWORK.md` identifies the Portable S&T Planning Kernel and `.planning/STATUS.yaml` exists, treat S&T Planner as already installed and do not overwrite installed framework/project state merely because the command was invoked again;
    - if `.planning/` exists for another purpose and **none** of the eleven S&T destination filenames conflict, preserve the unrelated files and install the eleven S&T files alongside them;
    - if any S&T destination filename already exists but the directory is not a recognizable complete S&T Planner installation, do not overwrite it. Report the exact conflicting/partial paths and require an explicit repair/upgrade decision.
 5. For a permitted fresh install, copy the **eleven files under `templates/project/.planning/`** into target `.planning/` using the same filenames.
@@ -66,18 +66,30 @@ When invoked from another repository:
 7. Verify the bootstrap before planning:
    - all eleven S&T `.planning/` files expected for a fresh install exist;
    - the S&T rules block appears exactly once in root `AGENTS.md`;
-   - no pre-existing target file was overwritten unless the user explicitly requested repair/upgrade;
+   - no pre-existing target file was overwritten unless the user explicitly requested repair/upgrade or a valid new-cycle transition applies;
    - for a fresh install, installed framework/tooling files match the single source commit selected in step 3.
 8. Treat `.planning/STATUS.yaml` as the only S&T Planner-owned lifecycle/status file. If the target repository also has `STATUS.yaml`, phase/state files, or workstream status, preserve them unless the target's own instructions explicitly require a coordinated integration update.
-9. After bootstrap/reuse, continue **in the same conversation** as the planning agent. Do not stop merely because installation completed.
-10. Determine the current planning boundary and required outcome from the user's command plus target-repository context. Do not silently widen a feature/change request into a whole-product plan.
-11. Separate:
+9. If S&T Planner is already installed, inspect `.planning/STATUS.yaml -> cycle_state` before changing current-cycle state:
+   - `active`: continue/replan that cycle when the request belongs to the same intended scope. Never erase active cycle files merely because a new request arrived;
+   - `completed` or `abandoned`: a later independent planning scope may start a new cycle after the terminal review/snapshot is durably preserved;
+   - V1 supports one active S&T cycle per repository. A genuinely independent new scope must not silently create parallel cycle state while another cycle remains active.
+10. A **new-cycle transition is not bootstrap/reinstall**. When the previous cycle is terminal, preserve installed framework/tooling and the S&T rules block, but reset only current-cycle state:
+   - `.planning/GOAL.md`;
+   - `.planning/TREE.yaml`;
+   - `.planning/DECISIONS.md`;
+   - `.planning/REVIEWS.md`;
+   - `.planning/STATUS.yaml`;
+   - `.planning/EXECUTION.yaml`.
+   Start the new STATUS with `cycle_state: active`, `plan_state: active`, `implementation_authorized: false`. Use repository history for prior-cycle audit; do not create an archive hierarchy by default.
+11. After bootstrap/reuse/new-cycle transition, continue **in the same conversation** as the planning agent. Do not stop merely because installation/state setup completed.
+12. Determine the current planning boundary and required outcome from the user's command plus target-repository context. Do not silently widen a feature/change request into a whole-product plan.
+13. Separate:
    - required outcome;
    - established current reality;
    - hard constraints / already-fixed decisions;
    - proposed feature/tool/technology/architecture.
-12. If the request starts from a proposed solution, climb upward until the outcome that makes the solution worth considering is understood. Do not challenge a genuinely fixed constraint merely to create artificial alternatives.
-13. Follow the installed S&T Framework Rules automatically:
+14. If the request starts from a proposed solution, climb upward until the outcome that makes the solution worth considering is understood. Do not challenge a genuinely fixed constraint merely to create artificial alternatives.
+15. Follow the installed S&T Framework Rules automatically:
    - use target-repository context progressively;
    - build/update `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, and `.planning/STATUS.yaml`;
    - challenge every material root/lower-level Tactic at the depth justified by its impact, including materially plausible alternatives and invalidating assumptions;
@@ -88,27 +100,40 @@ When invoked from another repository:
    - continue until the complete intended planning scope passes Final Planning Review;
    - record the reviewed baseline evidence in REVIEWS;
    - verify no material GOAL/TREE/DECISIONS drift from that reviewed baseline;
-   - freeze only that reviewed baseline with implementation still unauthorized;
+   - freeze only that reviewed baseline with `cycle_state: active` and implementation still unauthorized;
    - if merge/rebase/integration changes the frozen ref afterward, repeat no-drift verification before handoff;
    - populate EXECUTION with numbered executor-chat assignments based on implementation context/dependencies/workload rather than blindly on feature subtree boundaries;
    - run `node .planning/validate-allocation.mjs --initial` and fix any allocation failure;
    - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification;
    - record the verification in REVIEWS;
-   - explicitly authorize implementation only after that gate passes.
-14. Investigate repository context/evidence before asking the user. Ask only for a missing outcome/boundary or a material fact/choice that cannot be established reliably and can change the plan. Do not ask the user to repeat framework instructions.
+   - explicitly authorize implementation only after that gate passes;
+   - after required execution is done, run Cycle Closure Review before marking the cycle `completed`; integrated root-outcome proof and durable carry-forward of cross-cycle contracts are required.
+16. Investigate repository context/evidence before asking the user. Ask only for a missing outcome/boundary or a material fact/choice that cannot be established reliably and can change the plan. Do not ask the user to repeat framework instructions.
 
 ## Safety against accidental overwrite
 
-Ordinary reuse of an existing S&T Planner installation overwrites **nothing** under `.planning/` and does not append another S&T rules block to `AGENTS.md`.
+**Ordinary reuse/continuation of the same cycle overwrites nothing from source templates** under `.planning/` and does not append another S&T rules block to `AGENTS.md`.
 
-An existing S&T planning state is project data. Never replace `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, `.planning/STATUS.yaml`, `.planning/EXECUTION.yaml`, or `.planning/EXECUTOR_HANDOFF.md` from source templates during ordinary reuse.
+An existing active S&T planning state is project data. Never replace `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, `.planning/STATUS.yaml`, `.planning/EXECUTION.yaml`, or `.planning/EXECUTOR_HANDOFF.md` from source templates during ordinary reuse.
 
-`FRAMEWORK.md`, `.planning/README.md`, `validate-allocation.mjs`, and `verify-freeze-baseline.mjs` are installed framework material/tooling, but they also remain untouched during ordinary reuse. Updating installed framework files is an explicit upgrade operation, not a side effect of starting another planning chat.
+A permitted **new-cycle transition** is different: it may intentionally reinitialize only the six current-cycle state files listed in step 10, and only after the prior cycle is `completed` or `abandoned` with terminal evidence durably preserved. It does **not** overwrite installed framework/tooling from upstream and does not reinstall/duplicate AGENTS rules.
+
+`FRAMEWORK.md`, `.planning/README.md`, `EXECUTOR_HANDOFF.md`, `validate-allocation.mjs`, and `verify-freeze-baseline.mjs` are installed framework material/tooling and remain untouched during ordinary reuse or new-cycle reset. Updating them is an explicit framework upgrade operation.
 
 ## Normal execution after planning
 
-Once planning is frozen, execution allocation/handoff is complete, and `.planning/STATUS.yaml -> implementation_authorized: true`, a new executor chat in the target repository can simply say:
+Once `.planning/STATUS.yaml` has all of:
+
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: true
+```
+
+a new executor chat in the target repository can simply say:
 
 > אני צ'אט מספר 1
 
 The installed target-project rules define how that chat resumes its assigned S&T nodes. The executor does not need the user to restate the project/feature/release context; repository state must provide the assigned nodes, relevant ancestor/Decision context, dependencies, and next runnable work.
+
+A `completed` or `abandoned` cycle never authorizes execution, even if stale TREE/EXECUTION content still exists before a later cycle reset.
