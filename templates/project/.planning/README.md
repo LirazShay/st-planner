@@ -16,6 +16,15 @@ or:
 
 The scope may be a project, release, feature, migration, refactor, architecture change, or another meaningful change. The user should not need to classify it, name these files, or repeat the framework procedure.
 
+The planner should keep the user-facing transition equally simple. Once the plan is frozen, allocation/handoff checks pass, and implementation is authorized, tell the user explicitly:
+- that planning is ready for execution;
+- how many executor chats were allocated;
+- the exact next action: open a new chat in the same target repository and say `אני צ'אט מספר 1` (or `I am chat 1`).
+
+Do not make the user inspect `STATUS.yaml` or `EXECUTION.yaml` to discover whether planning is ready or what to do next.
+
+After Cycle Closure Review reaches `completed`, tell the user explicitly that this scope is closed and that a later scope can be requested with the normal short S&T Planner command. If the cycle becomes `abandoned`, say that it was closed without claiming the planned outcome succeeded.
+
 ## Planner read order
 
 1. project `AGENTS.md` and its routing/source-of-truth rules
