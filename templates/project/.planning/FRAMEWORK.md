@@ -28,7 +28,7 @@ Use this test before loading more context:
 
 If not, do not preload it.
 
-Investigate before asking the user. Ask only when a material fact or choice cannot be established from repository context/evidence and the answer can change the plan.
+Investigate before asking the user. Default to informed planner autonomy: when the goal, constraints, repository evidence, and tradeoffs support a responsible choice, make that planner-owned product/technical choice, record the rationale, and continue. Do not ask merely because several valid implementations exist. Prefer a reasonable reversible default for low-risk uncertainty. Ask only when the missing input is genuinely user-owned or cannot be responsibly derived and different answers would materially change the plan. If a question is unavoidable, ask the smallest useful question, batch tightly related unknowns, and include a recommendation when useful.
 
 ### Long-running work progress orientation
 
@@ -435,7 +435,8 @@ Verify repository state alone reveals:
 - prerequisite states;
 - first runnable node or none;
 - exact next context to load;
-- factual blocker when unavailable.
+- factual blocker when unavailable;
+- after an executor finishes, the exact next runnable chat ID(s), or that Cycle Closure Review is next.
 
 Record the result in `REVIEWS.md`, fix the smallest defect, and rerun failed cases.
 
@@ -446,6 +447,8 @@ cycle_state: active
 plan_state: frozen
 implementation_authorized: true
 ```
+
+After authorization, determine from `EXECUTION.yaml` and TREE `depends_on` which chat ID or IDs are runnable now and tell the user explicitly how many executor chats were allocated and which exact new chat command(s) may be opened. Do not make the user inspect YAML. Do not hard-code Chat 1 unless Chat 1 is actually runnable. If several independent chats are runnable and the target workflow permits parallel work, say so.
 
 A chat saying "I am chat N" / "אני צ'אט מספר N" follows `EXECUTOR_HANDOFF.md` and may execute only when all three conditions above hold.
 
@@ -544,6 +547,8 @@ implementation_authorized: false
 
 `plan_state` normally remains `frozen`, describing the last reviewed planning baseline.
 
+Tell the user explicitly that the current S&T scope is closed and that a later scope can be requested with the normal short S&T Planner command; do not make the user inspect lifecycle state to discover that reuse is available.
+
 ### Abandon the cycle
 
 If the scope is intentionally stopped without proving the root outcome, record an abandonment review and set:
@@ -553,7 +558,7 @@ cycle_state: abandoned
 implementation_authorized: false
 ```
 
-Do not call it completed. `plan_state` may remain `active` or `frozen` according to the last truthful planning state; the terminal `cycle_state` prevents execution.
+Do not call it completed. `plan_state` may remain `active` or `frozen` according to the last truthful planning state; the terminal `cycle_state` prevents execution. Tell the user that the scope was closed without claiming the intended outcome succeeded.
 
 ### Start a later cycle
 
