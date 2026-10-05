@@ -152,11 +152,12 @@ A useful final challenge for every material choice is:
 
 After this review passes, record the reviewed baseline in `REVIEWS.md` and prove no material drift before freeze. In Git workflows prefer `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>`; any material drift makes the review stale and requires review of the changed baseline.
 
-Only the verified reviewed baseline may become `.planning/STATUS.yaml -> plan_state: frozen`. Freeze does not authorize implementation; `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
+Only a currently `active` cycle may proceed to execution preparation. The verified reviewed baseline may become `.planning/STATUS.yaml -> plan_state: frozen`; freeze does not authorize implementation and `.planning/STATUS.yaml -> implementation_authorized` remains false through post-freeze handoff.
 
 ## Fresh planning-chat continuity check
 
 For planning continuation, a fresh GPT should be able to read repository state and identify:
+- the current cycle state;
 - the current planning scope and desired outcome;
 - current planning location;
 - blockers;
@@ -170,7 +171,7 @@ This is separate from the mandatory **executor** handoff gate below.
 
 ## Gate 11 — Execution allocation
 
-After freeze, with `.planning/STATUS.yaml -> implementation_authorized: false`, pass only when:
+After freeze, with `.planning/STATUS.yaml -> cycle_state: active` and `implementation_authorized: false`, pass only when:
 
 - every implementation-ready frozen leaf appears exactly once in `EXECUTION.yaml`;
 - no non-leaf or non-approved planning node is assigned as executable work;
@@ -207,7 +208,7 @@ Any validator failure keeps `.planning/STATUS.yaml -> implementation_authorized:
 
 ## Gate 12 — Mandatory fresh-chat executor handoff
 
-Before implementation authorization, follow `.planning/EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only.
+Before implementation authorization, require `.planning/STATUS.yaml -> cycle_state: active`, then follow `.planning/EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only.
 
 Pass only when representative simulations cover:
 - first available executor;
@@ -216,6 +217,7 @@ Pass only when representative simulations cover:
 - final closure executor.
 
 For each case, the fresh executor must correctly determine:
+- that `cycle_state` is active;
 - authorization state;
 - assigned nodes;
 - prerequisite states;
@@ -230,11 +232,17 @@ Record the gate result in `REVIEWS.md`.
 
 Any failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`. Fix the smallest handoff/allocation/context-routing defect and rerun the failed case.
 
-Only a pass here allows `.planning/STATUS.yaml -> implementation_authorized: true`.
+Only a pass here allows the exact executable state:
+
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: true
+```
 
 ## Gate 13 — Re-freeze after an execution-discovered defect
 
-When a frozen plan is reopened, first set `.planning/STATUS.yaml -> implementation_authorized: false`, then re-freeze only when:
+When a frozen plan is reopened, keep `.planning/STATUS.yaml -> cycle_state: active`, set `.planning/STATUS.yaml -> implementation_authorized: false`, then re-freeze only when:
 
 - the material defect is represented and corrected in TREE/DECISIONS;
 - affected Tactic-choice logic and Necessity/Sufficiency logic have been re-reviewed;
@@ -250,3 +258,32 @@ When a frozen plan is reopened, first set `.planning/STATUS.yaml -> implementati
 Re-freeze alone does not restore execution permission. First rerun Gate 11 mechanical validation with `--resume`, then Gate 12 must pass again and be recorded before `.planning/STATUS.yaml -> implementation_authorized: true` is restored.
 
 Do not require a new global plan version. Git history and REVIEWS provide the audit trail.
+
+## Post-execution Cycle Closure Gate
+
+Do not infer whole-cycle success merely because all allocated leaves are `done`.
+
+A cycle may become `completed` only when Cycle Closure Review proves:
+- every required implementation-ready leaf is `done`;
+- required leaf `success_evidence` is verified;
+- the integrated root/current-scope outcome is verified after the implemented pieces operate together;
+- no required execution blocker remains;
+- material decisions/contracts that future planning cycles must obey have been promoted from cycle-local planning history into the target repository's durable source of truth;
+- repository current reality/documentation used by future planners accurately reflects what was delivered;
+- terminal evidence/review is recorded in `REVIEWS.md`.
+
+Then set:
+
+```yaml
+cycle_state: completed
+implementation_authorized: false
+```
+
+If the scope is intentionally stopped without proving the root outcome, record an abandonment review instead and set:
+
+```yaml
+cycle_state: abandoned
+implementation_authorized: false
+```
+
+A new independent planning cycle may replace current-cycle state only after one of these terminal states is durably recorded. V1 does not allow a second active cycle, and it does not require `.planning/archive/`, plan-version registries, or parallel scope directories.
