@@ -4,6 +4,10 @@ This is the minimum planning/execution method a fresh GPT needs.
 
 The same method applies to any meaningful current planning scope: a whole project or initiative, a release, feature, migration, refactor, architectural change, or another substantial change inside an existing system. These are not different node types; they use the same S&T logic.
 
+V1 supports **one active S&T planning+execution cycle per repository**. The same installed framework can be reused sequentially for later scopes after the current cycle is completed or abandoned.
+
+---
+
 ## 0. Connect to the target project without context dumping
 
 Before building S&T, understand only the current reality that can materially change the current planning scope.
@@ -40,7 +44,39 @@ For programmatic repository text edits, require expected source text, preserve i
 
 ---
 
-## 1. Start from the outcome, not the proposed solution
+## 1. Planning cycles and current scope
+
+`.planning/STATUS.yaml` separates three concerns:
+
+```yaml
+cycle_state: active | completed | abandoned
+plan_state: active | frozen
+implementation_authorized: false | true
+```
+
+- `cycle_state` is the lifecycle of the whole current planning+execution scope.
+- `plan_state` describes whether the current planning baseline is editable or frozen.
+- `implementation_authorized` is a separate execution permission gate.
+
+A new cycle begins as:
+
+```yaml
+cycle_state: active
+plan_state: active
+implementation_authorized: false
+```
+
+A `completed` or `abandoned` cycle is terminal and must have `implementation_authorized: false`.
+
+If a new request belongs to the same still-active intended scope, continue/replan that cycle. Do not reset active state merely because another request arrived.
+
+A genuinely independent later scope may start only after the current cycle is `completed` or explicitly `abandoned` and its terminal review/snapshot is durably preserved.
+
+Do not create parallel active scope directories, a plan registry, or `.planning/archive/` by default.
+
+---
+
+## 2. Start from the outcome, not the proposed solution
 
 The current planning boundary belongs in `GOAL.md`:
 - desired outcome;
@@ -60,7 +96,7 @@ Do not challenge a genuinely fixed constraint merely to manufacture alternatives
 
 ---
 
-## 2. Every node is Strategy + selected Tactic
+## 3. Every node is Strategy + selected Tactic
 
 Every node contains:
 
@@ -73,17 +109,16 @@ Every node contains:
 
 The same node model applies at business, product, feature, architecture, component, and technical levels. Do not add `kind`, `feature`, `release`, or other category fields merely to label those levels.
 
-### Assumption placement
+Assumption placement:
+- `parallel_assumptions` justify **Tactic → Strategy**;
+- `necessary_assumptions` live on the child and justify **child → parent** necessity;
+- `sufficiency_assumptions` live on the parent and justify **children together → parent** sufficiency.
 
-- `parallel_assumptions` live on the node: they justify **Tactic → Strategy**.
-- `necessary_assumptions` live on the child: they justify **child → parent** necessity.
-- `sufficiency_assumptions` live on the parent: they justify **children together → parent** sufficiency.
-
-V1 deliberately keeps one logical parent per non-root node. Parent is derived from the parent's `children`; do not add a duplicate `parent` field or edge model.
+V1 keeps one logical parent per non-root node. Parent is derived from the parent's `children`; do not add a duplicate `parent` field or edge model.
 
 ---
 
-## 3. Challenge every material Tactic before decomposing it
+## 4. Challenge every material Tactic before decomposing it
 
 A material tactic is a choice, not merely a sentence in the tree.
 
@@ -98,13 +133,13 @@ Do not mechanically brainstorm alternatives for trivial/reversible choices. Chal
 
 Parallel assumptions must defend real claims. Avoid decorative statements such as "this tactic helps achieve the strategy."
 
-This challenge is recursive. A feature choice can be challenged at product level, an architecture choice inside that feature at the next level, and a component/technical choice below that.
+This challenge is recursive. A feature choice can be challenged at product level, an architecture choice inside it at the next level, and component/technical choices below that.
 
-Do not allow strong business reasoning at the top of the tree to degrade into an unchallenged technical checklist below.
+Do not allow strong business reasoning at the top to degrade into an unchallenged technical checklist below.
 
 ---
 
-## 4. Alternatives and Decisions
+## 5. Alternatives and Decisions
 
 Alternatives are different ways of satisfying the same Strategy. They are not simultaneous necessary children.
 
@@ -123,7 +158,7 @@ Do not guess material unknowns.
 
 ---
 
-## 5. Go down by asking "How?"
+## 6. Go down by asking "How?"
 
 After the parent tactic is sufficiently justified, ask:
 
@@ -136,47 +171,39 @@ For each child:
 - explain why the child Strategy is necessary for its parent;
 - challenge material alternatives when relevant.
 
-For every child use the removal test:
+Necessity test:
 
 > If this child disappeared and nothing replaced it, could the parent still succeed?
 
-If yes, challenge its place in the required tree.
-
-For every sibling group use the sufficiency test:
+Sufficiency test:
 
 > Assume all children succeed. What required condition could still be missing?
 
-If something is missing, the group is incomplete.
+Siblings should live at a coherent logical level. If one child merely implements another sibling, it belongs below that sibling.
 
-### Sibling coherence
-
-Siblings should live at a coherent logical level.
-
-If one proposed child merely implements another sibling, it belongs below that sibling instead.
-
-Do not generate default folders such as `Frontend / Backend / Database / Tests` unless each is genuinely an independently necessary outcome for the parent.
+Do not generate default folders such as `Frontend / Backend / Database / Tests` unless each is genuinely an independently necessary outcome.
 
 A one-child decomposition is usually rewording. Merge it or find the missing independent required steps unless the extra level provides genuine control value.
 
 ---
 
-## 6. Feature and release trees use the same S&T logic
+## 7. Feature and release trees use the same S&T logic
 
 A feature is an ordinary S&T node/subtree. It does not need a special schema.
 
-A large feature may contain capabilities that product teams informally call sub-features; S&T does not need an Epic/Feature/Story/Task taxonomy.
+A large feature may contain capabilities that teams informally call sub-features; S&T does not need an Epic/Feature/Story/Task taxonomy.
 
 A release may contain multiple feature subtrees only when its parent logic is honest:
 - the feature outcomes are jointly necessary for one shared release outcome; or
 - each feature is explicitly required by an approved release commitment/scope.
 
-Release membership alone is not S&T causality. If a release is merely packaging unrelated changes, do not invent a false causal relationship; each included change still needs its own justification inside the chosen planning boundary.
+Release membership alone is not S&T causality. If a release is merely packaging unrelated changes, do not invent a false causal relationship; each included change still needs its own justification inside the chosen boundary.
 
 Architecture should emerge from required outcomes. Do not begin with a technology/component checklist and retrofit strategies around it.
 
 ---
 
-## 7. Stop at implementation-ready leaves
+## 8. Stop at implementation-ready leaves
 
 There is no QUICK/DEEP mode. Small, obvious work naturally creates a shallow tree; ambiguous or architectural work naturally creates a deeper one.
 
@@ -196,7 +223,7 @@ A leaf should make clear enough to derive:
 
 Do not decompose into routine coding/clicking trivia.
 
-If a single leaf is too large for a practical executor chat, planning stopped too early even if no new design decision remains; decompose it into coherent necessary outcomes.
+If a leaf is decision-complete but too large for a practical executor chat, planning stopped too early; decompose it further into coherent necessary outcomes.
 
 ### Execution dependencies
 
@@ -204,11 +231,7 @@ If a single leaf is too large for a practical executor chat, planning stopped to
 
 > This implementation-ready leaf cannot correctly begin until those referenced leaf outcomes exist.
 
-It is not:
-- the S&T parent/child relationship;
-- priority;
-- preferred sequence;
-- a general schedule.
+It is not the S&T parent/child relationship, priority, preferred sequence, or a general schedule.
 
 Rules:
 - reference existing implementation-ready leaf IDs only;
@@ -220,7 +243,7 @@ Do not distort the S&T hierarchy to represent execution order.
 
 ---
 
-## 8. Node planning status
+## 9. Node planning status
 
 Use exactly:
 - `draft` — normal unfinished planning;
@@ -235,10 +258,9 @@ Rules:
 
 ---
 
-## 9. Review as you build
+## 10. Review as you build
 
-Review separate dimensions instead of merely rereading prose:
-
+Review separate dimensions:
 - **Outcome validity** — Strategy is an outcome, not a disguised feature/tool.
 - **Parallel logic** — selected Tactic genuinely supports the Strategy.
 - **Alternative challenge** — material alternatives were handled where they could change the choice.
@@ -253,7 +275,7 @@ Correct defects while authoring. Local approval is not permission to execute.
 
 ---
 
-## 10. Whole-plan completeness audit
+## 11. Whole-plan completeness audit
 
 Local Necessity/Sufficiency can still miss a concern that never entered the tree.
 
@@ -261,9 +283,9 @@ Before Final Planning Review perform an outside-in audit from `GOAL.md`:
 
 1. **Goal traceability** — every meaningful desired-outcome clause and hard constraint is protected by TREE, an assumption, a decision, or success evidence.
 2. **Root gap test** — assume every leaf succeeds; ask whether the desired outcome can still fail for a reason this plan should have handled.
-3. **Boundary challenge** — inspect only materially relevant actors, system boundaries, external dependencies, and failure paths.
+3. **Boundary challenge** — inspect only materially relevant actors, boundaries, external dependencies, and failure paths.
 4. **Negative-space check** — non-goals have not leaked into required work.
-5. **Scenario walkthrough** — walk representative end-to-end scenarios; include a failure/edge scenario only when it can materially invalidate the plan.
+5. **Scenario walkthrough** — walk representative end-to-end scenarios; include failure/edge scenarios only when materially relevant.
 
 For feature/release work additionally verify:
 - each feature/change is justified by a real outcome or explicit committed scope;
@@ -279,12 +301,12 @@ For legacy migration/extraction, a fresh inventory-to-contract/tree completeness
 
 ---
 
-## 11. Final Planning Review and durable-contract hygiene
+## 12. Final Planning Review and durable-contract hygiene
 
 The whole intended planning scope must be complete before implementation begins.
 
 Before Final Review:
-- remove duplicated live progress from durable product/data/technical/test contracts actually used by the plan;
+- remove duplicated live progress from durable target-project contracts actually used by the plan;
 - keep durable contracts about what must remain true, not today's planning status;
 - verify every `open` DECISIONS entry is still genuinely unresolved;
 - mark resolved choices `resolved` and obsolete questions `superseded`;
@@ -299,7 +321,7 @@ Planning is complete only when:
 - necessary/sufficient decomposition holds;
 - material decisions affecting implementation are resolved;
 - leaves are implementation-ready;
-- required execution dependencies are explicit and acyclic;
+- execution dependencies are explicit and acyclic;
 - outside-in coverage passes;
 - KISS passes.
 
@@ -307,7 +329,7 @@ Record Final Planning Review in `REVIEWS.md`.
 
 ---
 
-## 12. Freeze no-drift gate
+## 13. Freeze no-drift gate
 
 Final Review approves a specific baseline, not whatever files exist later.
 
@@ -335,6 +357,7 @@ node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref> --frozen
 Any material drift makes the prior review stale. Keep/return:
 
 ```yaml
+cycle_state: active
 plan_state: active
 implementation_authorized: false
 ```
@@ -342,41 +365,42 @@ implementation_authorized: false
 Only the verified reviewed baseline may become:
 
 ```yaml
+cycle_state: active
 plan_state: frozen
 implementation_authorized: false
 ```
 
-Freeze closes ordinary planning edits. It does not authorize implementation.
+Freeze closes ordinary planning edits. It does not finish the cycle and does not authorize implementation.
 
 ---
 
-## 13. Keep state simple
+## 14. Keep state simple
 
 Ownership:
 
 - `GOAL.md` — stable boundary of the current planning scope.
 - `TREE.yaml` — active S&T logic, assumptions, dependencies, evidence.
-- `DECISIONS.md` — material open questions and decision history for the current scope.
-- `REVIEWS.md` — review/replanning evidence.
-- `.planning/STATUS.yaml` — S&T Planner planning pointer/lifecycle/authorization state.
+- `DECISIONS.md` — material open questions and decision history for the current cycle.
+- `REVIEWS.md` — review/replanning/closure evidence for the current cycle.
+- `.planning/STATUS.yaml` — cycle lifecycle, planning pointer/state, and execution authorization.
 - `EXECUTION.yaml` — after freeze: chat allocation + execution state/result for leaf IDs only.
 - `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap and verification contract, never task content.
 - `validate-allocation.mjs` — mechanical allocation validator, no planning state.
 - `verify-freeze-baseline.mjs` — no-drift verifier, no planning state.
 
-Do not create plan-version machinery, feature/release registries, one file per node, or a second task database. Git history provides audit history unless real usage proves richer machinery necessary.
+Framework/tooling files remain installed across cycles. Current-cycle state is GOAL/TREE/DECISIONS/REVIEWS/STATUS/EXECUTION.
+
+Do not create plan-version machinery, feature/release registries, one file per node, archive directories, or a second task database. Git/repository history provides audit history unless real usage proves richer machinery necessary.
 
 ---
 
-## 14. Execution handoff
+## 15. Execution handoff
 
 After freeze, keep `implementation_authorized: false` while preparing execution.
 
 The frozen implementation-ready leaves are already the work units. Do not create GitHub Issues merely to mirror them.
 
 Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to a numbered chat. Do not copy Strategy/Tactic text there; node IDs point back to TREE.
-
-### Allocation
 
 Choose chats from the actual shape of work:
 - shared implementation context;
@@ -396,35 +420,38 @@ Before first authorization run:
 node .planning/validate-allocation.mjs --initial
 ```
 
-Add `--serial-chats` only when the target explicitly uses serial numbered chats.
-
-After execution/replanning preserves valid completed work, use `--resume`.
+Add `--serial-chats` only when the target explicitly uses serial numbered chats. After execution/replanning preserves valid completed work, use `--resume`.
 
 Any failure keeps implementation unauthorized.
 
 ### Mandatory fresh-chat handoff gate
 
-Follow `EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only. Cover representative:
-- first available executor;
-- dependency-blocked early executor;
-- mid-plan executor with multiple dependencies;
-- final closure executor.
+Follow `EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only. Cover representative first-available, dependency-blocked, multi-dependency, and final-closure cases.
 
-Verify repository state alone reveals authorization, assignment, prerequisite states, first runnable node (or none), exact next context to load, and factual blocker when unavailable.
+Verify repository state alone reveals:
+- `cycle_state: active`;
+- authorization;
+- assignment;
+- prerequisite states;
+- first runnable node or none;
+- exact next context to load;
+- factual blocker when unavailable.
 
 Record the result in `REVIEWS.md`, fix the smallest defect, and rerun failed cases.
 
 Only then set:
 
 ```yaml
+cycle_state: active
+plan_state: frozen
 implementation_authorized: true
 ```
 
-A chat saying "I am chat N" / "אני צ'אט מספר N" follows `EXECUTOR_HANDOFF.md` and may execute only when both `plan_state: frozen` and `implementation_authorized: true`.
+A chat saying "I am chat N" / "אני צ'אט מספר N" follows `EXECUTOR_HANDOFF.md` and may execute only when all three conditions above hold.
 
 ---
 
-## 15. Execution state and evidence
+## 16. Execution state and evidence
 
 Use only:
 - `pending`;
@@ -434,7 +461,7 @@ Use only:
 
 Set `done` only after the node's `success_evidence` is verified.
 
-If implementation/offline verification is complete but required external live verification is temporarily unavailable (authenticated session, market, device, deployment environment, third-party system, etc.):
+If implementation/offline verification is complete but required external live verification is temporarily unavailable:
 - keep the leaf `blocked`, not `done`;
 - record what evidence passed, what live evidence remains, and the factual availability reason;
 - do not reopen planning merely because the external condition is unavailable when the plan itself is still correct;
@@ -445,14 +472,14 @@ Do not silently waive live evidence and do not add another execution state.
 
 ---
 
-## 16. Learn from meaningful unexpected failures
+## 17. Learn from meaningful unexpected failures
 
 Do not create ceremony for normal red-green TDD, trivial typos, expected validation failures, or isolated operator mistakes.
 
 For a meaningful unexpected failure with reusable value:
 1. identify technical root cause;
 2. identify reasoning/process cause;
-3. identify escape cause — why existing review/test/guardrails missed it;
+3. identify escape cause;
 4. apply the local fix;
 5. add appropriate regression proof;
 6. add the smallest reusable prevention for the same failure class.
@@ -463,15 +490,16 @@ Do not turn one failure into broad framework machinery without evidence.
 
 ---
 
-## 17. Replanning after execution discovers a material defect
+## 18. Replanning after execution discovers a material defect
 
-Do not improvise around a planning defect during execution.
+Do not improvise around a planning defect during execution and do not create a new cycle for it.
 
 Executor response:
-1. mark the affected node `blocked` with a short factual result;
-2. set `.planning/STATUS.yaml -> plan_state: active`;
-3. set `.planning/STATUS.yaml -> implementation_authorized: false`;
-4. stop starting new execution work.
+1. keep `.planning/STATUS.yaml -> cycle_state: active`;
+2. mark the affected node `blocked` with a short factual result;
+3. set `.planning/STATUS.yaml -> plan_state: active`;
+4. set `.planning/STATUS.yaml -> implementation_authorized: false`;
+5. stop starting new execution work.
 
 Planner response:
 1. reopen only the smallest affected S&T area;
@@ -487,3 +515,66 @@ Planner response:
 11. explicitly re-authorize only after all gates pass.
 
 Do not restart at the root unless the defect changes root framing. Do not create a plan-version registry; Git history and REVIEWS are enough.
+
+---
+
+## 19. Cycle closure and reuse
+
+Leaf completion does not automatically prove the whole planning scope succeeded.
+
+### Complete the cycle
+
+After all required execution work appears done, run the Cycle Closure Review defined in `REVIEWS.md`.
+
+A cycle may become `completed` only when:
+- every required leaf is `done`;
+- required leaf evidence is verified;
+- the root/current-scope outcome is verified after integration;
+- no required blocker remains;
+- durable decisions/contracts needed by future work have been promoted into the target project's long-lived source of truth;
+- repository current reality/documentation used by future planners reflects what was delivered;
+- terminal review/evidence is durably recorded.
+
+Then set:
+
+```yaml
+cycle_state: completed
+implementation_authorized: false
+```
+
+`plan_state` normally remains `frozen`, describing the last reviewed planning baseline.
+
+### Abandon the cycle
+
+If the scope is intentionally stopped without proving the root outcome, record an abandonment review and set:
+
+```yaml
+cycle_state: abandoned
+implementation_authorized: false
+```
+
+Do not call it completed. `plan_state` may remain `active` or `frozen` according to the last truthful planning state; the terminal `cycle_state` prevents execution.
+
+### Start a later cycle
+
+A later project/release/feature/change does not reinstall the framework.
+
+Only after the prior cycle is terminal and its snapshot is durable, reset current-cycle state:
+- `GOAL.md`;
+- `TREE.yaml`;
+- `DECISIONS.md`;
+- `REVIEWS.md`;
+- `STATUS.yaml`;
+- `EXECUTION.yaml`.
+
+Keep `FRAMEWORK.md`, `.planning/README.md`, `EXECUTOR_HANDOFF.md`, helper scripts, and the project `AGENTS.md` S&T rules.
+
+Start the new cycle from the current repository reality with:
+
+```yaml
+cycle_state: active
+plan_state: active
+implementation_authorized: false
+```
+
+Do not import old trees as active planning. Historical reasoning remains in repository history; truths that must constrain future work belong in durable project contracts.
