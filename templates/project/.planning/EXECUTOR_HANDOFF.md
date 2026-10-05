@@ -106,6 +106,8 @@ If implementation reveals a material planning gap or contradiction:
 
 Do not redesign the plan inside an executor chat.
 
+Tell the user exactly what happened and what to do next. The user-facing next action is to open or return to a planning chat in the same repository and say `תקן והמשך את מחזור S&T לפי הריפו` (or `Repair and continue the S&T cycle from the repository`). The executor should identify the factual planning defect, but the user should not need to interpret STATUS/EXECUTION state or restate the affected design context.
+
 After correction, re-freeze alone is not enough. The planner must record the corrected reviewed baseline, pass freeze no-drift verification again, freeze that verified baseline, run allocation validation in `--resume` mode, and rerun the required fresh-chat handoff verification before `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
 
 ## Mandatory fresh-chat verification before authorization
@@ -125,7 +127,8 @@ Verify these representative situations:
 1. **first available executor** — can identify its assignment and first runnable node;
 2. **dependency-blocked early executor** — can identify that no node may start yet and exactly which prerequisite state blocks progress;
 3. **mid-plan executor with multiple dependencies** — can resolve all prerequisite states and determine what is runnable;
-4. **final closure executor** — can determine the remaining assigned work, the evidence needed to finish it, and the correct user-facing transition to Cycle Closure Review when all required leaves become done.
+4. **final closure executor** — can determine the remaining assigned work, the evidence needed to finish it, and the correct user-facing transition to Cycle Closure Review when all required leaves become done;
+5. **planning-defect executor** — can stop safely, revoke further execution through repository state, identify the factual defect, and give the exact user-facing transition back to planning without asking the user to reconstruct context.
 
 Use actual chats/nodes from the allocation when they exist. If a small allocation does not contain a literal example of one situation, simulate that condition against the closest real assignment **without mutating durable execution state**, and record the adaptation.
 
@@ -138,7 +141,7 @@ For every simulation, the fresh executor must be able to determine:
 - the first available node, or that none is available;
 - the exact contract/project context it should load next;
 - the factual reason it cannot proceed when unavailable;
-- after its assigned work finishes, the exact next runnable chat ID(s), or that Cycle Closure Review is the next action.
+- after its assigned work finishes, the exact next runnable chat ID(s), Cycle Closure Review, or return-to-planning action.
 
 Record the post-allocation verification result in `.planning/REVIEWS.md`.
 
