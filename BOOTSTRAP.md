@@ -34,7 +34,9 @@ The planner defaults to informed autonomy: investigate the repository, evaluate 
 
 The user does not need to copy files, explain the framework, choose tree depth, or paste another prompt.
 
-Automatic bootstrap requires an agent that can read this public source repository and write to the target repository. If target write access is unavailable, do not pretend installation succeeded.
+Automatic bootstrap requires an agent that can read this public source repository and write to the target repository. If source read access or target write access is unavailable, do not pretend installation or persisted planning succeeded. Tell the user exactly which capability is missing, what could not be completed, and the single next action required to resume. Do not turn an access failure into framework questions or ask the user to manually reconstruct the bundle.
+
+If a partial/conflicting installation prevents safe bootstrap, report the exact conflicting paths, preserve all existing data, recommend the least-destructive repair/upgrade path, and ask for approval only when that repair would modify or replace pre-existing target content.
 
 ## Bootstrap contract
 
