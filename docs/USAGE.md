@@ -77,11 +77,13 @@ This challenge repeats from business/product reasoning through architecture/comp
 
 ## When the agent should ask the user
 
-The agent investigates the repository and available evidence first.
+The default is informed planner autonomy, not a questionnaire.
 
-It asks the user only when a missing fact or choice is material, cannot be established reliably from repository context/evidence, and can change the plan.
+The agent investigates the repository and available evidence first. When the goal, constraints, evidence, and tradeoffs support a responsible product/technical choice, it makes that choice, records the rationale, and continues. It should not ask for approval merely because several valid implementations exist, and it should prefer a reasonable reversible default for low-risk uncertainty.
 
-It should not turn the framework into a questionnaire.
+It asks the user only when the missing input is genuinely user-owned, such as a material product/business preference or acceptance boundary, or when a material fact cannot be established reliably and different answers would materially change the plan.
+
+If a question is unavoidable, it should ask the smallest useful question, batch tightly related unknowns, and include its recommendation when useful.
 
 If the user explicitly states that a product/technical choice is fixed, the planner treats it as a constraint instead of repeatedly challenging it.
 
@@ -101,6 +103,8 @@ If `cycle_state: active`:
 - a request belonging to the same intended scope resumes/replans that cycle;
 - active planning state is never erased merely because another request arrived;
 - a genuinely independent new scope does not silently create parallel planning state.
+
+If an independent new request arrives while another cycle is active, the planner should not silently abandon the current cycle or force the new request into it. If the requests cannot responsibly be combined, choosing whether to finish or explicitly abandon the existing cycle is a genuine user-owned prioritization decision; ask one focused question with a recommendation rather than starting a second active cycle.
 
 If the cycle is `completed` or `abandoned`, a later independent scope can start a new cycle after the terminal review/snapshot is durably preserved.
 
@@ -181,11 +185,21 @@ plan_state: frozen
 implementation_authorized: true
 ```
 
-open an executor chat in the target repository and say:
+the planner determines from `EXECUTION.yaml` and TREE `depends_on` which executor chat ID or IDs are runnable now and tells the user exactly which new chat(s) can be opened. The user should not inspect planning files to discover the next chat.
 
-> אני צ'אט מספר 1
+For a runnable chat, say:
+
+> אני צ'אט מספר N
+
+or:
+
+> I am chat N
+
+`Chat 1` is only an example when Chat 1 is actually runnable; chat numbering does not imply execution order. If several independent chats are runnable and the target workflow permits parallel work, the planner should say so explicitly.
 
 The executor first follows `.planning/EXECUTOR_HANDOFF.md`, then reads its assigned nodes from `EXECUTION.yaml`, loads those nodes from `TREE.yaml`, checks `depends_on`, and loads only the target-project/ancestor/Decision context required for available assigned work.
+
+After each executor finishes its currently runnable assigned work, it computes from repository state what comes next and tells the user the exact next runnable chat ID(s), the blocking dependency when none is runnable, or that Cycle Closure Review is next when all required leaves are done. The user never needs to inspect `EXECUTION.yaml` manually to route execution.
 
 Chat allocation follows implementation context, dependencies, and manageable workload. It does not require `one feature = one chat`: one feature may span several chats, and one chat may own leaves from several feature subtrees when that is the coherent implementation unit.
 
@@ -196,13 +210,15 @@ Keep it inside the same active cycle:
 1. block the affected node with a short factual reason;
 2. keep `cycle_state: active`;
 3. set planning active again and revoke implementation authorization;
-4. reopen only the smallest affected S&T area;
-5. correct/review it, record the corrected reviewed baseline, and pass freeze no-drift verification again;
-6. freeze the verified corrected baseline and repair only affected EXECUTION entries;
-7. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
-8. rerun and record the mandatory fresh-chat handoff verification;
-9. explicitly re-authorize only after all gates pass;
-10. preserve valid completed work.
+4. stop starting new execution work;
+5. tell the user to return to/open a planning chat in the same repository with the exact command `תקן והמשך את מחזור S&T לפי הריפו` (or `Repair and continue the S&T cycle from the repository`);
+6. reopen only the smallest affected S&T area;
+7. correct/review it, record the corrected reviewed baseline, and pass freeze no-drift verification again;
+8. freeze the verified corrected baseline and repair only affected EXECUTION entries;
+9. run `node .planning/validate-allocation.mjs --resume` and fix any failure;
+10. rerun and record the mandatory fresh-chat handoff verification;
+11. explicitly re-authorize only after all gates pass;
+12. preserve valid completed work.
 
 ## Authoritative external entry point
 
