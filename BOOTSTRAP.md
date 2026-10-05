@@ -30,6 +30,8 @@ Examples include:
 
 A user-proposed feature/tool/technology/architecture is normally a **candidate tactic**, not automatically the desired outcome. Treat it as fixed only when the user explicitly makes it a constraint/decision or an existing durable target-project contract already does so.
 
+The planner defaults to informed autonomy: investigate the repository, evaluate material alternatives, and make responsible planner-owned product/technical choices without asking the user to approve every valid option. Ask only when the missing input is genuinely user-owned or cannot be responsibly derived and different answers would materially change the plan. Prefer a reasonable reversible default for low-risk uncertainty. If a question is unavoidable, minimize and batch it and include the planner's recommendation when useful.
+
 The user does not need to copy files, explain the framework, choose tree depth, or paste another prompt.
 
 Automatic bootstrap requires an agent that can read this public source repository and write to the target repository. If target write access is unavailable, do not pretend installation succeeded.
@@ -108,7 +110,7 @@ When invoked from another repository:
    - record the verification in REVIEWS;
    - explicitly authorize implementation only after that gate passes;
    - after required execution is done, run Cycle Closure Review before marking the cycle `completed`; integrated root-outcome proof and durable carry-forward of cross-cycle contracts are required.
-16. Investigate repository context/evidence before asking the user. Ask only for a missing outcome/boundary or a material fact/choice that cannot be established reliably and can change the plan. Do not ask the user to repeat framework instructions.
+16. Investigate repository context/evidence before asking the user. Make planner-owned product/technical choices yourself when the goal, constraints, evidence, and tradeoffs support a responsible choice; do not ask for approval merely because multiple valid implementations exist. Ask only for a missing outcome/boundary, genuinely user-owned material preference/constraint, or a material fact that cannot be established reliably and can change the plan. If a question is unavoidable, ask the smallest useful question, batch tightly related unknowns, and include a recommendation when useful. Do not ask the user to repeat framework instructions.
 
 ## Safety against accidental overwrite
 
@@ -130,10 +132,18 @@ plan_state: frozen
 implementation_authorized: true
 ```
 
-a new executor chat in the target repository can simply say:
+the planning agent must determine from `EXECUTION.yaml` and TREE `depends_on` which executor chat ID or IDs are runnable now and tell the user exactly which new chat(s) can be opened. The user should not inspect planning files to discover the next chat.
 
-> אני צ'אט מספר 1
+For each runnable chat, the command is simply:
 
-The installed target-project rules define how that chat resumes its assigned S&T nodes. The executor does not need the user to restate the project/feature/release context; repository state must provide the assigned nodes, relevant ancestor/Decision context, dependencies, and next runnable work.
+> אני צ'אט מספר N
+
+or:
+
+> I am chat N
+
+`Chat 1` is only an example when Chat 1 is actually runnable; chat numbering does not imply execution order. If several independent chats are runnable and the target workflow permits parallel work, the planner should say so explicitly.
+
+The installed target-project rules define how each executor resumes its assigned S&T nodes. The executor does not need the user to restate the project/feature/release context; repository state must provide the assigned nodes, relevant ancestor/Decision context, dependencies, and next runnable work.
 
 A `completed` or `abandoned` cycle never authorizes execution, even if stale TREE/EXECUTION content still exists before a later cycle reset.
