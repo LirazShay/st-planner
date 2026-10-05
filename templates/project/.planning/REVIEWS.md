@@ -1,8 +1,10 @@
 # Planning Reviews
 
-This file is audit history. It records what was checked, what failed, and what was corrected.
+This file is audit history for the **current S&T cycle**. It records what was checked, what failed, and what was corrected.
 
 It is **not** the source of truth for open questions or current state. If a review discovers a material unresolved question, create/reference a D-ID in DECISIONS.md.
+
+When a completed/abandoned cycle is replaced by a new cycle, this file may be reset for the new current scope only after the terminal cycle snapshot is durably preserved by the repository history. Git history is the normal audit trail; do not build an archive directory merely to retain old REVIEWS files.
 
 ## Planning review template
 
@@ -13,9 +15,10 @@ It is **not** the source of truth for open questions or current state. If a revi
 **Gates checked:**
 - goal clarity
 - step validity
+- tactic-choice validity
 - necessity
 - sufficiency
-- assumption honesty
+- assumption/decision honesty
 - KISS
 - executability
 - tree-state consistency
@@ -105,3 +108,54 @@ If the allocation is too small to contain a literal example of one scenario, rec
 - None / TBD
 
 Any failure is `changes-required` and keeps implementation unauthorized until corrected and rechecked.
+
+## Cycle closure review
+
+A planning cycle is larger than `plan_state`. Freeze closes the reviewed planning baseline; cycle closure decides whether the entire planning+execution scope is finished or intentionally abandoned.
+
+Before setting `.planning/STATUS.yaml -> cycle_state: completed`, record a closure review proving:
+- every required implementation-ready leaf in EXECUTION is `done` and its success evidence was verified;
+- the root/current-scope outcome is verified after integration, not merely inferred from individual commits;
+- no required execution blocker remains;
+- material decisions/contracts that must govern future changes have been promoted to the target repository's durable product/architecture/API/data/test/instruction source of truth rather than surviving only in this cycle's DECISIONS;
+- repository current reality/documentation used by future planners reflects what was actually delivered;
+- `implementation_authorized` is set to `false` when the cycle becomes terminal.
+
+### R-XXX — YYYY-MM-DD — Cycle closure
+
+**Result:** completed | abandoned | changes-required
+
+**Terminal outcome:**
+- intended root outcome verified: yes | no | not-applicable-for-abandonment
+- all required execution leaves done: yes | no | not-applicable-for-abandonment
+- remaining blockers/open work: None / summary
+
+**Durable carry-forward:**
+- decisions/contracts promoted for future cycles: None / paths + summary
+- current-reality/docs updated: None / paths
+
+**Abandonment only:**
+- reason for abandonment: None / summary
+- already-delivered work retained/reconciled: None / summary
+- no claim of root success is made: yes
+
+**Terminal-state evidence:**
+- durable repository ref/evidence preserving this cycle before reset: ref / equivalent
+
+A `completed` result permits `cycle_state: completed`. An intentional stop that does not prove the root outcome permits `cycle_state: abandoned` instead. Both terminal states require `implementation_authorized: false`.
+
+## Starting a later cycle
+
+V1 permits only one active S&T cycle per repository. Start a new cycle only when the prior cycle is `completed` or `abandoned` and its terminal review/snapshot is durable.
+
+For the new cycle, keep framework/tooling files in place and reset only current-cycle state:
+- `GOAL.md`
+- `TREE.yaml`
+- `DECISIONS.md`
+- `REVIEWS.md`
+- `STATUS.yaml`
+- `EXECUTION.yaml`
+
+The new `STATUS.yaml` starts with `cycle_state: active`, `plan_state: active`, and `implementation_authorized: false`.
+
+Do not create `.planning/archive/`, plan-version registries, or parallel active cycle directories by default. Prior cycle history remains recoverable from repository history, while durable cross-cycle truths live in the target project's normal long-lived contracts.

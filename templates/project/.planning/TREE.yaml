@@ -5,6 +5,10 @@ version: 1
 # - blocked: cannot advance because an open material D-entry references the node
 # - approved: local node logic/immediate decomposition passed review
 # Status is local; it does not cascade through the subtree.
+#
+# The same node model is used for any planning scope and at every depth:
+# project, release, feature, migration, architecture, component, or technical change.
+# Do not add type/category fields merely to label those levels.
 
 root: "0"
 
@@ -12,10 +16,18 @@ nodes:
   "0":
     status: draft
 
+    # Strategy states the required outcome at this level.
+    # Do not disguise a proposed feature/tool/architecture as an outcome.
     strategy: "TBD"
+
+    # Tactic states the selected way to achieve the Strategy.
+    # For material choices, challenge plausible alternatives before approving it.
     tactic: "TBD"
 
-    # Why this Tactic can achieve this Strategy.
+    # Why this selected Tactic can achieve this Strategy.
+    # For material choices, capture the assumptions that make the choice valid,
+    # including why a materially plausible alternative is not preferable when relevant.
+    # Put unresolved material choices in DECISIONS.md rather than guessing here.
     parallel_assumptions: []
 
     # Why this node is necessary for its parent.
@@ -23,6 +35,8 @@ nodes:
     necessary_assumptions: []
 
     # Why this node's children are sufficient together for this node.
+    # Children are independently necessary outcomes, not default folders such as
+    # Frontend / Backend / Database / Tests unless those are genuinely required outcomes.
     # Leaves normally keep this empty.
     sufficiency_assumptions: []
 
@@ -30,7 +44,7 @@ nodes:
 
     # Execution-order prerequisites by S&T node ID.
     # Normally used only on implementation-ready leaves.
-    # This is not the logical parent/child relationship.
+    # This is not the logical parent/child relationship and must not be used to encode schedule.
     depends_on: []
 
     children: []

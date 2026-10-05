@@ -1,8 +1,26 @@
 # AI Planning Protocol
 
-Planning depth is adaptive; there is no QUICK/DEEP mode. Use the same S&T rules for every task and stop decomposing when further detail would not materially improve implementation readiness or logical confidence.
+Planning depth is adaptive; there is no QUICK/DEEP mode. Use the same S&T rules for every meaningful planning scope and stop decomposing when further detail would not materially improve implementation readiness or logical confidence.
 
-## 1. Start with the goal boundary
+A planning scope may be a whole project/initiative or a meaningful change inside an existing system, including a release, feature, migration, refactor, architectural change, or other substantial change. The user does not need to classify the scope.
+
+## 1. Determine the planning boundary before accepting a solution
+
+Start by identifying what outcome must be true when the requested scope succeeds.
+
+Separate four things that are often mixed together in a user request:
+- required outcome;
+- established current reality;
+- hard constraint / already-fixed decision;
+- proposed solution.
+
+A user-proposed feature, tool, technology, architecture, or implementation is normally a **candidate tactic**, not the desired outcome. Treat it as fixed only when the user explicitly makes it a constraint/decision or a durable project contract already does so.
+
+If the request starts from a proposed solution, climb upward by asking internally:
+
+> Why is this needed? What outcome is it intended to create?
+
+Do not challenge a genuinely fixed constraint merely to generate alternatives.
 
 Update `.planning/GOAL.md` with:
 - desired outcome;
@@ -12,88 +30,170 @@ Update `.planning/GOAL.md` with:
 
 Material unresolved questions go to `DECISIONS.md`.
 
-## 2. Build the root
+## 2. Establish only current reality that can change the plan
 
-Create the root Strategy/Tactic and success evidence.
+Use the target repository's normal context-loading/source-of-truth rules.
 
-Do not choose a tactic when a material decision is still unknown; expose the question instead.
+Inspect only context that could materially change GOAL, TREE, DECISIONS, or a review, such as:
+- relevant current behavior/code/contracts;
+- actors and boundaries;
+- existing capabilities/infrastructure;
+- binding decisions;
+- material failure modes;
+- constraints.
 
-## 3. Decompose
+Do not recursively preload the repository.
 
-For a parent tactic ask:
+Investigate before asking the user. Ask only when a material fact or choice cannot be established from repository context/evidence and the answer can change the plan.
 
-> How exactly must this be performed?
+## 3. Build and challenge the root
+
+Create the root Strategy, candidate Tactic, parallel assumptions, and success evidence.
+
+For every **material** tactic, including the root, challenge:
+
+1. **Need** — why is this Strategy required inside the current planning boundary?
+2. **Tactic validity** — why can this Tactic achieve the Strategy?
+3. **Alternatives** — is there another materially plausible tactic that would be preferable under the actual constraints?
+4. **Invalidation** — what fact/assumption, if false or changed, would make the choice wrong?
+
+Do not brainstorm alternatives mechanically for trivial/reversible decisions. Challenge depth is proportional to materiality: impact, reversibility, cross-cutting effect, uncertainty, and ability to reshape the tree.
+
+If a material choice cannot yet be resolved, expose it in `DECISIONS.md` rather than guessing. An open decision blocks a TREE node only when continuing would require guessing or could create a materially different subtree.
+
+## 4. Decompose the selected tactic recursively
+
+Only after a tactic is sufficiently justified, ask:
+
+> How exactly must this tactic be performed?
+
+Each child should represent an **independently necessary outcome** required to perform the parent tactic, not merely a project folder, discipline, implementation file, or phase.
 
 For each proposed child:
 1. define its Strategy;
-2. define its Tactic;
-3. explain why the child is independently necessary;
-4. validate that its tactic can achieve its strategy.
+2. define its candidate Tactic;
+3. explain why the child is independently necessary for its parent;
+4. challenge why its tactic can achieve its strategy;
+5. challenge a materially plausible alternative when one exists;
+6. record material unresolved choices in DECISIONS rather than treating alternatives as children.
 
 For the whole sibling group ask:
 
 > If every child succeeds, what required condition could still be missing?
 
+Also check sibling coherence:
+- siblings should live at a coherent logical level;
+- a child that merely implements another sibling belongs below that sibling;
+- alternatives are not simultaneous necessary children;
+- do not generate default `Frontend / Backend / Database / Tests` branches unless those are genuinely independent necessary outcomes.
+
 Do not choose the number of children in advance.
 
-## 4. Continue until implementation-ready leaves
+### Feature and release scopes
 
-A leaf is ready when an executor would not need another material design/product decision.
+A feature is an ordinary S&T node/subtree, not a special schema type.
+
+A release may contain multiple feature subtrees only when the parent logic is honest:
+- the feature outcomes are jointly necessary for a shared release outcome; or
+- each is explicitly required by an approved release scope/commitment.
+
+Release membership by itself is not S&T causality. If a release is merely packaging unrelated changes, do not invent a false causal relationship; each included change still needs its own justification inside the chosen planning boundary.
+
+## 5. Keep decision handling proportional
+
+Ordinary local reasoning belongs in TREE assumptions.
+
+Create/use a `DECISIONS.md` entry only for a material unknown or choice whose resolution can significantly change product behavior, architecture, cross-cutting constraints, implementation scope, costly-to-reverse work, or the tree itself.
+
+For a material decision:
+- preserve only materially plausible alternatives;
+- record the selected resolution and basis;
+- state what would reopen the decision when useful;
+- update affected TREE logic after resolution.
+
+Do not turn DECISIONS into a diary of every option the planner briefly considered.
+
+## 6. Continue until implementation-ready leaves
+
+A leaf is ready only when both conditions hold:
+
+1. **Decision-complete** — an executor would not need another material product/design/architecture decision.
+2. **Practically executable** — the work is a coherent, manageable unit for an executor chat.
 
 The leaf should provide enough information to derive:
 - responsibility;
 - scope;
 - relevant constraints;
+- selected implementation direction and rationale at the level that matters;
 - execution prerequisites in `depends_on`, when real;
 - success/acceptance evidence.
 
-Do not decompose into trivial implementation steps.
+Do not decompose into trivial implementation steps, exact clicks, or routine file edits unless they themselves are material design constraints.
 
-## 5. Review repeatedly
+If a single leaf is too large for a practical executor chat, planning stopped too early even if no new design decision remains; decompose it into coherent necessary outcomes.
 
-While building:
-- Strategy/Tactic validity;
+## 7. Review repeatedly while authoring
+
+While building, review:
+- Strategy is an outcome, not a disguised tool/feature;
+- Tactic → Strategy validity;
+- materially plausible alternatives for material tactics;
+- assumption honesty and invalidation conditions;
 - necessity;
 - sufficiency;
-- assumption honesty;
+- sibling-level coherence;
 - KISS;
-- tree consistency.
+- tree consistency;
+- implementation readiness.
 
 Correct defects immediately.
 
+The same challenge applies recursively at business, product, feature, architecture, component, and technical levels. Do not allow a well-reasoned business top half to degrade into an unchallenged technical checklist below.
+
 Branch approval means the branch logic is sound; it does **not** permit implementation. Neither local approval nor freeze alone authorizes execution.
 
-## 6. Outside-in completeness audit
+## 8. Outside-in completeness audit
 
-Before the final review, challenge the tree from the goal boundary rather than from its existing branches.
+Before the final review, challenge the tree from the GOAL boundary rather than from its existing branches.
 
 For every meaningful desired-outcome clause and hard constraint, identify where the plan protects it through a node, assumption, decision, or success evidence.
 
 Then ask:
 
-> Assume every planned leaf succeeds exactly as written. Can the project still miss the desired outcome for a reason this plan should have handled?
+> Assume every planned leaf succeeds exactly as written. Can this planning scope still miss the desired outcome for a reason the plan should have handled?
 
 Also inspect only materially relevant actors, boundaries, dependencies, and failure paths, and walk a small number of representative end-to-end scenarios.
 
-Do not create a separate coverage artifact. Persist only defects/corrections in the existing TREE, DECISIONS, and REVIEWS files.
+For feature/release work specifically, verify:
+- each feature/change is justified by a real outcome or explicit committed scope;
+- the release does not use membership as fake causal logic;
+- no material product/architecture choice was accepted merely because the user proposed it;
+- no expected capability is missing between the current system and requested outcome.
 
-## 7. Final whole-plan review
+Do not create a separate coverage artifact by default. Persist only defects/corrections in TREE, DECISIONS, and REVIEWS.
+
+## 9. Final whole-plan review
 
 When the intended tree appears complete and the completeness audit finds no unresolved gap, review it as one system.
 
 Planning is complete only if:
+- the intended planning boundary is correct;
+- desired outcome and proposed solution were not conflated;
 - intended scope is fully represented;
-- every desired-outcome clause and hard constraint is accounted for;
+- every meaningful desired-outcome clause and hard constraint is accounted for;
+- every material tactic has defensible tactic → strategy logic;
+- materially plausible alternatives were handled where they could change the choice;
 - every required branch is sufficiently decomposed;
+- siblings remain logically coherent;
 - material decisions are resolved;
-- leaves are implementation-ready;
+- leaves are decision-complete and practically executable;
 - cross-branch dependencies needed for execution are understood;
 - no important gap appears when the entire tree is considered together;
 - KISS review passes.
 
 Record the result in `REVIEWS.md`.
 
-## 8. Freeze
+## 10. Freeze
 
 If Final Planning Review passes:
 1. record immutable/reproducible evidence for the reviewed baseline in `REVIEWS.md`;
@@ -106,7 +206,7 @@ If merge/rebase/integration later creates a different frozen ref, verify that re
 
 Freeze closes the planning baseline. It does not start implementation.
 
-## 9. Handoff to execution
+## 11. Handoff to execution
 
 Do not create a second task system.
 
@@ -131,12 +231,12 @@ Choose the number of chats from the actual amount and shape of work.
 
 Priorities:
 
-1. coherent context/responsibility;
+1. coherent implementation context/responsibility;
 2. valid dependency flow;
 3. manageable amount of work per chat;
 4. reasonable load balance.
 
-There is no fixed number of leaves per chat.
+There is no fixed number of leaves per chat and no rule that one feature/subtree equals one chat. A chat may own leaves from more than one feature when shared implementation context makes that the coherent allocation; one feature may require multiple chats.
 
 If a single leaf is too large for a practical executor chat, reopen planning and decompose it.
 
@@ -146,7 +246,7 @@ Execution prerequisites remain only in `TREE.yaml -> depends_on`.
 
 An executor checks the prerequisite node's state in `EXECUTION.yaml`.
 
-Do not create a separate chat dependency graph.
+Do not create a separate chat dependency graph and do not distort S&T parent/child logic to express execution order.
 
 ### Execution state
 
@@ -163,8 +263,7 @@ The short `result` field may reference a commit, test, artifact, or concise veri
 
 The framework does not become a scheduler or task-management application.
 
-
-## 10. Replan only when execution proves it necessary
+## 12. Replan only when execution proves it necessary
 
 If execution exposes a material defect in the frozen plan:
 

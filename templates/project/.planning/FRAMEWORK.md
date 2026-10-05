@@ -1,541 +1,585 @@
 # Portable S&T Planning Kernel
 
-This is the minimum planning method a fresh GPT needs.
+This is the minimum planning/execution method a fresh GPT needs.
 
-## 0. Connect to an existing project without context dumping
+The same method applies to any meaningful current planning scope: a whole project or initiative, a release, feature, migration, refactor, architectural change, or another substantial change inside an existing system. These are not different node types; they use the same S&T logic.
 
-Before building S&T, understand only the current reality needed for this goal.
+V1 supports **one active S&T planning+execution cycle per repository**. The same installed framework can be reused sequentially for later scopes after the current cycle is completed or abandoned.
 
-If the repository already has `AGENTS.md`, workstream routing, status files, context-loading rules, specs, or other source-of-truth conventions, **use them**. The S&T framework does not replace project-native context management.
+---
 
-Progressive disclosure rule:
+## 0. Connect to the target project without context dumping
+
+Before building S&T, understand only the current reality that can materially change the current planning scope.
+
+If the repository already has `AGENTS.md`, workstream routing, status files, context-loading rules, specs, or other source-of-truth conventions, use them. S&T Planner does not replace project-native context management.
+
+Progressive disclosure:
 
 1. read the project's normal AI entry point;
-2. identify the relevant workstream/component for the requested goal;
+2. identify the relevant workstream/component for the requested scope;
 3. read its current status/context;
 4. read directly relevant code/docs/tests/specs as planning questions require them;
 5. load history or unrelated areas only when a concrete uncertainty requires it.
 
-Do not recursively scan the repository by default.
-
-The test for loading more context is:
+Use this test before loading more context:
 
 > Could this information materially change GOAL, TREE, DECISIONS, or a review?
 
 If not, do not preload it.
 
-## 0.1 Long-running work progress orientation
+Investigate before asking the user. Default to informed planner autonomy: when the goal, constraints, repository evidence, and tradeoffs support a responsible choice, make that planner-owned product/technical choice, record the rationale, and continue. Do not ask merely because several valid implementations exist. Prefer a reasonable reversible default for low-risk uncertainty. Ask only when the missing input is genuinely user-owned or cannot be responsibly derived and different answers would materially change the plan. If a question is unavoidable, ask the smallest useful question, batch tightly related unknowns, and include a recommendation when useful.
 
-When planning/implementation becomes long, tool-heavy, or spans many checks, keep the user oriented with concise progress updates at meaningful boundaries.
+### Long-running work progress orientation
 
-Useful updates say:
-- what is being checked now;
-- what is already complete;
-- what remains before this stage can close;
-- any meaningful discovery or blocker.
+For long/tool-heavy work, give concise progress updates at meaningful boundaries: what is being checked, what is complete, what remains, and any meaningful discovery/blocker. Do not narrate every tool call. If the user requested one stage per message, updates stay inside that stage.
 
-Do not narrate every tool call, repeat the same status, or turn updates into a second task log.
+### Repository engineering rules
 
-If the user requested one stage per message, progress updates stay within that stage and do not advance to a new stage by themselves.
+S&T Planner does not impose GitHub Flow, feature branches, pull requests, merge methods, or post-merge verification universally. Discover and follow the target repository's own workflow when one exists.
 
-## 0.2 Helper scripts over complex CI heredocs
+When CI/workflow validation logic becomes non-trivial, prefer a small versioned helper script over a large inline parser/heredoc.
 
-When repository validation logic becomes non-trivial, keep the logic in a small versioned helper script and let CI/workflow files call that script.
+For programmatic repository text edits, require expected source text, preserve inserted text literally, and reread the rendered file or complete diff before treating the edit as correct.
 
-Prefer:
-- normal source files with focused tests;
-- short CI steps such as `node scripts/check-x.mjs`;
-- reusable logic that can run locally and in CI.
+---
 
-Avoid embedding large parsers, multi-line programs, or complex data transformations directly inside GitHub Actions YAML, shell heredocs, or workflow strings. Inline workflow logic is appropriate only while it remains genuinely trivial.
+## 1. Planning cycles and current scope
 
-This is a repository-engineering guideline, not a requirement to add scripts where plain commands are already clear.
-
-## 0.3 Programmatic text-edit safety
-
-When an agent edits repository text programmatically, treat the transformation itself as code that can corrupt content.
-
-For JavaScript string replacement:
-- if inserted text may contain `$`, do not pass it blindly as a replacement string to `String.replace`/`replaceAll`; use a replacer function or another method that preserves the text literally;
-- when a transformation is complex, prefer rebuilding from a known-good baseline rather than chaining fragile ad-hoc replacements;
-- require the expected source text to exist and, when appropriate, to be unique before replacing it;
-- after the edit, reread the rendered file or inspect the complete diff before PR/merge.
-
-Do not trust "the update call succeeded" as proof that the resulting text is correct.
-
-This is editing safety guidance, not a requirement to introduce a new transformation tool.
-
-## 0.4 Target-specific repository workflow
-
-S&T Planner does not impose GitHub Flow, feature branches, pull requests, merge methods, or post-merge verification universally.
-
-Before changing the target repository, discover its existing repository-engineering contract from project instructions, CI/release docs, branch protections, or established workflow.
-
-If the target defines branch/PR/merge rules:
-- follow them for planning-file changes and implementation work;
-- preserve required verification before merge;
-- perform any required post-merge/main verification.
-
-If the target does not define such rules, do not invent branch/PR ceremony merely because the framework repository uses it.
-
-Repository workflow is target-owned. S&T Planner supplies planning/execution semantics, not a universal Git hosting process.
-
-## 1. Strategy + Tactic
-
-Every node contains:
-
-- **Strategy** — what objective must exist?
-- **Tactic** — how will it be achieved?
-- **Parallel assumptions** — why can this tactic achieve this strategy?
-- **Necessary assumptions** — why is this child necessary for its parent?
-- **Sufficiency assumptions** — why are the children enough together?
-- **Success evidence** — how will achievement be recognized?
-
-## 2. Where each assumption belongs
-
-Keep the three logical relationships distinct:
-
-- `parallel_assumptions` belong to the **node itself**: why this node's Tactic can achieve this node's Strategy.
-- `necessary_assumptions` belong to the **child → parent relationship**: why this child Strategy is necessary for its parent. Store them on the child.
-- `sufficiency_assumptions` belong to the **children-as-a-group → parent relationship**: why this parent's children are sufficient together. Store them on the parent.
-
-V1 deliberately does **not** add a separate edge object or duplicate `parent` field:
-- the parent is derived from the parent's `children` list;
-- every non-root node has exactly one logical parent;
-- the root has no necessary assumptions;
-- a leaf normally has no sufficiency assumptions because it has no children.
-
-This placement keeps the tree compact while preserving the S&T logic.
-
-## 3. Go down by asking "How?"
-
-For the parent tactic ask:
-
-> How exactly must this be performed?
-
-Each child should represent an independently necessary part of performing the parent tactic.
-
-A one-child decomposition is usually just rewording.
-
-## 4. Necessity
-
-For every child:
-
-> Remove it without replacing it. Can the parent still be achieved?
-
-If yes, challenge its place in the required tree.
-
-## 5. Sufficiency
-
-For every parent:
-
-> Assume all children succeed. What required condition could still be missing?
-
-If something is missing, the group is incomplete.
-
-## 6. Alternatives and unknowns
-
-Do not represent alternatives as simultaneous necessary children.
-
-Material unresolved questions belong in `DECISIONS.md`.
-
-Do not guess important unknowns.
-
-## 7. Stop at implementation-ready leaves
-
-There is no QUICK/DEEP mode. Small problems naturally produce small trees; difficult problems naturally produce deeper trees.
-
-Stop when an executor would not need another material design/product decision.
-
-For an implementation-ready leaf, also record any real execution prerequisites in `depends_on` using S&T node IDs.
-
-`depends_on` means only:
-
-> This node's execution cannot correctly begin until those node outcomes exist.
-
-It is **not**:
-- the S&T parent/child relationship;
-- priority;
-- a preferred sequence;
-- a general schedule.
-
-V1 dependency invariants:
-- reference existing implementation-ready leaf node IDs only;
-- no self-dependency;
-- no dependency cycles;
-- if two leaves can execute independently, do not invent a dependency.
-
-Do not decompose into trivial coding/clicking instructions.
-
-## 8. Node planning status
-
-Use exactly three local planning statuses:
-
-- `draft` — the node is still being designed/reviewed and may change.
-- `blocked` — planning for this node cannot proceed because a material unresolved question exists.
-- `approved` — this node's own Strategy/Tactic logic and immediate decomposition have passed local review.
-
-KISS rules:
-
-- Do not add more node statuses in V1.
-- `blocked` is not a synonym for "unfinished"; ordinary unfinished work stays `draft`.
-- Every `blocked` node must have at least one open entry in `DECISIONS.md` that references that node.
-- Do not add a separate `blocked_by` field to TREE; the D-entry is the source of the reason.
-- Status is local. A blocked descendant does not automatically change its parent from approved to blocked.
-- Local approval never authorizes implementation. A frozen plan also remains non-executable until explicit implementation authorization is granted.
-
-## 9. Review as you build
-
-Check:
-- Strategy/Tactic validity;
-- necessity;
-- sufficiency;
-- assumptions;
-- KISS;
-- tree consistency.
-
-Local approval means planning logic is sound locally. It does not authorize implementation.
-
-## 10. Whole-plan completeness audit
-
-Local Necessity/Sufficiency checks can still miss a whole concern if that concern never entered the tree.
-
-Before Final Planning Review, perform one **outside-in coverage audit** from `GOAL.md`.
-
-Default: **do not create a separate coverage artifact**. Use the challenge questions below.
-
-### Optional high-complexity coverage mode
-
-Enable a separate coverage ledger only when there is concrete evidence the normal outside-in audit is insufficient, such as:
-- a very large source brief;
-- a major legacy migration;
-- hundreds of independent obligations;
-- an explicit requirement for exhaustive anti-forgetting traceability.
-
-Do not enable it merely because the project is important or the tree is large.
-
-When this opt-in mode is used:
-- coverage IDs must be unique;
-- every coverage obligation maps exactly once to its durable owner/S&T protection;
-- the ledger must not become a second STATUS/progress tracker;
-- add a small target-project validator that fails on duplicate IDs, missing mappings, or unexpected extras;
-- keep the validator target-specific unless repeated use proves a generic framework tool is justified.
-
-### Optional legacy migration completeness gate
-
-Use this pre-freeze gate only when the goal includes migration/extraction from a legacy system, repository, specification set, or other authoritative source. Do not run it for greenfield work.
-
-Before Final Planning Review:
-1. produce a fresh inventory of the relevant legacy source surface;
-2. compare that inventory against the extracted durable contracts and S&T coverage;
-3. classify every discrepancy instead of silently ignoring it;
-4. correct real omissions or record the justified exclusion/supersession;
-5. rerun the normal outside-in coverage audit after those corrections.
-
-The inventory may reuse an existing target-project artifact or a one-time reproducible query/report. Do not create a permanent framework artifact unless the project actually needs one.
-
-A discrepancy is not automatically a defect: the point is that every meaningful difference is accounted for before freeze.
-
-Use these challenge questions:
-
-1. **Goal traceability** — For every meaningful clause in the desired outcome and every hard constraint, where is it protected by the TREE, a material assumption, a decision, or success evidence?
-2. **Root gap test** — Assume every planned leaf succeeds exactly as written. Can the desired outcome still fail for a reason the plan should have handled?
-3. **Boundary challenge** — Look only at actors, system boundaries, external dependencies, and failure paths that materially affect this goal. Did the plan silently assume one of them away?
-4. **Negative-space check** — Did the tree accidentally include work that belongs to a stated non-goal?
-5. **Scenario walkthrough** — Walk a small number of representative end-to-end scenarios implied by the goal. Include a failure/edge scenario only when it could materially invalidate the plan.
-
-If the audit finds a gap:
-- add/correct the smallest affected S&T branch;
-- create a D-entry if the gap is an unresolved material question;
-- re-run affected Necessity/Sufficiency reviews.
-
-If it finds no gap, record the pass in the normal Final Planning Review. Do not persist a duplicate coverage matrix.
-
-## 11. Finish the entire plan before execution
-
-Do not hand partially planned leaves to implementation.
-
-### Durable contract vs live status hygiene
-
-As part of Final Planning Review, inspect only the durable target-project contracts that materially govern this plan (for example product/data/technical/test specs and any README used as a durable entry point).
-
-Durable contracts should describe what must remain true, not today's planning/extraction/readiness progress.
-
-Move or remove live snapshots such as:
-- current planning stage/readiness result;
-- extraction/migration progress;
-- temporary investigation progress;
-- "as of now" completion snapshots.
-
-Live progress belongs in the target repository's designated status/review owner (or S&T Planner's own REVIEWS/STATUS when it is S&T state), not duplicated inside durable specs.
-
-A README should be phase-neutral unless the target repository explicitly defines it as live status.
-
-Do not erase durable history, decision rationale, version compatibility notes, or intentionally time-scoped contractual facts merely because they contain dates. The problem is duplicated **current progress**, not historical context.
-
-Do not recursively scan unrelated documentation. Check the contracts actually used by the plan.
-
-### Stale decision / investigation cleanup
-
-Before freeze, verify that the planning state does not still claim an issue is unresolved after the plan has already resolved it.
-
-Check:
-- every `open` entry in `DECISIONS.md` is still materially unresolved;
-- resolved choices are marked `resolved` and record their actual resolution;
-- replaced questions are marked `superseded`;
-- live markers such as `INVESTIGATE`, `TBD`, `OPEN`, or equivalent classifications in planning/contracts are either still genuinely unresolved or removed/reclassified.
-
-A genuinely unresolved material question blocks freeze and must remain represented by an open D-entry (and by a blocked TREE node when it blocks a node).
-
-Do not flag definitions, legends, examples, historical notes, or quoted source material merely because they contain words such as `TBD` or `INVESTIGATE`.
-
-Do not scan unrelated repository content. Check `DECISIONS.md` and the durable planning/contracts actually used by this plan.
-
-When the whole intended tree is ready, run Final Planning Review across the complete plan.
-
-Only after it passes **and the reviewed baseline passes freeze no-drift verification**:
+`.planning/STATUS.yaml` separates three concerns:
 
 ```yaml
-plan_state: frozen
-implementation_authorized: false
+cycle_state: active | completed | abandoned
+plan_state: active | frozen
+implementation_authorized: false | true
 ```
 
-Before that:
+- `cycle_state` is the lifecycle of the whole current planning+execution scope.
+- `plan_state` describes whether the current planning baseline is editable or frozen.
+- `implementation_authorized` is a separate execution permission gate.
+
+A new cycle begins as:
 
 ```yaml
+cycle_state: active
 plan_state: active
 implementation_authorized: false
 ```
 
-### Freeze no-drift gate
+A `completed` or `abandoned` cycle is terminal and must have `implementation_authorized: false`.
 
-Final Planning Review approves a specific baseline, not whatever files happen to exist later.
+If a new request belongs to the same still-active intended scope, continue/replan that cycle. Do not reset active state merely because another request arrived.
 
-Record reviewed-baseline evidence in `REVIEWS.md`. The default material baseline is:
+A genuinely independent later scope may start only after the current cycle is `completed` or explicitly `abandoned` and its terminal review/snapshot is durably preserved.
+
+Do not create parallel active scope directories, a plan registry, or `.planning/archive/` by default.
+
+---
+
+## 2. Start from the outcome, not the proposed solution
+
+The current planning boundary belongs in `GOAL.md`:
+- desired outcome;
+- established current reality;
+- hard constraints / already-fixed decisions;
+- non-goals.
+
+A user request can mix need and solution. Separate them.
+
+A proposed feature, tool, technology, architecture, or implementation is normally a **candidate tactic**, not the desired outcome. Treat it as fixed only when the user explicitly makes it a constraint/decision or an existing durable project contract already does so.
+
+If planning starts from a proposed solution, climb upward:
+
+> Why is this needed? What outcome is it intended to create?
+
+Do not challenge a genuinely fixed constraint merely to manufacture alternatives.
+
+---
+
+## 3. Every node is Strategy + selected Tactic
+
+Every node contains:
+
+- **Strategy** — what objective/outcome must exist?
+- **Tactic** — the selected way to achieve it.
+- **Parallel assumptions** — why this tactic can achieve this strategy.
+- **Necessary assumptions** — why this child is necessary for its parent.
+- **Sufficiency assumptions** — why the children are enough together.
+- **Success evidence** — how achievement of the strategy will be recognized.
+
+The same node model applies at business, product, feature, architecture, component, and technical levels. Do not add `kind`, `feature`, `release`, or other category fields merely to label those levels.
+
+Assumption placement:
+- `parallel_assumptions` justify **Tactic → Strategy**;
+- `necessary_assumptions` live on the child and justify **child → parent** necessity;
+- `sufficiency_assumptions` live on the parent and justify **children together → parent** sufficiency.
+
+V1 keeps one logical parent per non-root node. Parent is derived from the parent's `children`; do not add a duplicate `parent` field or edge model.
+
+---
+
+## 4. Challenge every material Tactic before decomposing it
+
+A material tactic is a choice, not merely a sentence in the tree.
+
+Before approving it, challenge:
+
+1. **Need** — why is this Strategy required inside the current planning boundary?
+2. **Tactic validity** — why can this Tactic achieve the Strategy?
+3. **Alternatives** — is another materially plausible tactic preferable under the actual constraints?
+4. **Invalidation** — what fact/assumption, if false or changed, would make this choice wrong?
+
+Do not mechanically brainstorm alternatives for trivial/reversible choices. Challenge depth is proportional to materiality: impact, reversibility, cross-cutting effect, uncertainty, and ability to reshape the plan.
+
+Parallel assumptions must defend real claims. Avoid decorative statements such as "this tactic helps achieve the strategy."
+
+This challenge is recursive. A feature choice can be challenged at product level, an architecture choice inside it at the next level, and component/technical choices below that.
+
+Do not allow strong business reasoning at the top to degrade into an unchallenged technical checklist below.
+
+---
+
+## 5. Alternatives and Decisions
+
+Alternatives are different ways of satisfying the same Strategy. They are not simultaneous necessary children.
+
+Keep only the selected active path in `TREE.yaml`.
+
+Ordinary local reasoning stays in TREE assumptions. Use `DECISIONS.md` only for a material unknown or choice whose resolution can significantly change product behavior, architecture, cross-cutting constraints, implementation scope, costly-to-reverse work, or the tree itself.
+
+For material alternatives:
+- preserve only options plausible enough to affect the choice;
+- record the selected resolution and rationale;
+- record what would reopen the decision when useful.
+
+An `open` decision does not automatically block a node. Use `blocked` only when continuing would require guessing or could create a materially different subtree.
+
+Do not guess material unknowns.
+
+---
+
+## 6. Go down by asking "How?"
+
+After the parent tactic is sufficiently justified, ask:
+
+> How exactly must this tactic be performed?
+
+Each child should be an **independently necessary outcome** required for the parent tactic, with its own Strategy + candidate Tactic.
+
+For each child:
+- validate its own Tactic → Strategy relationship;
+- explain why the child Strategy is necessary for its parent;
+- challenge material alternatives when relevant.
+
+Necessity test:
+
+> If this child disappeared and nothing replaced it, could the parent still succeed?
+
+Sufficiency test:
+
+> Assume all children succeed. What required condition could still be missing?
+
+Siblings should live at a coherent logical level. If one child merely implements another sibling, it belongs below that sibling.
+
+Do not generate default folders such as `Frontend / Backend / Database / Tests` unless each is genuinely an independently necessary outcome.
+
+A one-child decomposition is usually rewording. Merge it or find the missing independent required steps unless the extra level provides genuine control value.
+
+---
+
+## 7. Feature and release trees use the same S&T logic
+
+A feature is an ordinary S&T node/subtree. It does not need a special schema.
+
+A large feature may contain capabilities that teams informally call sub-features; S&T does not need an Epic/Feature/Story/Task taxonomy.
+
+A release may contain multiple feature subtrees only when its parent logic is honest:
+- the feature outcomes are jointly necessary for one shared release outcome; or
+- each feature is explicitly required by an approved release commitment/scope.
+
+Release membership alone is not S&T causality. If a release is merely packaging unrelated changes, do not invent a false causal relationship; each included change still needs its own justification inside the chosen boundary.
+
+Architecture should emerge from required outcomes. Do not begin with a technology/component checklist and retrofit strategies around it.
+
+---
+
+## 8. Stop at implementation-ready leaves
+
+There is no QUICK/DEEP mode. Small, obvious work naturally creates a shallow tree; ambiguous or architectural work naturally creates a deeper one.
+
+A leaf is ready only when both are true:
+
+1. **Decision-complete** — an executor does not need another material product/design/architecture decision.
+2. **Practically executable** — the work is a coherent, manageable unit for an executor chat.
+
+A leaf should make clear enough to derive:
+- responsibility;
+- scope/boundary;
+- relevant constraints;
+- selected implementation direction and material rationale;
+- required inputs;
+- real execution prerequisites in `depends_on`;
+- objective success evidence.
+
+Do not decompose into routine coding/clicking trivia.
+
+If a leaf is decision-complete but too large for a practical executor chat, planning stopped too early; decompose it further into coherent necessary outcomes.
+
+### Execution dependencies
+
+`depends_on` means only:
+
+> This implementation-ready leaf cannot correctly begin until those referenced leaf outcomes exist.
+
+It is not the S&T parent/child relationship, priority, preferred sequence, or a general schedule.
+
+Rules:
+- reference existing implementation-ready leaf IDs only;
+- no self-dependency;
+- no dependency cycles;
+- omit dependencies when leaves can execute independently.
+
+Do not distort the S&T hierarchy to represent execution order.
+
+---
+
+## 9. Node planning status
+
+Use exactly:
+- `draft` — normal unfinished planning;
+- `blocked` — cannot advance because a material unresolved D-entry blocks the node;
+- `approved` — this node's Strategy/Tactic logic and immediate decomposition passed local review.
+
+Rules:
+- every blocked node has at least one open DECISIONS entry referencing it;
+- do not duplicate a `blocked_by` field in TREE;
+- status is local, not recursive;
+- local approval never authorizes implementation.
+
+---
+
+## 10. Review as you build
+
+Review separate dimensions:
+- **Outcome validity** — Strategy is an outcome, not a disguised feature/tool.
+- **Parallel logic** — selected Tactic genuinely supports the Strategy.
+- **Alternative challenge** — material alternatives were handled where they could change the choice.
+- **Epistemic honesty** — facts are supported, assumptions visible, unknowns not guessed.
+- **Necessity** — every child survives removal.
+- **Sufficiency** — every sibling group survives the missing-condition challenge.
+- **Sibling coherence** — abstraction levels are not mixed.
+- **KISS** — no speculative machinery, duplicate nodes, premature tools, or unnecessary detail.
+- **Executability** — leaves are decision-complete and practical.
+
+Correct defects while authoring. Local approval is not permission to execute.
+
+---
+
+## 11. Whole-plan completeness audit
+
+Local Necessity/Sufficiency can still miss a concern that never entered the tree.
+
+Before Final Planning Review perform an outside-in audit from `GOAL.md`:
+
+1. **Goal traceability** — every meaningful desired-outcome clause and hard constraint is protected by TREE, an assumption, a decision, or success evidence.
+2. **Root gap test** — assume every leaf succeeds; ask whether the desired outcome can still fail for a reason this plan should have handled.
+3. **Boundary challenge** — inspect only materially relevant actors, boundaries, external dependencies, and failure paths.
+4. **Negative-space check** — non-goals have not leaked into required work.
+5. **Scenario walkthrough** — walk representative end-to-end scenarios; include failure/edge scenarios only when materially relevant.
+
+For feature/release work additionally verify:
+- each feature/change is justified by a real outcome or explicit committed scope;
+- release membership is not used as fake causality;
+- no material product/architecture choice was accepted merely because the user proposed it;
+- the path from current system reality to requested outcome has no missing required capability.
+
+If a gap appears, change only the smallest affected area and rerun affected logic reviews.
+
+Do not create a permanent coverage artifact by default. Use one only when concrete high-complexity evidence shows normal outside-in auditing is insufficient.
+
+For legacy migration/extraction, a fresh inventory-to-contract/tree completeness comparison may be required before freeze; discrepancies must be classified rather than silently ignored.
+
+---
+
+## 12. Final Planning Review and durable-contract hygiene
+
+The whole intended planning scope must be complete before implementation begins.
+
+Before Final Review:
+- remove duplicated live progress from durable target-project contracts actually used by the plan;
+- keep durable contracts about what must remain true, not today's planning status;
+- verify every `open` DECISIONS entry is still genuinely unresolved;
+- mark resolved choices `resolved` and obsolete questions `superseded`;
+- remove/reclassify stale live markers such as `TBD` / `INVESTIGATE` where the underlying issue is already resolved.
+
+Planning is complete only when:
+- planning boundary is correct;
+- outcome and proposed solution were not conflated;
+- intended scope is represented;
+- material tactics have defensible logic;
+- material alternatives were handled;
+- necessary/sufficient decomposition holds;
+- material decisions affecting implementation are resolved;
+- leaves are implementation-ready;
+- execution dependencies are explicit and acyclic;
+- outside-in coverage passes;
+- KISS passes.
+
+Record Final Planning Review in `REVIEWS.md`.
+
+---
+
+## 13. Freeze no-drift gate
+
+Final Review approves a specific baseline, not whatever files exist later.
+
+Default material baseline:
 - `.planning/GOAL.md`;
 - `.planning/TREE.yaml`;
 - `.planning/DECISIONS.md`.
 
-If the Final Review explicitly covers another durable contract whose drift would change the plan, include it as an additional checked file rather than expanding the default globally.
+If another durable contract is explicitly material to the review, include it as an additional checked file rather than expanding the default globally.
 
-When Git refs are available, prefer:
+Record reviewed-baseline evidence in `REVIEWS.md`.
+
+When Git refs are available prefer:
 
 ```text
 node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref>
 ```
 
-This compares the reviewed commit to the current working tree. If a merge/rebase/integration step later produces the actual frozen commit/ref, verify that result too:
+If merge/rebase/integration later produces the frozen ref, verify it too:
 
 ```text
 node .planning/verify-freeze-baseline.mjs --reviewed-ref <reviewed-ref> --frozen-ref <frozen-ref>
 ```
 
-A workflow that cannot provide a stable Git ref must record equivalent reproducible evidence in REVIEWS.
-
-Any material drift means the prior Final Planning Review is stale. Keep/return `.planning/STATUS.yaml -> plan_state: active`, review the changed baseline again, and record new baseline evidence. Never waive drift merely because the change looks small.
-
-Freeze means the reviewed planning baseline is closed for ordinary editing. It does **not** mean executors may start.
-
-## 12. Keep state simple
-
-- `GOAL.md` — stable boundary.
-- `TREE.yaml` — S&T plan.
-- `DECISIONS.md` — material questions/decisions.
-- `REVIEWS.md` — review history.
-- `.planning/STATUS.yaml` — the S&T Planner-owned planning pointer and lifecycle/authorization state.
-
-Prefer one planning conversation. Repository state exists so continuation is possible when needed.
-
-## 13. Execution handoff
-
-After freeze, first confirm no intervening merge/rebase/integration changed the reviewed baseline. Then prepare execution directly from the S&T tree, but keep implementation unauthorized until handoff is complete.
-
-**Do not create GitHub Issues merely to execute the S&T plan.**
-The implementation-ready leaves in `TREE.yaml` are already the work units.
-
-Use management files only:
-
-- `TREE.yaml` — work definition, rationale, dependencies, success evidence.
-- `EXECUTION.yaml` — chat allocation, execution state, short result.
-- `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap and mandatory post-allocation verification contract; no task descriptions.
-- `validate-allocation.mjs` — mechanical allocation validator; no planning state or task content.
-
-Create/populate `EXECUTION.yaml` while `.planning/STATUS.yaml -> implementation_authorized: false`.
-
-Every implementation-ready leaf appears exactly once under one numbered chat:
+Any material drift makes the prior review stale. Keep/return:
 
 ```yaml
-chats:
-  "1":
-    nodes:
-      "1.2.1":
-        state: pending
-        result: null
+cycle_state: active
+plan_state: active
+implementation_authorized: false
 ```
 
-The executor reads Strategy, Tactic, assumptions, `depends_on`, and `success_evidence` directly from TREE.
+Only the verified reviewed baseline may become:
 
-### Allocation
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: false
+```
 
-Choose the number of chats from the real amount of work.
+Freeze closes ordinary planning edits. It does not finish the cycle and does not authorize implementation.
 
-Group nodes by:
+---
+
+## 14. Keep state simple
+
+Ownership:
+
+- `GOAL.md` — stable boundary of the current planning scope.
+- `TREE.yaml` — active S&T logic, assumptions, dependencies, evidence.
+- `DECISIONS.md` — material open questions and decision history for the current cycle.
+- `REVIEWS.md` — review/replanning/closure evidence for the current cycle.
+- `.planning/STATUS.yaml` — cycle lifecycle, planning pointer/state, and execution authorization.
+- `EXECUTION.yaml` — after freeze: chat allocation + execution state/result for leaf IDs only.
+- `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap and verification contract, never task content.
+- `validate-allocation.mjs` — mechanical allocation validator, no planning state.
+- `verify-freeze-baseline.mjs` — no-drift verifier, no planning state.
+
+Framework/tooling files remain installed across cycles. Current-cycle state is GOAL/TREE/DECISIONS/REVIEWS/STATUS/EXECUTION.
+
+Do not create plan-version machinery, feature/release registries, one file per node, archive directories, or a second task database. Git/repository history provides audit history unless real usage proves richer machinery necessary.
+
+---
+
+## 15. Execution handoff
+
+After freeze, keep `implementation_authorized: false` while preparing execution.
+
+The frozen implementation-ready leaves are already the work units. Do not create GitHub Issues merely to mirror them.
+
+Populate `EXECUTION.yaml` by assigning every implementation-ready leaf exactly once to a numbered chat. Do not copy Strategy/Tactic text there; node IDs point back to TREE.
+
+Choose chats from the actual shape of work:
 - shared implementation context;
 - dependency compatibility;
-- manageable chat workload;
+- manageable workload;
 - reasonable balance.
 
-Do not use a fixed leaf count.
+There is no fixed leaves-per-chat rule and no rule that one feature equals one chat. One feature may span several chats; one chat may own leaves from multiple feature subtrees when shared implementation context makes that coherent.
 
-If one leaf is too large for a practical executor chat, planning stopped too early: reopen and decompose it.
+Execution dependencies remain only in `TREE.yaml -> depends_on`; do not create a chat dependency graph.
 
-### State
+### Mechanical allocation gate
 
-Use only:
-- pending
-- in_progress
-- done
-- blocked
-
-Set `done` only after success evidence is verified.
-
-### External live verification
-
-When a leaf requires a real external condition that may be temporarily unavailable — for example an authenticated session, open market, hardware device, deployment environment, or third-party system — keep the requirement explicit in that leaf's existing `success_evidence`.
-
-When implementation and offline/harness verification are complete but the external live check cannot factually run yet:
-- keep the leaf `blocked`, not `done`;
-- put a short `result` stating what offline/harness evidence already passed, which live evidence remains, and the factual availability reason;
-- do **not** reopen planning merely because the external condition is unavailable when the plan itself is still correct;
-- continue unrelated execution normally;
-- only leaves whose `depends_on` genuinely requires this live-verified outcome wait for it.
-
-When the external condition becomes available, run the live verification. Mark the leaf `done` only after the remaining success evidence passes.
-
-Do not silently waive or delete live evidence because it could not run at the earlier time, and do not add a new execution state just for this case.
-
-Dependencies remain only in TREE. A chat checks prerequisite node states in EXECUTION.
-
-### Mandatory mechanical allocation gate
-
-Before first implementation authorization, run:
+Before first authorization run:
 
 ```text
 node .planning/validate-allocation.mjs --initial
 ```
 
-It must prove mechanically that:
-- every approved implementation-ready leaf is assigned exactly once;
-- no non-leaf, missing, or non-approved node is assigned;
-- execution states are valid;
-- initial allocation is `pending` with `result: null`;
-- every dependency references an approved implementation-ready leaf and is assigned.
+Add `--serial-chats` only when the target explicitly uses serial numbered chats. After execution/replanning preserves valid completed work, use `--resume`.
 
-If the target explicitly uses serial numbered chats, also pass `--serial-chats`. That mode additionally requires chat IDs `1..N` and every dependency to be in an earlier chat or earlier in the same chat. Do not enable serial mode merely because chats have numbers.
-
-After execution has already begun and replanning preserves valid completed work, use `--resume` instead of `--initial`; it validates state/result consistency without requiring completed nodes to return to pending.
-
-Any validator failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`.
+Any failure keeps implementation unauthorized.
 
 ### Mandatory fresh-chat handoff gate
 
-Before setting `.planning/STATUS.yaml -> implementation_authorized: true`, follow `EXECUTOR_HANDOFF.md` and simulate a brand-new executor from repository state only.
+Follow `EXECUTOR_HANDOFF.md` and simulate fresh executors from repository state only. Cover representative first-available, dependency-blocked, multi-dependency, and final-closure cases.
 
-The verification must cover representative:
-- first available executor;
-- dependency-blocked early executor;
-- mid-plan executor with multiple dependencies;
-- final closure executor.
-
-For every case verify that repository state alone reveals:
+Verify repository state alone reveals:
+- `cycle_state: active`;
 - authorization;
-- assigned nodes;
+- assignment;
 - prerequisite states;
-- first available node or that none is available;
-- exact next contract/project context to load;
-- factual blocking reason when unavailable.
+- first runnable node or none;
+- exact next context to load;
+- factual blocker when unavailable;
+- after an executor finishes, the exact next runnable chat ID(s), or that Cycle Closure Review is next.
 
-Use actual allocation cases where possible. If a small plan lacks a literal example, simulate the condition against the closest real assignment without mutating durable execution state.
+Record the result in `REVIEWS.md`, fix the smallest defect, and rerun failed cases.
 
-Record the result in `REVIEWS.md`. Any failure keeps `.planning/STATUS.yaml -> implementation_authorized: false`; correct the smallest handoff/allocation/routing defect and rerun the failed verification.
+Only then set:
 
-Only after this gate passes, explicitly set `.planning/STATUS.yaml -> implementation_authorized: true`.
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: true
+```
 
-A chat that says "I am chat N" / "אני צ'אט מספר N" reads `EXECUTOR_HANDOFF.md` and may execute its assigned nodes only when both `.planning/STATUS.yaml -> plan_state: frozen` and `.planning/STATUS.yaml -> implementation_authorized: true`.
+After authorization, determine from `EXECUTION.yaml` and TREE `depends_on` which chat ID or IDs are runnable now and tell the user explicitly how many executor chats were allocated and which exact new chat command(s) may be opened. Do not make the user inspect YAML. Do not hard-code Chat 1 unless Chat 1 is actually runnable. If several independent chats are runnable and the target workflow permits parallel work, say so.
 
-Do not build an execution engine, scheduler, or duplicated task database.
+A chat saying "I am chat N" / "אני צ'אט מספר N" follows `EXECUTOR_HANDOFF.md` and may execute only when all three conditions above hold.
 
+---
 
-## 14. Learn from meaningful unexpected failures
+## 16. Execution state and evidence
 
-Do not create ceremony for normal red-green TDD, trivial typos, expected validation failures, or one-off operator mistakes.
+Use only:
+- `pending`;
+- `in_progress`;
+- `done`;
+- `blocked`.
 
-When a **meaningful unexpected failure** exposes a reusable process or reasoning weakness, close the loop before treating the work as complete:
+Set `done` only after the node's `success_evidence` is verified.
 
-1. identify the technical root cause;
-2. identify the reasoning/process cause that allowed it;
-3. identify the escape cause — why existing review/test/guardrails did not catch it earlier;
+If implementation/offline verification is complete but required external live verification is temporarily unavailable:
+- keep the leaf `blocked`, not `done`;
+- record what evidence passed, what live evidence remains, and the factual availability reason;
+- do not reopen planning merely because the external condition is unavailable when the plan itself is still correct;
+- continue unrelated work;
+- only dependent leaves wait.
+
+Do not silently waive live evidence and do not add another execution state.
+
+---
+
+## 17. Learn from meaningful unexpected failures
+
+Do not create ceremony for normal red-green TDD, trivial typos, expected validation failures, or isolated operator mistakes.
+
+For a meaningful unexpected failure with reusable value:
+1. identify technical root cause;
+2. identify reasoning/process cause;
+3. identify escape cause;
 4. apply the local fix;
-5. add regression proof appropriate to the failure;
-6. add the **smallest reusable prevention** that would stop the same class of failure recurring.
+5. add appropriate regression proof;
+6. add the smallest reusable prevention for the same failure class.
 
-Record this in the target project's existing incident/retrospective/review owner when one exists. If there is no project-native owner and the failure is relevant to S&T planning/execution quality, record it briefly in `.planning/REVIEWS.md`.
+Use the target project's existing incident/retrospective/review owner when one exists; otherwise use `REVIEWS.md` when the learning is relevant to S&T quality.
 
-Do not turn a single failure into broad framework machinery unless the reusable prevention is clearly justified.
+Do not turn one failure into broad framework machinery without evidence.
 
-## 15. Replanning after execution discovers a defect
+---
 
-A frozen plan may still meet reality and prove wrong.
+## 18. Replanning after execution discovers a material defect
 
-Do not patch around a material planning defect during execution.
+Do not improvise around a planning defect during execution and do not create a new cycle for it.
 
-### Executor response
+Executor response:
+1. keep `.planning/STATUS.yaml -> cycle_state: active`;
+2. mark the affected node `blocked` with a short factual result;
+3. set `.planning/STATUS.yaml -> plan_state: active`;
+4. set `.planning/STATUS.yaml -> implementation_authorized: false`;
+5. stop starting new execution work.
 
-When an executor discovers a material planning defect:
+Planner response:
+1. reopen only the smallest affected S&T area;
+2. review its parent logic upward until impact is contained;
+3. inspect affected `depends_on` relationships and previously completed work;
+4. preserve a `done` node only when its Strategy, evidence, and produced outcome remain valid;
+5. reset invalidated work to `pending` or remove obsolete nodes;
+6. correct only affected EXECUTION allocation;
+7. record/review the corrected baseline and pass no-drift verification;
+8. freeze again while still unauthorized;
+9. run `validate-allocation.mjs --resume` (plus serial mode only when applicable);
+10. rerun mandatory fresh-chat handoff verification;
+11. explicitly re-authorize only after all gates pass.
 
-1. stop the affected node;
-2. set that node in `EXECUTION.yaml` to `blocked`;
-3. put a short concrete reason in `result`;
-4. change `.planning/STATUS.yaml -> plan_state` back to `active`;
-5. set `.planning/STATUS.yaml -> implementation_authorized: false`;
-6. set `.planning/STATUS.yaml` to the smallest S&T area that must be reconsidered.
+Do not restart at the root unless the defect changes root framing. Do not create a plan-version registry; Git history and REVIEWS are enough.
 
-No other execution may start while `.planning/STATUS.yaml -> plan_state: active` or `.planning/STATUS.yaml -> implementation_authorized: false`.
+---
 
-### Planner response
+## 19. Cycle closure and reuse
 
-Reopen only the smallest affected planning area.
+Leaf completion does not automatically prove the whole planning scope succeeded.
 
-Review:
-- the defective node/branch;
-- its parent logic upward until the changed logic is contained;
-- affected `depends_on` relationships;
-- any previously executed nodes whose validity depends on the changed outcome;
-- whole-plan coverage only where the change can affect it.
+### Complete the cycle
 
-Do not re-plan unrelated branches.
+After all required execution work appears done, run the Cycle Closure Review defined in `REVIEWS.md`.
 
-### Preserve valid completed work
+A cycle may become `completed` only when:
+- every required leaf is `done`;
+- required leaf evidence is verified;
+- the root/current-scope outcome is verified after integration;
+- no required blocker remains;
+- durable decisions/contracts needed by future work have been promoted into the target project's long-lived source of truth;
+- repository current reality/documentation used by future planners reflects what was delivered;
+- terminal review/evidence is durably recorded.
 
-A node already marked `done` stays `done` if:
-- its Strategy still means the same thing;
-- its success evidence still proves that Strategy;
-- the revised plan does not invalidate the produced outcome.
+Then set:
 
-If any of those are false, reset that node to `pending` (or remove it if the node no longer exists) and record the reason in the review.
+```yaml
+cycle_state: completed
+implementation_authorized: false
+```
 
-Do not add a `stale` state.
+`plan_state` normally remains `frozen`, describing the last reviewed planning baseline.
 
-### Rebuild only affected allocation
+Tell the user explicitly that the current S&T scope is closed and that a later scope can be requested with the normal short S&T Planner command; do not make the user inspect lifecycle state to discover that reuse is available.
 
-After the corrected planning area passes review:
+### Abandon the cycle
 
-1. ensure obsolete leaf IDs are removed from EXECUTION;
-2. add any new implementation-ready leaves exactly once as `pending`;
-3. keep unaffected chat allocations and valid `done` nodes unchanged where practical;
-4. re-check dependencies and chat coherence only for affected work;
-5. set `.planning/STATUS.yaml -> plan_state: frozen` again while keeping `.planning/STATUS.yaml -> implementation_authorized: false`;
-6. run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode applies) and fix any failure;
-7. rerun the mandatory repository-only fresh-chat handoff verification from `EXECUTOR_HANDOFF.md`, record the pass in `REVIEWS.md`, and only then explicitly restore `.planning/STATUS.yaml -> implementation_authorized: true`.
+If the scope is intentionally stopped without proving the root outcome, record an abandonment review and set:
 
-No plan-version registry is required. Git history already records prior file versions.
+```yaml
+cycle_state: abandoned
+implementation_authorized: false
+```
+
+Do not call it completed. `plan_state` may remain `active` or `frozen` according to the last truthful planning state; the terminal `cycle_state` prevents execution. Tell the user that the scope was closed without claiming the intended outcome succeeded.
+
+### Start a later cycle
+
+A later project/release/feature/change does not reinstall the framework.
+
+Only after the prior cycle is terminal and its snapshot is durable, reset current-cycle state:
+- `GOAL.md`;
+- `TREE.yaml`;
+- `DECISIONS.md`;
+- `REVIEWS.md`;
+- `STATUS.yaml`;
+- `EXECUTION.yaml`.
+
+Keep `FRAMEWORK.md`, `.planning/README.md`, `EXECUTOR_HANDOFF.md`, helper scripts, and the project `AGENTS.md` S&T rules.
+
+Start the new cycle from the current repository reality with:
+
+```yaml
+cycle_state: active
+plan_state: active
+implementation_authorized: false
+```
+
+Do not import old trees as active planning. Historical reasoning remains in repository history; truths that must constrain future work belong in durable project contracts.

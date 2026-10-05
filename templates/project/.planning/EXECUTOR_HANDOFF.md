@@ -8,18 +8,21 @@ It explains **how to resume execution from repository state only**. It does not 
 
 Before reading implementation details, read `.planning/STATUS.yaml`.
 
-Execution is allowed only when both values in **`.planning/STATUS.yaml`** are true:
+Execution is allowed only when all three values in **`.planning/STATUS.yaml`** are satisfied:
 
 ```yaml
+cycle_state: active
 plan_state: frozen
 implementation_authorized: true
 ```
 
-If either condition is false:
+If any condition is false:
 
 - do not start or mark any node `in_progress`;
 - do not improvise missing planning;
 - report the repository-visible reason execution is unavailable.
+
+A `completed` or `abandoned` cycle is terminal and cannot execute even if stale planning/execution data remains in the repository. Terminal cycles must have `implementation_authorized: false`.
 
 ## Fresh executor read order
 
@@ -53,7 +56,7 @@ The target repository remains authoritative for its own implementation rules and
 Use this order:
 
 1. target `AGENTS.md` / project routing rules;
-2. the assigned S&T node and any decisions it references;
+2. the assigned S&T node, the ancestor reasoning needed to understand why it exists, and materially relevant decisions;
 3. directly relevant target specs/code/tests;
 4. history or unrelated areas only when a concrete uncertainty requires them.
 
@@ -73,18 +76,37 @@ Before marking a node `done`:
 - verify its `success_evidence` using the target project's appropriate tests/inspection;
 - write only a short result/evidence reference to `EXECUTION.yaml`.
 
+## User-facing completion handoff
+
+Do not leave the user to inspect planning files to discover what happens after an executor finishes.
+
+After finishing all currently runnable work assigned to this chat and persisting the resulting `EXECUTION.yaml` state:
+
+1. re-read `.planning/EXECUTION.yaml` and the relevant leaf `depends_on` relationships;
+2. if this same chat still has another runnable assigned node, continue with it instead of asking the user to open another chat;
+3. otherwise determine which other pending executor chats now have at least one runnable assigned node;
+4. tell the user the exact runnable chat ID or IDs and the exact next command, for example `אני צ'אט מספר 3` / `I am chat 3`;
+5. if several independent chats are runnable, say that they may be opened in parallel when the target repository workflow permits it; do not imply serial order merely from chat numbering;
+6. if no pending chat is runnable, state the exact dependency/blocker that prevents progress rather than giving a generic "continue later" message;
+7. if all required execution leaves are `done`, do **not** infer `cycle_state: completed`. Tell the user that implementation work is complete and that the next action is to open or return to a planning chat in the same repository and say `בדוק וסגור את מחזור S&T לפי הריפו` (or `Review and close the S&T cycle from the repository`). The planner must run Cycle Closure Review and prove the integrated root outcome before completion.
+
+Never require the user to read `STATUS.yaml`, `EXECUTION.yaml`, or `TREE.yaml` to choose the next chat or decide whether closure is next.
+
 ## Planning defect discovered during execution
 
 If implementation reveals a material planning gap or contradiction:
 
 1. stop the affected node;
 2. mark it `blocked` with a short factual reason in `.planning/EXECUTION.yaml`;
-3. set `.planning/STATUS.yaml -> plan_state: active`;
-4. set `.planning/STATUS.yaml -> implementation_authorized: false`;
-5. stop starting new execution work;
-6. return the smallest affected S&T area to planning.
+3. keep `.planning/STATUS.yaml -> cycle_state: active`;
+4. set `.planning/STATUS.yaml -> plan_state: active`;
+5. set `.planning/STATUS.yaml -> implementation_authorized: false`;
+6. stop starting new execution work;
+7. return the smallest affected S&T area to planning.
 
 Do not redesign the plan inside an executor chat.
+
+Tell the user exactly what happened and what to do next. The user-facing next action is to open or return to a planning chat in the same repository and say `תקן והמשך את מחזור S&T לפי הריפו` (or `Repair and continue the S&T cycle from the repository`). The executor should identify the factual planning defect, but the user should not need to interpret STATUS/EXECUTION state or restate the affected design context.
 
 After correction, re-freeze alone is not enough. The planner must record the corrected reviewed baseline, pass freeze no-drift verification again, freeze that verified baseline, run allocation validation in `--resume` mode, and rerun the required fresh-chat handoff verification before `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
 
@@ -105,18 +127,21 @@ Verify these representative situations:
 1. **first available executor** — can identify its assignment and first runnable node;
 2. **dependency-blocked early executor** — can identify that no node may start yet and exactly which prerequisite state blocks progress;
 3. **mid-plan executor with multiple dependencies** — can resolve all prerequisite states and determine what is runnable;
-4. **final closure executor** — can determine the remaining assigned work and the evidence needed to finish it.
+4. **final closure executor** — can determine the remaining assigned work, the evidence needed to finish it, and the correct user-facing transition to Cycle Closure Review when all required leaves become done;
+5. **planning-defect executor** — can stop safely, revoke further execution through repository state, identify the factual defect, and give the exact user-facing transition back to planning without asking the user to reconstruct context.
 
 Use actual chats/nodes from the allocation when they exist. If a small allocation does not contain a literal example of one situation, simulate that condition against the closest real assignment **without mutating durable execution state**, and record the adaptation.
 
 For every simulation, the fresh executor must be able to determine:
 
+- whether the cycle is active;
 - whether implementation is authorized;
 - which nodes belong to the chat;
 - prerequisite states;
 - the first available node, or that none is available;
 - the exact contract/project context it should load next;
-- the factual reason it cannot proceed when unavailable.
+- the factual reason it cannot proceed when unavailable;
+- after its assigned work finishes, the exact next runnable chat ID(s), Cycle Closure Review, or return-to-planning action.
 
 Record the post-allocation verification result in `.planning/REVIEWS.md`.
 

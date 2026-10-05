@@ -6,18 +6,29 @@ The S&T leaves are already the planned work units.
 
 After Final Planning Review passes:
 
-1. freeze the plan;
-2. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
-3. collect every implementation-ready leaf;
-4. group the leaf node IDs into numbered executor chats;
-5. write the allocation to `.planning/EXECUTION.yaml`;
-6. initialize every assigned node as `pending`;
-7. run `node .planning/validate-allocation.mjs --initial` and fix every failure;
-8. if numbered chats are explicitly serial, rerun/add `--serial-chats`;
-9. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
-10. record the verification result in `.planning/REVIEWS.md`;
-11. fix and rerun any failed case;
-12. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after both gates pass.
+1. keep `.planning/STATUS.yaml -> cycle_state: active`;
+2. freeze the plan;
+3. keep `.planning/STATUS.yaml -> implementation_authorized: false`;
+4. collect every implementation-ready leaf;
+5. group the leaf node IDs into numbered executor chats;
+6. write the allocation to `.planning/EXECUTION.yaml`;
+7. initialize every assigned node as `pending`;
+8. run `node .planning/validate-allocation.mjs --initial` and fix every failure;
+9. if numbered chats are explicitly serial, rerun/add `--serial-chats`;
+10. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
+11. record the verification result in `.planning/REVIEWS.md`;
+12. fix and rerun any failed case;
+13. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after both gates pass.
+
+Execution is allowed only when `.planning/STATUS.yaml` has all three:
+
+```yaml
+cycle_state: active
+plan_state: frozen
+implementation_authorized: true
+```
+
+A `completed` or `abandoned` cycle is terminal and cannot authorize execution.
 
 A frozen plan is a stable baseline, not permission to implement. `.planning/EXECUTOR_HANDOFF.md` is the portable entry contract for every new executor chat.
 
@@ -92,6 +103,7 @@ The `result` field stores only a short result/evidence reference, not a new exec
 
 Git remains the normal implementation/history mechanism for code changes.
 
+Even when every leaf is `done`, the whole planning cycle is not closed automatically. The planner performs Cycle Closure Review, verifies the root outcome and any required durable-contract promotion, then sets `cycle_state: completed` and keeps `implementation_authorized: false`.
 
 ## When execution proves the plan wrong
 
@@ -101,6 +113,7 @@ When one appears:
 
 - stop the affected node;
 - mark it `blocked` with a short factual reason;
+- keep `.planning/STATUS.yaml -> cycle_state: active`;
 - switch `.planning/STATUS.yaml -> plan_state: active`;
 - set `.planning/STATUS.yaml -> implementation_authorized: false`;
 - return to planning.

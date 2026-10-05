@@ -9,8 +9,10 @@ version: 1
 # Then the mandatory repository-only fresh-chat verification in EXECUTOR_HANDOFF.md
 # must pass and be recorded in REVIEWS.md.
 # Executors may start only when .planning/STATUS.yaml has:
+#   cycle_state: active
 #   plan_state: frozen
 #   implementation_authorized: true
+# A completed or abandoned cycle is terminal and can never authorize execution.
 #
 # Each implementation-ready leaf must appear exactly once under one numbered chat.
 # TREE.yaml remains the planning source.
@@ -30,6 +32,7 @@ version: 1
 # depends_on relationships wait for that leaf to become done.
 #
 # If blocked because the frozen plan itself is materially wrong/incomplete:
+# - keep .planning/STATUS.yaml -> cycle_state: active;
 # - set .planning/STATUS.yaml -> plan_state: active;
 # - set .planning/STATUS.yaml -> implementation_authorized: false;
 # - stop starting new execution work;
