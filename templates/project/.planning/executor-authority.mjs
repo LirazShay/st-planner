@@ -91,6 +91,16 @@ function allow(action, code, identity, nextChatId, detail, warnings = [], previo
   };
 }
 
+function allocationUnknown(identity, nextChatId, warnings = []) {
+  return reject(
+    "repository_allocation_unknown",
+    identity,
+    nextChatId,
+    "Authoritative EXECUTION allocation was not provided. Read EXECUTION.yaml before executor mutation; target current-chat pointers are not a substitute for allocation.",
+    warnings,
+  );
+}
+
 /**
  * Framework-level executor authority gate.
  *
@@ -109,11 +119,12 @@ export function evaluateExecutorAuthority({
   handoffEmitted = false,
   userMessage = "",
   repoExecutionAuthorized = true,
-  repoAllocatedChatIds = [],
+  repoAllocatedChatIds = null,
   repoCurrentChatId = null,
 } = {}) {
   const identity = normalizeChatId(conversationIdentity);
   const startupId = parseExplicitExecutorStartup(userMessage);
+  const allocationKnown = Array.isArray(repoAllocatedChatIds);
   const allocated = allocatedSet(repoAllocatedChatIds);
   const currentChatId = normalizeChatId(repoCurrentChatId);
   const nextChatId = currentChatId ?? (allocated.size === 1 ? [...allocated][0] : null);
@@ -137,13 +148,16 @@ export function evaluateExecutorAuthority({
       );
     }
 
-    if (allocated.size > 0 && !allocated.has(startupId)) {
+    const warnings = pointerWarning(currentChatId, startupId);
+    if (!allocationKnown) return allocationUnknown(identity, nextChatId, warnings);
+
+    if (!allocated.has(startupId)) {
       return reject(
         "startup_chat_not_allocated",
         identity,
         nextChatId,
         `Explicit startup requested Chat ${startupId}, which is not allocated in current repository execution state.`,
-        pointerWarning(currentChatId, startupId),
+        warnings,
       );
     }
 
@@ -153,29 +167,33 @@ export function evaluateExecutorAuthority({
       startupId,
       nextChatId,
       `Explicit startup intentionally re-bootstrapped Chat ${startupId} after the prior handoff. Repository allocation remains authoritative; the project pointer is advisory.`,
-      pointerWarning(currentChatId, startupId),
+      warnings,
       identity,
     );
   }
 
   if (identity) {
+    const warnings = pointerWarning(currentChatId, identity);
+
     if (startupId && startupId !== identity) {
       return reject(
         "conversation_switch_requires_handoff",
         identity,
         nextChatId,
         `This active conversation is executing Chat ${identity}. Finish/handoff that executor before explicitly switching to Chat ${startupId}.`,
-        pointerWarning(currentChatId, identity),
+        warnings,
       );
     }
 
-    if (allocated.size > 0 && !allocated.has(identity)) {
+    if (!allocationKnown) return allocationUnknown(identity, nextChatId, warnings);
+
+    if (!allocated.has(identity)) {
       return reject(
         "conversation_identity_not_allocated",
         identity,
         nextChatId,
         `Chat ${identity} is not allocated in current repository execution state.`,
-        pointerWarning(currentChatId, identity),
+        warnings,
       );
     }
 
@@ -185,7 +203,7 @@ export function evaluateExecutorAuthority({
       identity,
       nextChatId,
       `Conversation remains Chat ${identity}; repository allocation confirms execution authority.`,
-      pointerWarning(currentChatId, identity),
+      warnings,
     );
   }
 
@@ -198,13 +216,16 @@ export function evaluateExecutorAuthority({
     );
   }
 
-  if (allocated.size > 0 && !allocated.has(startupId)) {
+  const warnings = pointerWarning(currentChatId, startupId);
+  if (!allocationKnown) return allocationUnknown(null, nextChatId, warnings);
+
+  if (!allocated.has(startupId)) {
     return reject(
       "startup_chat_not_allocated",
       null,
       nextChatId,
       `Explicit startup requested Chat ${startupId}, which is not allocated in current repository execution state.`,
-      pointerWarning(currentChatId, startupId),
+      warnings,
     );
   }
 
@@ -214,7 +235,7 @@ export function evaluateExecutorAuthority({
     startupId,
     nextChatId,
     `Explicit startup activated Chat ${startupId} after repository authorization/allocation confirmation.`,
-    pointerWarning(currentChatId, startupId),
+    warnings,
   );
 }
 
@@ -226,6 +247,7 @@ function usage() {
     "Allocation/dependencies authorize work; target current_chat/current_node pointers are advisory projections.",
     "A generic continue never rolls an old conversation into the next executor implicitly.",
     "After handoff, an explicit startup may intentionally re-bootstrap an allocated executor in the same conversation.",
+    "Authoritative EXECUTION allocation must be known before any executor mutation.",
     "",
     "Usage:",
     "  node .planning/executor-authority.mjs --help",
