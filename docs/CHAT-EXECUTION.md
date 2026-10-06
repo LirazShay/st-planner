@@ -1,12 +1,16 @@
 # Numbered Executor Chats
 
-After the complete S&T plan is frozen, implementation-ready leaves are allocated directly to numbered chats in `.planning/EXECUTION.yaml`. Allocation still does not authorize execution.
+After the complete S&T plan is frozen, implementation-ready leaves are allocated directly to numbered chats in `.planning/EXECUTION.yaml`. Allocation still does not authorize execution and does not activate a conversation identity.
 
 No separate task layer is required.
 
 ## Starting a chat
 
-The user can write only:
+The preferred explicit startup is:
+
+> אני צאט 1 תתחיל
+
+Established explicit forms such as:
 
 > I am chat 1.
 
@@ -14,21 +18,45 @@ or:
 
 > אני צ'אט מספר 1
 
-The executor then:
+also identify the executor intentionally.
+
+A generic continuation such as `תמשיך לשלב הבא` / `continue` is never executor startup.
+
+Before any implementation mutation, the executor must apply two independent gates in this order:
+
+1. **Conversation identity gate** — this conversation must have explicitly activated Chat N and must not already be execution-closed after a new-chat handoff.
+2. **Repository authority gate** — repository state must still authorize execution and confirm Chat N's allocation/dependencies.
+
+Repository state may confirm Chat N, but it may never create or change the conversation's identity. A target-owned `current_chat`, a newly runnable chat, or a `NEXT_CHAT_PROMPT` does not implicitly turn the existing conversation into that chat.
+
+Once a conversation has activated Chat N, its executor identity is immutable. If repository state later points to another chat, do not adopt that ID. If the conversation has emitted `[[SEQUENCE_RUNNER_NEW_CHAT]] ... [[/SEQUENCE_RUNNER_NEW_CHAT]]`, it is terminal for execution of later allocated chats.
+
+Therefore, if Chat 16 has handed off to Chat 17 and the user writes `תמשיך לשלב הבא` in the old conversation, the correct response is a short redirect such as:
+
+```text
+העבודה בצ'אט הזה הסתיימה והועברה ל-Chat 17.
+פתח צ'אט חדש ושלח:
+אני צאט 17 תתחיל
+```
+
+No Chat 17 bootstrap, node start, branch creation, code change, or execution/status mutation may occur in the old conversation.
+
+For a valid fresh startup, the executor then:
 
 1. reads repository `AGENTS.md` and its routing/source-of-truth rules;
 2. reads `.planning/EXECUTOR_HANDOFF.md`;
-3. confirms `.planning/STATUS.yaml -> cycle_state: active`;
-4. confirms `.planning/STATUS.yaml -> plan_state: frozen`;
-5. confirms `.planning/STATUS.yaml -> implementation_authorized: true`;
-6. reads `.planning/EXECUTION.yaml`;
-7. finds chat N;
-8. reads only the assigned S&T nodes from `TREE.yaml`;
-9. checks each node's `depends_on` prerequisites;
-10. finds those prerequisite node states in `EXECUTION.yaml`;
-11. follows EXECUTOR_HANDOFF context routing to load only materially required decisions/specs/code/tests;
-12. executes only assigned nodes whose prerequisites are `done`;
-13. updates execution state as work proceeds.
+3. confirms the conversation identity from the explicit startup and that the conversation is not execution-closed;
+4. confirms `.planning/STATUS.yaml -> cycle_state: active`;
+5. confirms `.planning/STATUS.yaml -> plan_state: frozen`;
+6. confirms `.planning/STATUS.yaml -> implementation_authorized: true`;
+7. reads `.planning/EXECUTION.yaml`;
+8. finds the same Chat N that was explicitly activated;
+9. reads only the assigned S&T nodes from `TREE.yaml`;
+10. checks each node's `depends_on` prerequisites;
+11. finds those prerequisite node states in `EXECUTION.yaml`;
+12. follows EXECUTOR_HANDOFF context routing to load only materially required decisions/specs/code/tests;
+13. executes only assigned nodes whose prerequisites are `done`;
+14. updates execution state as work proceeds.
 
 A `completed` or `abandoned` cycle is terminal. Do not execute old assignments from it even if its plan remains frozen in Git history.
 
@@ -88,6 +116,8 @@ If a single leaf is too large for one chat, the planning granularity is wrong; r
 A chat is effectively complete when all nodes assigned to it are `done`.
 
 The file does not need a duplicated chat-level status.
+
+If another executor chat must continue the work, emit the new-chat handoff and treat the current conversation as execution-closed immediately. Repository advancement to the next chat never reopens or re-identifies the old conversation.
 
 Completion of every chat/node does **not** by itself change `.planning/STATUS.yaml -> cycle_state`. The planning side closes the whole cycle only after Cycle Closure Review verifies the root outcome and durable-contract handoff.
 
