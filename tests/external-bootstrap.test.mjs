@@ -51,6 +51,7 @@ test("planning bundle can be copied into a fresh target and helper CLIs start", 
 
   for (const helper of [
     "executor-authority.mjs",
+    "execution-guidance.mjs",
     "validate-allocation.mjs",
     "verify-freeze-baseline.mjs",
   ]) {
