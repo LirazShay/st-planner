@@ -20,9 +20,11 @@ The planner should keep the user-facing transition equally simple. Once the plan
 - that planning is ready for execution;
 - how many executor chats were allocated;
 - which executor chat(s) are runnable now based on `depends_on` and current EXECUTION states;
-- the exact next action: open a new chat in the same target repository and say `אני צ'אט מספר N` (or `I am chat N`) for one of those runnable chat IDs.
+- the exact next action: open a **new chat** in the same target repository and say `אני צאט N תתחיל` (established explicit forms such as `אני צ'אט מספר N` / `I am chat N` remain valid) for one of those runnable chat IDs.
 
 Do not hard-code Chat 1 unless Chat 1 is actually runnable. If several chats can start in parallel, tell the user which ones can be opened independently. Do not make the user inspect `STATUS.yaml` or `EXECUTION.yaml` to discover whether planning is ready, which chat can start, or what to do next.
+
+Chat allocation is not chat activation. Repository pointers identify which executor is allowed/next; only an explicit startup in that conversation activates the executor identity. Once activated, a conversation's executor identity is immutable. After a `SEQUENCE_RUNNER_NEW_CHAT` handoff, the old conversation is execution-closed for later allocated chats even if the repo advances and the user writes `תמשיך לשלב הבא` there.
 
 After Cycle Closure Review reaches `completed`, tell the user explicitly that this scope is closed and that a later scope can be requested with the normal short S&T Planner command. If the cycle becomes `abandoned`, say that it was closed without claiming the planned outcome succeeded.
 
@@ -44,11 +46,12 @@ Before replacing current-cycle state, inspect `STATUS.yaml -> cycle_state`:
 
 1. project `AGENTS.md` and its routing/source-of-truth rules
 2. `EXECUTOR_HANDOFF.md`
-3. `.planning/STATUS.yaml` — require `cycle_state: active`, `plan_state: frozen`, and `implementation_authorized: true`
-4. `EXECUTION.yaml`
-5. only assigned `TREE.yaml` nodes
-6. dependency states from EXECUTION
-7. only referenced/materially required decisions, ancestor reasoning, and target-project context
+3. apply the conversation identity / execution-closed gate before using repository pointers as authority
+4. `.planning/STATUS.yaml` — require `cycle_state: active`, `plan_state: frozen`, and `implementation_authorized: true`
+5. `EXECUTION.yaml`
+6. only assigned `TREE.yaml` nodes for the same explicitly activated Chat N
+7. dependency states from EXECUTION
+8. only referenced/materially required decisions, ancestor reasoning, and target-project context
 
 ## Ownership
 
@@ -57,6 +60,7 @@ Before replacing current-cycle state, inspect `STATUS.yaml -> cycle_state`:
 - `README.md` — this installed state/read-order map.
 - `FRAMEWORK.md` — portable S&T planning/execution/cycle contract.
 - `EXECUTOR_HANDOFF.md` — stable fresh-executor bootstrap/read-order and handoff-verification contract; never task content.
+- `executor-authority.mjs` — executable reference contract for conversation identity vs repository allocation; framework tooling, not project state.
 - `validate-allocation.mjs` — portable mechanical validator for TREE/EXECUTION allocation invariants; framework tooling, not project state.
 - `verify-freeze-baseline.mjs` — portable freeze no-drift verifier for the reviewed material baseline; framework tooling, not project state.
 - project `AGENTS.md` S&T rules — installed behavior contract.
@@ -69,6 +73,8 @@ Before replacing current-cycle state, inspect `STATUS.yaml -> cycle_state`:
 - `REVIEWS.md` — planning/replanning/handoff/closure review history for the current cycle.
 - `.planning/STATUS.yaml` — cycle lifecycle, active/frozen planning state, resume pointer, and explicit implementation-authorization gate.
 - `EXECUTION.yaml` — after freeze: numbered chat allocation + execution state/result for leaf node IDs.
+
+Conversation executor identity is intentionally **not** stored in repository state. It is local to the conversation and is established only by explicit startup there.
 
 ## Cycle lifecycle
 
@@ -122,12 +128,14 @@ Do not create `.planning/archive/`, plan-version registries, or parallel active 
 - The whole intended plan must pass Final Planning Review before `plan_state: frozen`.
 - `plan_state: frozen` does **not** authorize implementation.
 - Keep `implementation_authorized: false` while post-freeze allocation/handoff checks are being completed.
-- Execution requires the exact combination `cycle_state: active`, `plan_state: frozen`, `implementation_authorized: true`.
+- Execution requires the exact combination `cycle_state: active`, `plan_state: frozen`, `implementation_authorized: true` plus a valid conversation-local executor identity.
+- Allocation/current-chat pointers never activate or mutate conversation identity.
+- After a new-chat handoff the old conversation cannot execute later allocated chats.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
 - Before first authorization run `node .planning/validate-allocation.mjs --initial`. Any failure blocks authorization.
 - Use `--serial-chats` only when the target explicitly treats numbered chats as a serial execution order.
 - After replanning with preserved execution state, validate with `--resume`.
 - After all required work is done, run Cycle Closure Review before marking the cycle completed.
-- A target repository's root `STATUS.yaml`, phase, release state, or workstream status is target-owned and is never an alias for `.planning/STATUS.yaml`.
+- A target repository's root `STATUS.yaml`, phase, release state, `current_chat`, or workstream status is target-owned and is never an alias for `.planning/STATUS.yaml` or conversation identity.
 - Do not duplicate Strategy/Tactic/task descriptions in EXECUTION.
 - Execution dependencies remain in TREE -> depends_on.
