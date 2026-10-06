@@ -1,7 +1,8 @@
 version: 1
 
 # Generated only after the complete S&T plan is frozen.
-# A populated allocation does NOT authorize execution by itself.
+# A populated allocation does NOT authorize execution by itself and does NOT
+# activate a numbered executor identity in any conversation.
 # Before first authorization:
 #   node .planning/validate-allocation.mjs --initial
 # must pass. Use --resume after execution/replanning. Add --serial-chats only when
@@ -13,6 +14,13 @@ version: 1
 #   plan_state: frozen
 #   implementation_authorized: true
 # A completed or abandoned cycle is terminal and can never authorize execution.
+#
+# Conversation identity is separate from this repository allocation:
+# - Chat N becomes active only after an explicit startup in that conversation;
+# - repo/current_chat/runnable pointers may confirm but never create/change identity;
+# - after a conversation emits SEQUENCE_RUNNER_NEW_CHAT it is execution-closed for
+#   later allocated chats, even if the repo advances and the user says continue;
+# - apply EXECUTOR_HANDOFF.md / executor-authority.mjs before any execution mutation.
 #
 # Each implementation-ready leaf must appear exactly once under one numbered chat.
 # TREE.yaml remains the planning source.
@@ -65,7 +73,7 @@ chats: {}
 #         state: pending
 #         result: null
 #
-# A chat says "I am chat 1" / "אני צ'אט מספר 1".
+# A fresh conversation explicitly says "I am chat 1" / "אני צאט 1 תתחיל".
 # It follows EXECUTOR_HANDOFF.md, then reads only its assigned nodes plus required context.
 # Before executing a node, it checks TREE.yaml -> depends_on and confirms every
 # prerequisite node is state: done somewhere in this file.
