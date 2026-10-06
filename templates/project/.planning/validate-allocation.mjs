@@ -26,6 +26,20 @@ function parseIdLine(line, indent) {
   return match ? match[1] : null;
 }
 
+function parseInlineList(rest, index, field) {
+  const trimmed = rest.trim();
+  if (!trimmed) return null;
+  if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+    throw new Error(
+      `TREE.yaml unsupported inline value for ${field} at line ${index + 1}; use YAML list items or [..]`,
+    );
+  }
+
+  const inner = trimmed.slice(1, -1).trim();
+  if (!inner) return [];
+  return inner.split(",").map((value) => cleanScalar(value));
+}
+
 export function parseTreeYaml(text) {
   const lines = text.split(/\r?\n/);
   const nodes = new Map();
@@ -75,15 +89,13 @@ export function parseTreeYaml(text) {
     const listMatch = raw.match(/^    (children|depends_on):\s*(.*)$/);
     if (listMatch) {
       const [, field, rest] = listMatch;
-      listField = field;
-      if (rest.trim() === "[]") {
-        if (field === "children") current.children = [];
-        else current.dependsOn = [];
+      const inline = parseInlineList(rest, index, field);
+      if (inline !== null) {
+        if (field === "children") current.children = inline;
+        else current.dependsOn = inline;
         listField = null;
-      } else if (rest.trim()) {
-        throw new Error(
-          `TREE.yaml unsupported inline value for ${field} at line ${index + 1}; use [] or YAML list items`,
-        );
+      } else {
+        listField = field;
       }
       continue;
     }
@@ -154,6 +166,27 @@ export function parseExecutionYaml(text) {
     }
 
     if (!inChatNodes) continue;
+
+    const inlineNode = raw.match(
+      /^      ["']([^"']+)["']:\s*\{\s*state:\s*([^,}]+),\s*result:\s*(.+)\s*\}\s*$/,
+    );
+    if (inlineNode) {
+      const [, nodeId, stateValue, resultValue] = inlineNode;
+      if (currentChat.nodes.has(nodeId)) {
+        throw new Error(
+          `EXECUTION.yaml duplicate node key "${nodeId}" inside chat "${currentChat.id}" at line ${index + 1}`,
+        );
+      }
+      const node = {
+        id: nodeId,
+        state: cleanScalar(stateValue),
+        result: cleanScalar(resultValue),
+      };
+      currentChat.nodes.set(nodeId, node);
+      currentChat.order.push(nodeId);
+      currentNode = null;
+      continue;
+    }
 
     const nodeId = parseIdLine(raw, 6);
     if (nodeId !== null) {
