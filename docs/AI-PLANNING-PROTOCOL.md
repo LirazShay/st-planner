@@ -4,6 +4,32 @@ Planning depth is adaptive; there is no QUICK/DEEP mode. Use the same S&T rules 
 
 A planning scope may be a whole project/initiative or a meaningful change inside an existing system, including a release, feature, migration, refactor, architectural change, or other substantial change. The user does not need to classify the scope.
 
+## 0. Organize deep reasoning before spending it
+
+S&T depth is not an optimization target. Every material decision still requires the full reasoning justified by its importance, and the whole plan must still pass necessity, sufficiency, implementation-readiness, outside-in coverage, KISS, and Final Planning Review.
+
+The optimization target is duplicated reasoning and planning ceremony.
+
+Before deep decomposition, make a short **structural map** of the current scope:
+- outcome and planning boundary;
+- material questions/decisions that must be resolved;
+- dependency/order between those questions;
+- material repository evidence still needed;
+- likely major tree areas.
+
+The map is orientation, not approval. It must not select tactics prematurely, skip a material decision, weaken necessity/sufficiency, or replace S&T justification.
+
+Then work in **coherent planning slices**. A slice groups related questions/nodes that should be reasoned about together. Within the slice:
+1. gather only evidence that can change the reasoning;
+2. perform the full S&T reasoning for every material choice;
+3. persist the resulting rationale in GOAL/TREE/DECISIONS as appropriate;
+4. use mechanical validation for deterministic checks when practical;
+5. review the coherent slice rather than restarting a full review cycle after every small edit.
+
+Once a material decision is justified and durably recorded, treat it as closed inside the current planning effort unless new evidence, a contradiction, a changed assumption, or a concrete review finding could materially change it. Do not reopen it merely for reassurance.
+
+Existing project patterns, previous implementations, or reusable mechanisms are evidence and candidate alternatives only. They never justify a current material tactic by themselves.
+
 ## 1. Determine the planning boundary before accepting a solution
 
 Start by identifying what outcome must be true when the requested scope succeeds.
@@ -132,9 +158,9 @@ Do not decompose into trivial implementation steps, exact clicks, or routine fil
 
 If a single leaf is too large for a practical executor chat, planning stopped too early even if no new design decision remains; decompose it into coherent necessary outcomes.
 
-## 7. Review repeatedly while authoring
+## 7. Review deeply, but at coherent boundaries
 
-While building, review:
+While building, keep local quality control active:
 - Strategy is an outcome, not a disguised tool/feature;
 - Tactic → Strategy validity;
 - materially plausible alternatives for material tactics;
@@ -146,7 +172,20 @@ While building, review:
 - tree consistency;
 - implementation readiness.
 
-Correct defects immediately.
+Correct an obvious defect when you find it. But do not interpret this as a requirement to rerun every review dimension after every node or edit.
+
+Prefer:
+
+```text
+deep reasoning for a coherent slice
+→ persist rationale
+→ deterministic checks where available
+→ multidimensional slice/subtree review
+→ repair concrete findings
+→ targeted recheck of affected logic
+```
+
+A full review loop should repeat only when a concrete finding or material change justifies it. The same S&T proof depth remains mandatory; repeated review without new information does not increase confidence proportionally.
 
 The same challenge applies recursively at business, product, feature, architecture, component, and technical levels. Do not allow a well-reasoned business top half to degrade into an unchallenged technical checklist below.
 
