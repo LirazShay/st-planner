@@ -111,7 +111,7 @@ test("independent executor chats may be runnable at the same time", () => {
   assert.equal(result.runnableNodes.length, 2);
 });
 
-test("invalid authoritative execution remains a hard blocker", () => {
+test("invalid authoritative allocation remains a hard blocker", () => {
   const invalid = `version: 1
 
 chats:
@@ -135,6 +135,29 @@ chats:
   assert.equal(result.ok, false);
   assert.equal(result.severity, "blocker");
   assert.equal(result.code, "authoritative_execution_invalid");
+});
+
+test("in-progress node with unfinished authoritative dependency remains a hard blocker", () => {
+  const result = assessExecutionProjection(
+    tree(),
+    execution("pending", null, "in_progress", null),
+    { chatId: "18", nodeId: "8.2" },
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.severity, "blocker");
+  assert.equal(result.code, "authoritative_execution_invalid");
+  assert(result.derived.blockers.some((x) => x.includes('in_progress node "8.2"')));
+});
+
+test("done node with unfinished authoritative dependency remains a hard blocker", () => {
+  const result = deriveExecutionAvailability(
+    tree(),
+    execution("pending", null, "done", "invalid early completion"),
+  );
+
+  assert.equal(result.safe, false);
+  assert(result.blockers.some((x) => x.includes('done node "8.2"')));
 });
 
 test("all done execution derives implementation completion with no runnable executor", () => {
