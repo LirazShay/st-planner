@@ -148,6 +148,31 @@ test("unallocated chat remains a hard blocker", () => {
   assert.equal(result.mayMutateExecutionState, false);
 });
 
+test("known empty allocation remains a hard blocker even when a target pointer names the chat", () => {
+  const result = evaluateExecutorAuthority({
+    userMessage: "אני צאט 17 תתחיל",
+    repoExecutionAuthorized: true,
+    repoAllocatedChatIds: [],
+    repoCurrentChatId: "17",
+  });
+
+  assert.equal(result.allowed, false);
+  assert.equal(result.code, "startup_chat_not_allocated");
+  assert.equal(result.mayMutateExecutionState, false);
+});
+
+test("unknown allocation cannot be replaced by a target current-chat pointer", () => {
+  const result = evaluateExecutorAuthority({
+    userMessage: "אני צאט 17 תתחיל",
+    repoExecutionAuthorized: true,
+    repoCurrentChatId: "17",
+  });
+
+  assert.equal(result.allowed, false);
+  assert.equal(result.code, "repository_allocation_unknown");
+  assert.equal(result.mayMutateExecutionState, false);
+});
+
 test("repository authorization remains a hard gate", () => {
   const result = evaluateExecutorAuthority({
     userMessage: "אני צאט 17 תתחיל",
