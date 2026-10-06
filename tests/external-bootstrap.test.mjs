@@ -49,7 +49,11 @@ test("planning bundle can be copied into a fresh target and helper CLIs start", 
     planningBundleFiles(),
   );
 
-  for (const helper of ["validate-allocation.mjs", "verify-freeze-baseline.mjs"]) {
+  for (const helper of [
+    "executor-authority.mjs",
+    "validate-allocation.mjs",
+    "verify-freeze-baseline.mjs",
+  ]) {
     const result = spawnSync(
       process.execPath,
       [path.join(targetPlanning, helper), "--help"],
