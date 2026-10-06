@@ -6,7 +6,7 @@ This repository builds a reusable S&T planning framework for GPT.
 
 If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, record the reviewed baseline and verify no material drift before freeze, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only fresh-chat verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after all gates pass.
+The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, record the reviewed baseline and verify no material drift before freeze, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only execution/handoff verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after all hard gates pass.
 
 Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
 
@@ -46,14 +46,17 @@ Stop when leaves are detailed enough that execution does not require another mat
 ## Information ownership
 
 - `GOAL.md` — desired outcome, established current reality, constraints, non-goals.
-- `TREE.yaml` — S&T logic and node planning status.
+- `TREE.yaml` — S&T logic and node planning status; `depends_on` owns execution prerequisites.
 - `DECISIONS.md` — material unresolved questions and decisions.
 - `REVIEWS.md` — review history.
-- `.planning/STATUS.yaml` — S&T Planner-owned planning pointer plus plan freeze and implementation-authorization state.
+- `.planning/STATUS.yaml` — S&T Planner-owned cycle/planning/implementation-authorization state.
+- `.planning/EXECUTION.yaml` — authoritative executor allocation + node execution state after freeze.
 
-S&T Planner owns **only** `.planning/STATUS.yaml`. A target repository may have its own root/operational `STATUS.yaml`, phase file, release state, `current_chat`, or workstream status; that remains target-owned. Do not read S&T lifecycle meaning from it or mutate it unless the target repository's own contract explicitly requires an integration update.
+S&T Planner owns **only** `.planning/STATUS.yaml` for lifecycle/planning authorization. A target repository may have its own root/operational `STATUS.yaml`, phase file, release state, `current_chat`, `current_node`, or workstream status; that remains target-owned.
 
-Do not duplicate the same state in multiple files.
+Target-owned execution pointers are projections/navigation aids, not peer S&T execution authorities. Runnable executor work is derived from `TREE.yaml -> depends_on` plus `.planning/EXECUTION.yaml`. A projection mismatch should be diagnosed/repaired when useful, but it must not by itself stop otherwise-safe implementation or redefine conversation identity.
+
+Do not duplicate authoritative execution state in multiple framework-owned files.
 
 ## Planning conversation
 
@@ -79,61 +82,65 @@ Planning is complete only when the **whole intended plan**:
 - passes KISS and structural review;
 - passes a Final Planning Review.
 
-Then record the reviewed baseline in `.planning/REVIEWS.md`, verify no material drift with `.planning/verify-freeze-baseline.mjs` (or equivalent reproducible evidence), freeze only that verified baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory fresh-chat handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
+Then record the reviewed baseline in `.planning/REVIEWS.md`, verify no material drift with `.planning/verify-freeze-baseline.mjs` (or equivalent reproducible evidence), freeze only that verified baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory execution/handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
 
 ## Execution handoff
 
 After freeze:
 
-- keep `.planning/STATUS.yaml -> implementation_authorized: false` until handoff verification passes;
+- keep `.planning/STATUS.yaml -> implementation_authorized: false` until hard handoff verification gates pass;
 - create/populate `.planning/EXECUTION.yaml`;
 - assign every implementation-ready leaf to exactly one numbered chat;
 - do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
 - keep execution prerequisites only in `TREE.yaml -> depends_on`;
 - use execution states only in EXECUTION: `pending / in_progress / done / blocked`;
-- after allocation is complete, run `node .planning/validate-allocation.mjs --initial`; any failure keeps implementation unauthorized;
+- after allocation is complete, run `node .planning/validate-allocation.mjs --initial`; any authoritative allocation failure keeps implementation unauthorized;
 - if the target explicitly uses serial numbered chats, add `--serial-chats`;
-- after mechanical allocation validation passes, run the representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`, including old-conversation rollover and fresh-conversation activation;
+- derive runnable executor work from TREE + EXECUTION (`execution-guidance.mjs` is the executable reference); target-owned current pointers are advisory projections;
+- run the representative repository-only execution/handoff simulations defined in `.planning/EXECUTOR_HANDOFF.md`, including projection drift, accidental old-conversation rollover, explicit post-handoff re-bootstrap, and fresh-conversation activation;
 - record the result in `.planning/REVIEWS.md`;
-- fix and rerun any failed simulation before authorization.
+- warnings such as projection drift should be repaired when useful but do not keep implementation blocked; only failed authoritative allocation/authorization/dependency/context checks do.
 
-### Executor conversation identity is separate from repository allocation
+### Executor identity is separate from repository projections
 
 Chat allocation is not chat activation.
 
-A numbered executor becomes active in a conversation only after an explicit executor startup message in that conversation, for example `אני צאט 17 תתחיל` (established forms such as `אני צ'אט מספר 17` / `I am chat 17` remain valid explicit startup forms).
+A numbered executor context starts only after an explicit executor startup message, for example `אני צאט 17 תתחיל` (established forms such as `אני צ'אט מספר 17` / `I am chat 17` remain valid explicit startup forms).
 
-The conversation-local executor identity is immutable after activation. A repository allocation, a target-owned `current_chat` pointer, a newly runnable chat, `NEXT_CHAT_PROMPT`, `תמשיך לשלב הבא`, or `continue` may never create, advance, or replace that identity.
+A repository allocation, target-owned `current_chat`, newly runnable chat, `NEXT_CHAT_PROMPT`, `תמשיך לשלב הבא`, or `continue` may never **implicitly** create, advance, or replace executor identity.
 
-If a conversation has emitted `[[SEQUENCE_RUNNER_NEW_CHAT]] ... [[/SEQUENCE_RUNNER_NEW_CHAT]]`, that conversation is execution-closed for later allocated chats. It must not bootstrap or execute the next chat even if repository state now points to it. It may only explain that a new conversation is required and repeat the explicit startup command.
+While an executor is actively working before a handoff boundary, do not switch the conversation to another Chat N. Finish/handoff the active executor first.
 
-Before any executor-side branch/code/status/EXECUTION mutation, apply this order:
+A new-chat handoff recommends a fresh conversation for clean context but does not permanently lock the old conversation. After handoff:
 
-1. determine the conversation-local executor identity from explicit startup in this conversation;
-2. reject if no identity exists, if an attempted startup would change an existing identity, or if this conversation already emitted a new-chat handoff;
-3. only then read repository lifecycle/authorization/allocation/current pointers to confirm the **same** identity;
-4. only then evaluate dependencies and start work.
+- generic `continue` must not silently bootstrap the next chat;
+- if the user explicitly sends `אני צאט N תתחיל`, the same conversation may intentionally re-bootstrap that allocated Chat N after fresh repository authorization/allocation/dependency checks pass.
 
-Repository state can confirm identity; it never manufactures identity.
+This prevents accidental rollover without forcing a new chat when the user prefers continuity.
 
-When the user explicitly starts Chat N in a fresh conversation, the agent must:
+Before executor-side branch/code/status/EXECUTION mutation:
 
-- read `.planning/EXECUTOR_HANDOFF.md`;
-- confirm the conversation identity is N and the conversation is not execution-closed;
-- confirm `.planning/STATUS.yaml -> cycle_state: active`;
-- confirm `.planning/STATUS.yaml -> plan_state: frozen`;
-- confirm `.planning/STATUS.yaml -> implementation_authorized: true`;
-- read `EXECUTION.yaml`;
-- find that same chat N;
-- read only its assigned S&T nodes plus necessary decisions/context;
-- for each node, check `TREE.yaml -> depends_on` and confirm prerequisite nodes are `done` in EXECUTION;
-- execute only assigned unblocked nodes;
-- set a node `in_progress` before working on it;
-- set it `done` only after its `success_evidence` is verified;
-- record a short result/reference;
-- set `blocked` with a short reason if a real planning/execution blocker prevents progress.
+1. determine the explicit executor identity for this active/bootstrap context;
+2. confirm `.planning/STATUS.yaml` still authorizes implementation;
+3. confirm that same Chat N is allocated in `.planning/EXECUTION.yaml`;
+4. check its TREE dependencies against EXECUTION states;
+5. ignore target-owned current-pointer drift as an authority decision; warn/repair it separately;
+6. only then mutate target code or authoritative execution state.
 
-If an old conversation's identity no longer matches a target-owned current-chat pointer, or if it already emitted handoff, do not execute the newly pointed chat. Respond with a short new-chat instruction instead.
+`.planning/executor-authority.mjs` is the executable reference for activation/re-bootstrap semantics. `.planning/execution-guidance.mjs` is the executable reference for canonical runnable-work derivation and advisory target-pointer comparison.
+
+### Completion transitions
+
+Node completion must first make authoritative EXECUTION truthful:
+
+- re-read current authoritative state before writing;
+- confirm this chat still owns the node and its prerequisites remain valid;
+- verify `success_evidence`;
+- write `done` + short result to `.planning/EXECUTION.yaml`;
+- re-derive runnable work from TREE + EXECUTION;
+- only then update optional target-owned status/current projections as secondary summaries when the target project requires them.
+
+Do not make correctness depend on manually advancing several peer `current` representations in a particular file-by-file order. If a target projection temporarily lags, diagnose/repair it without stopping unrelated safe development.
 
 If execution exposes a material planning defect:
 - do not improvise;
@@ -145,8 +152,8 @@ If execution exposes a material planning defect:
 - preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
 - after focused re-review, repair only affected EXECUTION assignments/states and set `.planning/STATUS.yaml -> plan_state: frozen` again;
 - run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode is used);
-- rerun and record the mandatory fresh-chat verification;
-- do not resume execution until that gate passes and `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
+- rerun and record the mandatory execution/handoff verification;
+- do not resume execution until hard gates pass and `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
 
 Do not create plan-version machinery; Git history and REVIEWS are enough.
 
