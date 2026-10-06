@@ -54,25 +54,26 @@ When invoked from another repository:
    - `templates/project/.planning/STATUS.yaml`
    - `templates/project/.planning/EXECUTION.yaml`
    - `templates/project/.planning/EXECUTOR_HANDOFF.md`
+   - `templates/project/.planning/executor-authority.mjs`
    - `templates/project/.planning/validate-allocation.mjs`
    - `templates/project/.planning/verify-freeze-baseline.mjs`
    - `templates/project/AGENTS.snippet.md`
 4. Inspect the target before writing:
    - if `.planning/` is absent, this is a fresh install;
    - if `.planning/FRAMEWORK.md` identifies the Portable S&T Planning Kernel and `.planning/STATUS.yaml` exists, treat S&T Planner as already installed and do not overwrite installed framework/project state merely because the command was invoked again;
-   - if `.planning/` exists for another purpose and **none** of the eleven S&T destination filenames conflict, preserve the unrelated files and install the eleven S&T files alongside them;
+   - if `.planning/` exists for another purpose and **none** of the twelve S&T destination filenames conflict, preserve the unrelated files and install the twelve S&T files alongside them;
    - if any S&T destination filename already exists but the directory is not a recognizable complete S&T Planner installation, do not overwrite it. Report the exact conflicting/partial paths and require an explicit repair/upgrade decision.
-5. For a permitted fresh install, copy the **eleven files under `templates/project/.planning/`** into target `.planning/` using the same filenames.
+5. For a permitted fresh install, copy the **twelve files under `templates/project/.planning/`** into target `.planning/` using the same filenames.
 6. Merge `templates/project/AGENTS.snippet.md` into the target repository's root `AGENTS.md` **once**:
    - if `<!-- st-planner:rules:v1 -->` or the existing `# S&T Framework Rules` block is already present, do not append a duplicate;
    - otherwise preserve all existing target instructions and append/merge the snippet;
    - if no `AGENTS.md` exists, create one containing the snippet.
 7. Verify the bootstrap before planning:
-   - all eleven S&T `.planning/` files expected for a fresh install exist;
+   - all twelve S&T `.planning/` files expected for a fresh install exist;
    - the S&T rules block appears exactly once in root `AGENTS.md`;
    - no pre-existing target file was overwritten unless the user explicitly requested repair/upgrade or a valid new-cycle transition applies;
    - for a fresh install, installed framework/tooling files match the single source commit selected in step 3.
-8. Treat `.planning/STATUS.yaml` as the only S&T Planner-owned lifecycle/status file. If the target repository also has `STATUS.yaml`, phase/state files, or workstream status, preserve them unless the target's own instructions explicitly require a coordinated integration update.
+8. Treat `.planning/STATUS.yaml` as the only S&T Planner-owned lifecycle/status file. If the target repository also has `STATUS.yaml`, phase/state files, `current_chat`, or workstream status, preserve them unless the target's own instructions explicitly require a coordinated integration update. Such project-native pointers can constrain/confirm an executor but can never activate or change conversation identity.
 9. If S&T Planner is already installed, inspect `.planning/STATUS.yaml -> cycle_state` before changing current-cycle state:
    - `active`: continue/replan that cycle when the request belongs to the same intended scope. Never erase active cycle files merely because a new request arrived;
    - `completed` or `abandoned`: a later independent planning scope may start a new cycle after the terminal review/snapshot is durably preserved;
@@ -108,7 +109,7 @@ When invoked from another repository:
    - if merge/rebase/integration changes the frozen ref afterward, repeat no-drift verification before handoff;
    - populate EXECUTION with numbered executor-chat assignments based on implementation context/dependencies/workload rather than blindly on feature subtree boundaries;
    - run `node .planning/validate-allocation.mjs --initial` and fix any allocation failure;
-   - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification;
+   - use `.planning/EXECUTOR_HANDOFF.md` to run the mandatory repository-only fresh-chat verification, including the old-conversation rollover and fresh-conversation activation cases;
    - record the verification in REVIEWS;
    - explicitly authorize implementation only after that gate passes;
    - after required execution is done, run Cycle Closure Review before marking the cycle `completed`; integrated root-outcome proof and durable carry-forward of cross-cycle contracts are required.
@@ -122,7 +123,7 @@ An existing active S&T planning state is project data. Never replace `.planning/
 
 A permitted **new-cycle transition** is different: it may intentionally reinitialize only the six current-cycle state files listed in step 10, and only after the prior cycle is `completed` or `abandoned` with terminal evidence durably preserved. It does **not** overwrite installed framework/tooling from upstream and does not reinstall/duplicate AGENTS rules.
 
-`FRAMEWORK.md`, `.planning/README.md`, `EXECUTOR_HANDOFF.md`, `validate-allocation.mjs`, and `verify-freeze-baseline.mjs` are installed framework material/tooling and remain untouched during ordinary reuse or new-cycle reset. Updating them is an explicit framework upgrade operation.
+`FRAMEWORK.md`, `.planning/README.md`, `EXECUTOR_HANDOFF.md`, `executor-authority.mjs`, `validate-allocation.mjs`, and `verify-freeze-baseline.mjs` are installed framework material/tooling and remain untouched during ordinary reuse or new-cycle reset. Updating them is an explicit framework upgrade operation.
 
 ## Normal execution after planning
 
@@ -134,17 +135,17 @@ plan_state: frozen
 implementation_authorized: true
 ```
 
-the planning agent must determine from `EXECUTION.yaml` and TREE `depends_on` which executor chat ID or IDs are runnable now and tell the user exactly which new chat(s) can be opened. The user should not inspect planning files to discover the next chat.
+the planning agent must determine from `EXECUTION.yaml` and TREE `depends_on` which executor chat ID or IDs are runnable now and tell the user exactly which **new chat(s)** can be opened. The user should not inspect planning files to discover the next chat.
 
-For each runnable chat, the command is simply:
+For each runnable chat, the preferred explicit startup command is:
 
-> אני צ'אט מספר N
+> אני צאט N תתחיל
 
-or:
+Established explicit forms such as `אני צ'אט מספר N` / `I am chat N` remain valid. `Chat 1` is only an example when Chat 1 is actually runnable; chat numbering does not imply execution order. If several independent chats are runnable and the target workflow permits parallel work, the planner should say so explicitly.
 
-> I am chat N
+Chat allocation is not chat activation. The repo may say Chat N is allocated/current/runnable, but a conversation becomes Chat N only after explicit startup in that conversation. Once activated, that conversation's executor identity does not change when repo pointers change.
 
-`Chat 1` is only an example when Chat 1 is actually runnable; chat numbering does not imply execution order. If several independent chats are runnable and the target workflow permits parallel work, the planner should say so explicitly.
+If an executor conversation emits `[[SEQUENCE_RUNNER_NEW_CHAT]] ... [[/SEQUENCE_RUNNER_NEW_CHAT]]`, that conversation is execution-closed for later allocated chats. A subsequent `תמשיך לשלב הבא` in the old conversation must not bootstrap the next executor; it must direct the user to open the new conversation and send the explicit startup command.
 
 The installed target-project rules define how each executor resumes its assigned S&T nodes. The executor does not need the user to restate the project/feature/release context; repository state must provide the assigned nodes, relevant ancestor/Decision context, dependencies, and next runnable work.
 
