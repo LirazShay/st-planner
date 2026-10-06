@@ -13,7 +13,7 @@ test("explicit startup parser recognizes supported executor forms", () => {
   assert.equal(parseExplicitExecutorStartup("תמשיך לשלב הבא"), null);
 });
 
-test("old conversation stays terminal after handoff even when repo advances to next chat", () => {
+test("generic continue cannot implicitly roll an old conversation into the next chat after handoff", () => {
   const result = evaluateExecutorAuthority({
     conversationIdentity: "16",
     handoffEmitted: true,
@@ -24,13 +24,13 @@ test("old conversation stays terminal after handoff even when repo advances to n
   });
 
   assert.equal(result.allowed, false);
-  assert.equal(result.code, "execution_closed_after_handoff");
+  assert.equal(result.code, "explicit_startup_required_after_handoff");
   assert.equal(result.executorIdentity, "16");
   assert.equal(result.nextChatId, "17");
   assert.equal(result.mayMutateExecutionState, false);
 });
 
-test("even an explicit next-chat startup cannot reopen the old conversation after handoff", () => {
+test("explicit startup may intentionally rebootstrap the next allocated chat after handoff", () => {
   const result = evaluateExecutorAuthority({
     conversationIdentity: "16",
     handoffEmitted: true,
@@ -40,11 +40,12 @@ test("even an explicit next-chat startup cannot reopen the old conversation afte
     repoCurrentChatId: "17",
   });
 
-  assert.equal(result.allowed, false);
-  assert.equal(result.code, "execution_closed_after_handoff");
-  assert.equal(result.executorIdentity, "16");
-  assert.equal(result.nextChatId, "17");
-  assert.equal(result.mayMutateExecutionState, false);
+  assert.equal(result.allowed, true);
+  assert.equal(result.action, "rebootstrap");
+  assert.equal(result.code, "explicit_rebootstrap_after_handoff");
+  assert.equal(result.previousExecutorIdentity, "16");
+  assert.equal(result.executorIdentity, "17");
+  assert.equal(result.mayMutateExecutionState, true);
 });
 
 test("repo pointer cannot bootstrap next chat from an unidentified conversation", () => {
@@ -63,7 +64,7 @@ test("repo pointer cannot bootstrap next chat from an unidentified conversation"
   assert.equal(result.mayMutateExecutionState, false);
 });
 
-test("repo pointer mismatch cannot mutate an existing conversation identity", () => {
+test("repo pointer mismatch is advisory and cannot mutate an existing conversation identity", () => {
   const result = evaluateExecutorAuthority({
     conversationIdentity: "16",
     handoffEmitted: false,
@@ -73,14 +74,35 @@ test("repo pointer mismatch cannot mutate an existing conversation identity", ()
     repoCurrentChatId: "17",
   });
 
-  assert.equal(result.allowed, false);
-  assert.equal(result.code, "repository_pointer_does_not_match_conversation");
+  assert.equal(result.allowed, true);
+  assert.equal(result.action, "continue");
+  assert.equal(result.code, "existing_identity_confirmed");
   assert.equal(result.executorIdentity, "16");
   assert.equal(result.nextChatId, "17");
-  assert.equal(result.mayMutateExecutionState, false);
+  assert.equal(result.mayMutateExecutionState, true);
+  assert.equal(result.severity, "warning");
+  assert.equal(result.warnings[0].code, "repository_pointer_differs");
 });
 
-test("explicit startup in a new conversation activates the allocated current chat", () => {
+test("fresh explicit startup may proceed when target current pointer is stale but allocation confirms the chat", () => {
+  const result = evaluateExecutorAuthority({
+    conversationIdentity: null,
+    handoffEmitted: false,
+    userMessage: "אני צאט 17 תתחיל",
+    repoExecutionAuthorized: true,
+    repoAllocatedChatIds: ["17", "18"],
+    repoCurrentChatId: "18",
+  });
+
+  assert.equal(result.allowed, true);
+  assert.equal(result.action, "activate");
+  assert.equal(result.code, "explicit_startup_confirmed");
+  assert.equal(result.executorIdentity, "17");
+  assert.equal(result.severity, "warning");
+  assert.equal(result.warnings[0].code, "repository_pointer_differs");
+});
+
+test("explicit startup in a new conversation activates an allocated chat", () => {
   const result = evaluateExecutorAuthority({
     conversationIdentity: null,
     handoffEmitted: false,
@@ -97,7 +119,7 @@ test("explicit startup in a new conversation activates the allocated current cha
   assert.equal(result.mayMutateExecutionState, true);
 });
 
-test("existing conversation identity cannot be replaced by another explicit startup", () => {
+test("active conversation cannot switch executor identity without a handoff boundary", () => {
   const result = evaluateExecutorAuthority({
     conversationIdentity: "16",
     handoffEmitted: false,
@@ -108,12 +130,25 @@ test("existing conversation identity cannot be replaced by another explicit star
   });
 
   assert.equal(result.allowed, false);
-  assert.equal(result.code, "conversation_identity_is_immutable");
+  assert.equal(result.code, "conversation_switch_requires_handoff");
   assert.equal(result.executorIdentity, "16");
   assert.equal(result.mayMutateExecutionState, false);
 });
 
-test("repository authorization still gates an explicit startup", () => {
+test("unallocated chat remains a hard blocker", () => {
+  const result = evaluateExecutorAuthority({
+    userMessage: "אני צאט 17 תתחיל",
+    repoExecutionAuthorized: true,
+    repoAllocatedChatIds: ["18"],
+    repoCurrentChatId: "18",
+  });
+
+  assert.equal(result.allowed, false);
+  assert.equal(result.code, "startup_chat_not_allocated");
+  assert.equal(result.mayMutateExecutionState, false);
+});
+
+test("repository authorization remains a hard gate", () => {
   const result = evaluateExecutorAuthority({
     userMessage: "אני צאט 17 תתחיל",
     repoExecutionAuthorized: false,
