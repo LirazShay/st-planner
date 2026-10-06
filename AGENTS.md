@@ -51,7 +51,7 @@ Stop when leaves are detailed enough that execution does not require another mat
 - `REVIEWS.md` — review history.
 - `.planning/STATUS.yaml` — S&T Planner-owned planning pointer plus plan freeze and implementation-authorization state.
 
-S&T Planner owns **only** `.planning/STATUS.yaml`. A target repository may have its own root/operational `STATUS.yaml`, phase file, release state, or workstream status; that remains target-owned. Do not read S&T lifecycle meaning from it or mutate it unless the target repository's own contract explicitly requires an integration update.
+S&T Planner owns **only** `.planning/STATUS.yaml`. A target repository may have its own root/operational `STATUS.yaml`, phase file, release state, `current_chat`, or workstream status; that remains target-owned. Do not read S&T lifecycle meaning from it or mutate it unless the target repository's own contract explicitly requires an integration update.
 
 Do not duplicate the same state in multiple files.
 
@@ -93,17 +93,38 @@ After freeze:
 - use execution states only in EXECUTION: `pending / in_progress / done / blocked`;
 - after allocation is complete, run `node .planning/validate-allocation.mjs --initial`; any failure keeps implementation unauthorized;
 - if the target explicitly uses serial numbered chats, add `--serial-chats`;
-- after mechanical allocation validation passes, run the four representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`;
+- after mechanical allocation validation passes, run the representative repository-only fresh-chat simulations defined in `.planning/EXECUTOR_HANDOFF.md`, including old-conversation rollover and fresh-conversation activation;
 - record the result in `.planning/REVIEWS.md`;
 - fix and rerun any failed simulation before authorization.
 
-When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
+### Executor conversation identity is separate from repository allocation
+
+Chat allocation is not chat activation.
+
+A numbered executor becomes active in a conversation only after an explicit executor startup message in that conversation, for example `אני צאט 17 תתחיל` (established forms such as `אני צ'אט מספר 17` / `I am chat 17` remain valid explicit startup forms).
+
+The conversation-local executor identity is immutable after activation. A repository allocation, a target-owned `current_chat` pointer, a newly runnable chat, `NEXT_CHAT_PROMPT`, `תמשיך לשלב הבא`, or `continue` may never create, advance, or replace that identity.
+
+If a conversation has emitted `[[SEQUENCE_RUNNER_NEW_CHAT]] ... [[/SEQUENCE_RUNNER_NEW_CHAT]]`, that conversation is execution-closed for later allocated chats. It must not bootstrap or execute the next chat even if repository state now points to it. It may only explain that a new conversation is required and repeat the explicit startup command.
+
+Before any executor-side branch/code/status/EXECUTION mutation, apply this order:
+
+1. determine the conversation-local executor identity from explicit startup in this conversation;
+2. reject if no identity exists, if an attempted startup would change an existing identity, or if this conversation already emitted a new-chat handoff;
+3. only then read repository lifecycle/authorization/allocation/current pointers to confirm the **same** identity;
+4. only then evaluate dependencies and start work.
+
+Repository state can confirm identity; it never manufactures identity.
+
+When the user explicitly starts Chat N in a fresh conversation, the agent must:
 
 - read `.planning/EXECUTOR_HANDOFF.md`;
+- confirm the conversation identity is N and the conversation is not execution-closed;
+- confirm `.planning/STATUS.yaml -> cycle_state: active`;
 - confirm `.planning/STATUS.yaml -> plan_state: frozen`;
 - confirm `.planning/STATUS.yaml -> implementation_authorized: true`;
 - read `EXECUTION.yaml`;
-- find chat N;
+- find that same chat N;
 - read only its assigned S&T nodes plus necessary decisions/context;
 - for each node, check `TREE.yaml -> depends_on` and confirm prerequisite nodes are `done` in EXECUTION;
 - execute only assigned unblocked nodes;
@@ -111,6 +132,8 @@ When the user says "I am chat N" / "אני צ'אט מספר N", the agent must:
 - set it `done` only after its `success_evidence` is verified;
 - record a short result/reference;
 - set `blocked` with a short reason if a real planning/execution blocker prevents progress.
+
+If an old conversation's identity no longer matches a target-owned current-chat pointer, or if it already emitted handoff, do not execute the newly pointed chat. Respond with a short new-chat instruction instead.
 
 If execution exposes a material planning defect:
 - do not improvise;
