@@ -33,6 +33,7 @@ export function deriveExecutionAvailability(treeText, executionText) {
   const tree = parseTreeYaml(treeText);
   const chats = parseExecutionYaml(executionText);
   const states = stateMap(chats);
+  const authorityBlockers = [];
   const runnableNodes = [];
   const blockedNodes = [];
 
@@ -42,15 +43,24 @@ export function deriveExecutionAvailability(treeText, executionText) {
       const plannedNode = tree.get(nodeId);
       if (!executionNode || !plannedNode) continue;
 
+      const unfinishedDependencies = plannedNode.dependsOn.filter(
+        (dependencyId) => states.get(dependencyId) !== "done",
+      );
+
+      if (
+        (executionNode.state === "in_progress" || executionNode.state === "done") &&
+        unfinishedDependencies.length > 0
+      ) {
+        authorityBlockers.push(
+          `${executionNode.state} node "${nodeId}" in Chat ${chatId} has unfinished dependencies: ${unfinishedDependencies.join(", ")}`,
+        );
+      }
+
       if (executionNode.state === "done") continue;
       if (executionNode.state === "blocked") {
         blockedNodes.push({ chatId, nodeId });
         continue;
       }
-
-      const unfinishedDependencies = plannedNode.dependsOn.filter(
-        (dependencyId) => states.get(dependencyId) !== "done",
-      );
 
       if (unfinishedDependencies.length === 0) {
         runnableNodes.push({
@@ -60,6 +70,17 @@ export function deriveExecutionAvailability(treeText, executionText) {
         });
       }
     }
+  }
+
+  if (authorityBlockers.length > 0) {
+    return {
+      safe: false,
+      complete: false,
+      runnableNodes: [],
+      runnableChatIds: [],
+      blockedNodes,
+      blockers: authorityBlockers,
+    };
   }
 
   const runnableChatIds = [...new Set(runnableNodes.map((node) => node.chatId))];
@@ -147,6 +168,7 @@ function usage() {
     "",
     "Prints canonical runnable execution derived from TREE dependencies and EXECUTION states.",
     "Target-owned current_chat/current_node pointers are projections and are not inputs to authority.",
+    "Projection drift is advisory; broken authoritative dependency state is a blocker.",
   ].join("\n");
 }
 
