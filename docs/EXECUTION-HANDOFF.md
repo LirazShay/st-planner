@@ -15,7 +15,7 @@ After Final Planning Review passes:
 7. initialize every assigned node as `pending`;
 8. run `node .planning/validate-allocation.mjs --initial` and fix every failure;
 9. if numbered chats are explicitly serial, rerun/add `--serial-chats`;
-10. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`;
+10. run the mandatory repository-only fresh-chat simulations defined by `.planning/EXECUTOR_HANDOFF.md`, including conversation-identity rollover regression;
 11. record the verification result in `.planning/REVIEWS.md`;
 12. fix and rerun any failed case;
 13. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after both gates pass.
@@ -31,6 +31,30 @@ implementation_authorized: true
 A `completed` or `abandoned` cycle is terminal and cannot authorize execution.
 
 A frozen plan is a stable baseline, not permission to implement. `.planning/EXECUTOR_HANDOFF.md` is the portable entry contract for every new executor chat.
+
+## Allocation is not conversation activation
+
+Repository state answers **which executor is allocated/eligible**. It does not answer **which executor this conversation is**.
+
+A numbered executor conversation becomes active only after an explicit startup message in that conversation, such as:
+
+```text
+אני צאט 17 תתחיל
+```
+
+Once activated, the conversation keeps that executor identity. A later repo/current-chat pointer must never mutate it.
+
+After a conversation emits a `SEQUENCE_RUNNER_NEW_CHAT` handoff, that conversation is execution-closed for later allocated chats. If the repo now points to Chat 17 and the old Chat 16 conversation receives `תמשיך לשלב הבא`, it must refuse to bootstrap or execute Chat 17 and must direct the user to open a new conversation and explicitly start Chat 17.
+
+Therefore the authority order is:
+
+1. conversation identity/closed-state;
+2. repository lifecycle authorization;
+3. repository chat allocation/current pointer;
+4. dependency/runnable-node checks;
+5. only then execution mutation.
+
+`.planning/executor-authority.mjs` is the executable reference contract used by framework regression tests. It deliberately stores no conversation state in the repository.
 
 ## Why direct node execution
 
