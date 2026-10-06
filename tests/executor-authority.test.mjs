@@ -30,6 +30,23 @@ test("old conversation stays terminal after handoff even when repo advances to n
   assert.equal(result.mayMutateExecutionState, false);
 });
 
+test("even an explicit next-chat startup cannot reopen the old conversation after handoff", () => {
+  const result = evaluateExecutorAuthority({
+    conversationIdentity: "16",
+    handoffEmitted: true,
+    userMessage: "אני צאט 17 תתחיל",
+    repoExecutionAuthorized: true,
+    repoAllocatedChatIds: ["16", "17"],
+    repoCurrentChatId: "17",
+  });
+
+  assert.equal(result.allowed, false);
+  assert.equal(result.code, "execution_closed_after_handoff");
+  assert.equal(result.executorIdentity, "16");
+  assert.equal(result.nextChatId, "17");
+  assert.equal(result.mayMutateExecutionState, false);
+});
+
 test("repo pointer cannot bootstrap next chat from an unidentified conversation", () => {
   const result = evaluateExecutorAuthority({
     conversationIdentity: null,
