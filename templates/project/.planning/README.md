@@ -50,6 +50,20 @@ Before replacing current-cycle state, inspect `STATUS.yaml -> cycle_state`:
 - `active` — resume/replan the current cycle; do not erase it merely because another request arrived;
 - `completed` / `abandoned` — a new independent cycle may start after terminal review/evidence is durably preserved.
 
+## Efficient deep planning
+
+S&T depth is non-negotiable. Every material decision must still be challenged and justified, and every required branch must still pass necessity, sufficiency, implementation-readiness, whole-plan coverage, and Final Planning Review.
+
+Efficiency comes from **ordering and batching the same deep reasoning**, not from skipping it:
+
+1. **Map first** — before deep decomposition, make a short structural map of the current scope: outcome/boundary, material questions and decisions, dependencies between those questions, material evidence still needed, and likely major tree areas. The map is orientation only; it approves nothing.
+2. **Prove second** — work through coherent planning slices and perform full S&T reasoning for every material tactic/decision in the slice. Existing patterns are evidence/candidates only; they never justify a choice by themselves.
+3. **Persist once** — once a decision is justified, record its durable rationale in the normal planning artifacts. Do not reopen the same reasoning merely for reassurance unless new evidence, a contradiction, a changed assumption, or a review finding can materially change it.
+4. **Batch mechanics** — avoid a full read/edit/status/review cycle after every small edit. Apply related changes together and use deterministic validation for deterministic checks where practical.
+5. **Review coherently** — correct obvious defects while authoring, but run the meaningful multidimensional review on a coherent slice or completed subtree. Re-review only the affected logic after a concrete finding. Whole-plan outside-in coverage and Final Planning Review remain mandatory.
+
+This is not a QUICK/DEEP mode. The standard of proof is unchanged; only repeated reasoning and planning ceremony are reduced.
+
 ## Executor read order
 
 1. project `AGENTS.md` and its routing/source-of-truth rules
