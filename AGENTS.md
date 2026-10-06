@@ -30,6 +30,20 @@ Every S&T node has:
 
 Do not choose a fixed number of phases in advance.
 
+## Efficient deep-planning flow
+
+Efficiency must come from ordering and batching the reasoning, never from reducing S&T depth.
+
+Before deep node-by-node planning, make a short structural map of the current scope: outcome/boundary, material questions and decisions that must be resolved, dependencies between those questions, material current-reality evidence still needed, and the likely major tree areas. This map is orientation only. It does not approve tactics, skip decisions, weaken necessity/sufficiency, or replace full justification.
+
+Then plan in coherent slices. Within a slice, perform the full S&T reasoning for the related decisions and nodes, persist the rationale in the normal planning artifacts, run mechanical validation where available, and review the coherent slice. Do not force a full read/edit/review/status cycle after every small edit.
+
+Once a material decision has been justified and durably recorded in the current cycle, do not reopen the same reasoning merely for reassurance. Reopen it only when new evidence, a contradiction, a changed assumption, or a review finding can materially change the decision.
+
+Existing project patterns, prior designs, or reusable mechanisms are evidence about current reality and candidate alternatives; they are never sufficient justification by themselves. Every material tactic must still stand on the current scope's evidence, assumptions, alternatives, and consequences.
+
+Keep deterministic checks mechanical where practical (for example schema/structure/dependency/allocation consistency) and reserve deep reasoning for judgments that actually require it. Whole-plan coverage and Final Planning Review remain mandatory.
+
 ## Decomposition
 
 To go down:
