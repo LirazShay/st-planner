@@ -22,6 +22,9 @@ plan_state: active
 # This must be false whenever cycle_state is completed or abandoned.
 implementation_authorized: false
 
+# Planning/resume pointer only. This is NOT the current executor node after freeze.
+# Execution current/runnable work is derived from TREE.yaml -> depends_on plus
+# EXECUTION.yaml states (see execution-guidance.mjs).
 current_node: "0"
 
 blockers: []
