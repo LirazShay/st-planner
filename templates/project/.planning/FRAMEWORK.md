@@ -30,6 +30,25 @@ If not, do not preload it.
 
 Investigate before asking the user. Default to informed planner autonomy: when the goal, constraints, repository evidence, and tradeoffs support a responsible choice, make that planner-owned product/technical choice, record the rationale, and continue. Do not ask merely because several valid implementations exist. Prefer a reasonable reversible default for low-risk uncertainty. Ask only when the missing input is genuinely user-owned or cannot be responsibly derived and different answers would materially change the plan. If a question is unavoidable, ask the smallest useful question, batch tightly related unknowns, and include a recommendation when useful.
 
+### Efficient deep planning
+
+S&T depth is mandatory. Efficiency must come from better ordering, batching, and reuse of already-proven reasoning — never from skipping a material decision, weakening justification, or accepting an existing pattern merely because it exists.
+
+Before deep decomposition, make a short structural map of the current scope:
+- outcome/boundary;
+- material questions and decisions that must be resolved;
+- dependencies between those questions;
+- material evidence still needed;
+- likely major tree areas.
+
+This map is orientation only. It approves nothing and does not replace the recursive S&T challenge.
+
+Then plan in coherent slices. Within each slice, gather only evidence that can change the reasoning, perform full S&T reasoning for every material choice, persist the rationale in the normal planning artifacts, use deterministic checks for deterministic invariants where practical, and review the coherent slice. Do not force a complete read/edit/status/review cycle after every small edit.
+
+Once a material decision is justified and durably recorded, do not reopen the same reasoning merely for reassurance. Reopen it only when new evidence, a contradiction, a changed assumption, or a concrete review finding could materially change the decision.
+
+Existing project patterns, prior designs, and reusable mechanisms are current-reality evidence or candidate alternatives only. They never replace justification for the current scope.
+
 ### Long-running work progress orientation
 
 For long/tool-heavy work, give concise progress updates at meaningful boundaries: what is being checked, what is complete, what remains, and any meaningful discovery/blocker. Do not narrate every tool call. If the user requested one stage per message, updates stay inside that stage.
@@ -258,9 +277,9 @@ Rules:
 
 ---
 
-## 10. Review as you build
+## 10. Review deeply, but at coherent boundaries
 
-Review separate dimensions:
+Keep local quality control active while authoring:
 - **Outcome validity** — Strategy is an outcome, not a disguised feature/tool.
 - **Parallel logic** — selected Tactic genuinely supports the Strategy.
 - **Alternative challenge** — material alternatives were handled where they could change the choice.
@@ -271,7 +290,20 @@ Review separate dimensions:
 - **KISS** — no speculative machinery, duplicate nodes, premature tools, or unnecessary detail.
 - **Executability** — leaves are decision-complete and practical.
 
-Correct defects while authoring. Local approval is not permission to execute.
+Correct obvious defects while authoring. But do not rerun the entire review matrix after every small edit or node merely because a change occurred.
+
+Prefer:
+
+```text
+deep reasoning for a coherent slice
+→ persist rationale
+→ deterministic checks where available
+→ multidimensional slice/subtree review
+→ repair concrete findings
+→ targeted recheck of affected logic
+```
+
+Repeat a broad review loop only when a concrete finding or material change justifies it. This changes review timing, not review depth. Local approval is not permission to execute.
 
 ---
 
