@@ -1,10 +1,14 @@
 {
   "schema_version": 2,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "released_at": "2026-10-07",
   "update_policy": "required",
-  "summary": "Hardens framework updates with source release-discipline checks, full local integrity for framework-managed files, deterministic bounded AGENTS rules, and non-zero local exit codes for required updates.",
+  "summary": "Prevents framework upgrades from silently overwriting target-owned customizations by requiring a pre-upgrade drift/customization audit against the installed release before managed files are replaced.",
   "upgrade_command": "Ask the repository agent to update S&T Planner from LirazShay/st-planner before continuing.",
+  "release_sensitive_source_paths": [
+    "BOOTSTRAP.md",
+    "docs/FRAMEWORK-UPDATES.md"
+  ],
   "state_paths_never_overwrite": [
     ".planning/GOAL.md",
     ".planning/TREE.yaml",
