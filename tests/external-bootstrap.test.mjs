@@ -27,7 +27,7 @@ function bootstrapListedPlanningFiles() {
   assert.notEqual(end, -1, "bootstrap bundle section end not found");
 
   const section = text.slice(start, end);
-  return [...section.matchAll(/^- `([A-Za-z0-9._-]+)`$/gm)].map((match) => match[1]);
+  return [...section.matchAll(/^\s*- `([A-Za-z0-9._-]+)`\s*$/gm)].map((match) => match[1]);
 }
 
 test("external bootstrap lists the complete planning bundle exactly once", () => {
