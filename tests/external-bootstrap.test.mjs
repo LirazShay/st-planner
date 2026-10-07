@@ -21,9 +21,13 @@ function planningBundleFiles() {
 
 function bootstrapListedPlanningFiles() {
   const text = fs.readFileSync(bootstrapPath, "utf8");
-  return [
-    ...text.matchAll(/templates\/project\/\.planning\/([A-Za-z0-9._-]+)/g),
-  ].map((match) => match[1]);
+  const start = text.indexOf("The current source bundle under `templates/project/.planning/` is:");
+  const end = text.indexOf("6. For a permitted **fresh install**", start);
+  assert.notEqual(start, -1, "bootstrap bundle section start not found");
+  assert.notEqual(end, -1, "bootstrap bundle section end not found");
+
+  const section = text.slice(start, end);
+  return [...section.matchAll(/^- `([A-Za-z0-9._-]+)`$/gm)].map((match) => match[1]);
 }
 
 test("external bootstrap lists the complete planning bundle exactly once", () => {
@@ -71,7 +75,7 @@ test("planning bundle can be copied into a fresh target and helper CLIs start", 
 
 test("AGENTS snippet has a stable idempotency marker", () => {
   const snippet = fs.readFileSync(agentsSnippetPath, "utf8");
-  const marker = "<!-- st-planner:rules:v1 -->";
+  const marker = "<!-- st-planner:rules:v2 -->";
 
   assert.equal(snippet.split(marker).length - 1, 1);
   assert.match(snippet, /# S&T Framework Rules/);
