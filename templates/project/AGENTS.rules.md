@@ -13,9 +13,9 @@ Interpret the result literally:
 
 - exit `0` + current — continue;
 - exit `0` + recommended update — surface the update and continue unless an upgrade is chosen;
-- exit `2` — a required framework upgrade exists; do not start new S&T planning/execution until it is installed and the checker reports current;
-- exit `3` — the installed freshness path itself drifted or is damaged; repair/upgrade it before S&T work;
-- freshness unavailable because the network/source cannot be reached — say that freshness is unverified and continue only from the installed framework without claiming it is current.
+- exit `2` — a required framework upgrade/reconciliation exists; do not start new S&T planning/execution until it is resolved and the checker reports current;
+- exit `3` — installed framework/provenance is missing, damaged, malformed, or drifted; repair/upgrade it before S&T work;
+- freshness unavailable because the network/source cannot be reached — say that source freshness is unverified and continue only from the locally integrity-checked installed framework without claiming it is current.
 
 Framework upgrades may refresh framework-owned instructions/tooling only. They must never overwrite `.planning/GOAL.md`, `.planning/TREE.yaml`, `.planning/DECISIONS.md`, `.planning/REVIEWS.md`, `.planning/STATUS.yaml`, or `.planning/EXECUTION.yaml`.
 
