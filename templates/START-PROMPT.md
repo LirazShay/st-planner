@@ -1,5 +1,5 @@
 Use the current ST Planner from `LirazShay/st-planner` for this repository.
-Read `BOOTSTRAP.md` first, then plan and manage execution for:
+Resolve one current ST Planner source commit for this session and read `LirazShay/st-planner/BOOTSTRAP.md` from that same commit first. Then plan and manage execution for:
 
 <WRITE THE OUTCOME / REQUEST HERE>
 
