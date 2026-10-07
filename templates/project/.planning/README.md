@@ -17,13 +17,17 @@ Interpret the checker literally:
 - exit `0` + current — continue;
 - exit `0` + recommended update — surface it and continue unless an upgrade is chosen;
 - exit `2` — required source update/reconciliation; do not start new S&T planning/execution;
-- exit `3` — the local freshness path itself drifted/damaged; repair/upgrade first;
-- source/network unavailable with exit `0` — local freshness-path integrity passed, but framework freshness is **unverified**; never claim current.
+- exit `3` — installed framework/provenance is missing, damaged, malformed, or drifted; repair/upgrade first;
+- source/network unavailable with exit `0` — local framework integrity passed, but source freshness is **unverified**; never claim current.
 
-The checker validates locally, before contacting the source, that:
+Before contacting the source, the checker validates locally that:
 
-1. `check-framework-update.mjs` still matches the installed release;
-2. the bounded S&T rules block inside root `AGENTS.md` still matches the installed release.
+1. every framework-managed `.planning` file exists and matches the installed release integrity metadata;
+2. the update checker itself is included in that managed integrity set;
+3. the bounded S&T rules block inside root `AGENTS.md` occurs exactly once and matches the installed release;
+4. install provenance is internally coherent.
+
+Text integrity is canonicalized to `LF`, so an ordinary Windows `CRLF` checkout does not create false drift.
 
 Framework upgrade is separate from cycle reset. It may refresh framework-owned instructions/tooling only and must never overwrite current-cycle state:
 
@@ -35,6 +39,8 @@ REVIEWS.md
 STATUS.yaml
 EXECUTION.yaml
 ```
+
+`ST_PLANNER_INSTALL.json` is special install metadata and is written last during upgrades; it is not a normal framework-managed replacement path.
 
 Root `AGENTS.md` is not framework-owned wholesale. Only the bounded `st-planner:rules:v3:begin/end` block belongs to S&T Planner; target-native rules outside it must survive upgrades unchanged.
 
@@ -157,13 +163,16 @@ Tell the user explicitly that progression is paused for RCA and that a local fix
 - `FRAMEWORK.md` — portable S&T planning/execution/cycle contract.
 - `EXECUTOR_HANDOFF.md` — executor bootstrap/handoff contract.
 - `CI-RCA-POLICY.md` — mandatory CI RCA procedure.
-- `ST_PLANNER_INSTALL.json` — installed version/provenance/integrity metadata.
 - `check-framework-update.mjs` — local integrity + source freshness detector.
 - `executor-authority.mjs` — explicit activation/re-bootstrap reference.
 - `execution-guidance.mjs` — canonical runnable-work derivation.
 - `validate-allocation.mjs` — TREE/EXECUTION allocation validator.
 - `verify-freeze-baseline.mjs` — reviewed-baseline no-drift verifier.
 - bounded root `AGENTS.md` S&T rules block — repository entry contract.
+
+### Install metadata
+
+- `ST_PLANNER_INSTALL.json` — installed version/source commit plus managed/root-rules integrity; written last during install/upgrade.
 
 ### Current-cycle project state — never overwritten by framework upgrade
 
