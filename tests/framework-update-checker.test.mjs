@@ -19,6 +19,10 @@ function gitBlobSha(bytes) {
   return crypto.createHash("sha1").update(header).update(buffer).digest("hex");
 }
 
+function toCrlf(text) {
+  return text.replace(/\r?\n/g, "\r\n");
+}
+
 function createTarget() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "st-planner-checker-"));
 
@@ -109,6 +113,39 @@ test("current release passes with full local framework integrity", async () => {
   }
 });
 
+test("Windows-style CRLF checkout does not create false framework drift", async () => {
+  const target = createTarget();
+  for (const relative of release.framework_managed_paths) {
+    const file = path.join(target.root, relative);
+    fs.writeFileSync(file, toCrlf(fs.readFileSync(file, "utf8")));
+  }
+  const agentsPath = path.join(target.root, "AGENTS.md");
+  fs.writeFileSync(agentsPath, toCrlf(fs.readFileSync(agentsPath, "utf8")));
+
+  const server = await serveRelease(remoteRelease());
+  try {
+    const result = await runChecker(target.root, server.url);
+    assert.equal(result.code, 0, result.output);
+    assert.match(result.output, /framework is current/i);
+  } finally {
+    await server.close();
+  }
+});
+
+test("target-native AGENTS changes outside the bounded block remain allowed", async () => {
+  const target = createTarget();
+  const agentsPath = path.join(target.root, "AGENTS.md");
+  fs.writeFileSync(agentsPath, fs.readFileSync(agentsPath, "utf8").replace("# Target rules", "# Target rules changed independently"));
+  const server = await serveRelease(remoteRelease());
+  try {
+    const result = await runChecker(target.root, server.url);
+    assert.equal(result.code, 0, result.output);
+    assert.match(result.output, /framework is current/i);
+  } finally {
+    await server.close();
+  }
+});
+
 test("recommended newer release is visible but non-blocking", async () => {
   const target = createTarget();
   const server = await serveRelease(remoteRelease({ version: "1.2.0", update_policy: "recommended" }));
@@ -164,6 +201,18 @@ test("same version with changed noncritical managed content also requires reconc
   }
 });
 
+test("malformed reachable source manifest blocks with exit 3", async () => {
+  const target = createTarget();
+  const server = await serveRelease(remoteRelease({ managed_integrity: null }));
+  try {
+    const result = await runChecker(target.root, server.url);
+    assert.equal(result.code, 3, result.output);
+    assert.match(result.output, /source release manifest is malformed/i);
+  } finally {
+    await server.close();
+  }
+});
+
 test("local checker drift exits 3 before source freshness can be trusted", async () => {
   const target = createTarget();
   fs.appendFileSync(path.join(target.planning, "check-framework-update.mjs"), "\n// local drift\n");
@@ -190,6 +239,14 @@ test("bounded AGENTS rules drift exits 3", async () => {
   const result = await runChecker(target.root, "http://127.0.0.1:1/unreachable");
   assert.equal(result.code, 3, result.output);
   assert.match(result.output, /rules block.*differs/i);
+});
+
+test("duplicate bounded AGENTS marker exits 3 instead of guessing ownership", async () => {
+  const target = createTarget();
+  fs.appendFileSync(path.join(target.root, "AGENTS.md"), `\n${release.agents_rules.end_marker}\n`);
+  const result = await runChecker(target.root, "http://127.0.0.1:1/unreachable");
+  assert.equal(result.code, 3, result.output);
+  assert.match(result.output, /missing, duplicated, or malformed/i);
 });
 
 test("source unavailable remains non-blocking but never claims current", async () => {
