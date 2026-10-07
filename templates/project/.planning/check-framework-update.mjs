@@ -37,8 +37,53 @@ function compareSemver(left, right) {
   return 0;
 }
 
+function stableObject(value) {
+  return JSON.stringify(Object.fromEntries(Object.entries(value ?? {}).sort(([a], [b]) => a.localeCompare(b))));
+}
+
 async function readJson(file) {
   return JSON.parse(await fs.readFile(file, "utf8"));
+}
+
+async function verifyManagedIntegrity(installed) {
+  const managed = installed.managed_integrity;
+  if (!managed || typeof managed !== "object" || Array.isArray(managed) || Object.keys(managed).length === 0) {
+    emit("error", "Installed S&T Planner provenance lacks framework-managed integrity metadata. Run an explicit framework upgrade before S&T work.");
+    return false;
+  }
+
+  for (const [relative, expected] of Object.entries(managed)) {
+    if (!relative.startsWith(".planning/") || relative.split("/").includes("..") || relative === ".planning/ST_PLANNER_INSTALL.json") {
+      emit("error", `Invalid framework-managed integrity path in installed provenance: ${relative}.`);
+      return false;
+    }
+    if (!/^[0-9a-f]{40}$/i.test(String(expected))) {
+      emit("error", `Invalid integrity digest for ${relative} in installed provenance.`);
+      return false;
+    }
+
+    let bytes;
+    try {
+      bytes = await fs.readFile(path.join(repoRoot, relative));
+    } catch (error) {
+      emit("error", `Installed framework-managed file is missing/unreadable: ${relative} (${error.message}). Repair/upgrade before S&T work.`);
+      return false;
+    }
+
+    const actual = gitBlobSha(bytes);
+    if (actual !== expected) {
+      emit("error", `Installed framework-managed file drifted from its recorded release: ${relative}. Repair/upgrade before S&T work.`);
+      return false;
+    }
+  }
+
+  const checkerExpected = managed[".planning/check-framework-update.mjs"];
+  if (!checkerExpected) {
+    emit("error", "Installed managed-integrity metadata does not include the framework update checker. Repair/upgrade before S&T work.");
+    return false;
+  }
+
+  return true;
 }
 
 async function verifyCriticalIntegrity(installed) {
@@ -48,10 +93,8 @@ async function verifyCriticalIntegrity(installed) {
     return false;
   }
 
-  const checkerBytes = await fs.readFile(checkerPath);
-  const checkerActual = gitBlobSha(checkerBytes);
-  if (checkerActual !== integrity.checker_git_blob_sha) {
-    emit("error", "Installed .planning/check-framework-update.mjs does not match its recorded framework release. The update detector itself drifted; repair/upgrade it before S&T work.");
+  if (integrity.checker_git_blob_sha !== installed.managed_integrity?.[".planning/check-framework-update.mjs"]) {
+    emit("error", "Installed S&T Planner provenance disagrees about the update checker's expected bytes. Repair/upgrade before S&T work.");
     return false;
   }
 
@@ -111,12 +154,12 @@ async function main() {
   }
 
   try {
-    if (!(await verifyCriticalIntegrity(installed))) {
+    if (!(await verifyManagedIntegrity(installed)) || !(await verifyCriticalIntegrity(installed))) {
       process.exitCode = 3;
       return;
     }
   } catch (error) {
-    emit("error", `Cannot verify installed S&T Planner freshness-path integrity: ${error.message}`);
+    emit("error", `Cannot verify installed S&T Planner integrity: ${error.message}`);
     process.exitCode = 3;
     return;
   }
@@ -125,7 +168,7 @@ async function main() {
   try {
     latest = await fetchLatestRelease();
   } catch (error) {
-    emit("notice", `S&T Planner freshness could not be verified (${error.message}). Installed version: ${installed.framework_version ?? "unknown"}. Local freshness-path integrity passed; do not claim the framework is current.`);
+    emit("notice", `S&T Planner freshness could not be verified (${error.message}). Installed version: ${installed.framework_version ?? "unknown"}. Local framework integrity passed; do not claim the framework is current.`);
     return;
   }
 
@@ -138,13 +181,14 @@ async function main() {
     return;
   }
 
-  const latestIntegrity = latest.critical_integrity ?? {};
-  const installedIntegrity = installed.critical_integrity ?? {};
-  const sameCriticalRelease = latestIntegrity.checker_git_blob_sha === installedIntegrity.checker_git_blob_sha
-    && latestIntegrity.agents_rules_git_blob_sha === installedIntegrity.agents_rules_git_blob_sha;
+  const sameManagedRelease = stableObject(latest.managed_integrity) === stableObject(installed.managed_integrity);
+  const latestCritical = latest.critical_integrity ?? {};
+  const installedCritical = installed.critical_integrity ?? {};
+  const sameCriticalRelease = latestCritical.checker_git_blob_sha === installedCritical.checker_git_blob_sha
+    && latestCritical.agents_rules_git_blob_sha === installedCritical.agents_rules_git_blob_sha;
 
-  if (relation === 0 && sameCriticalRelease) {
-    console.log(`S&T Planner framework is current (${installedVersion}); freshness-path integrity passed.`);
+  if (relation === 0 && sameManagedRelease && sameCriticalRelease) {
+    console.log(`S&T Planner framework is current (${installedVersion}); installed framework integrity passed.`);
     return;
   }
 
