@@ -34,7 +34,7 @@
     ".planning/execution-guidance.mjs": "8c58e7bb69b037ec33862e78934f3956e2dcd055",
     ".planning/validate-allocation.mjs": "19eac7236c9f8c4552be67ec8687a3fadfd17058",
     ".planning/verify-freeze-baseline.mjs": "e2361382959abc6db6b232f3c452fc2b772f8e49",
-    ".planning/check-framework-update.mjs": "1e8b5149bfb0bcf5deb52a6e868cd24dcc1059b5"
+    ".planning/check-framework-update.mjs": "5db287623b345605af8520392ee118a2ea618cb2"
   },
   "agents_rules": {
     "source_path": "templates/project/AGENTS.rules.md",
@@ -43,7 +43,7 @@
     "git_blob_sha": "42bd735770b5846e413f969595c7347d086e4f10"
   },
   "critical_integrity": {
-    "checker_git_blob_sha": "1e8b5149bfb0bcf5deb52a6e868cd24dcc1059b5",
+    "checker_git_blob_sha": "5db287623b345605af8520392ee118a2ea618cb2",
     "agents_rules_git_blob_sha": "42bd735770b5846e413f969595c7347d086e4f10"
   }
 }
