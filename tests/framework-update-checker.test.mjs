@@ -9,7 +9,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const checkerSource = path.join(repoRoot, "templates", "project", ".planning", "check-framework-update.mjs");
+const templateRoot = path.join(repoRoot, "templates", "project");
 const rulesSource = path.join(repoRoot, "templates", "project", "AGENTS.rules.md");
 const release = JSON.parse(fs.readFileSync(path.join(repoRoot, "FRAMEWORK_RELEASE.json"), "utf8"));
 
@@ -21,12 +21,15 @@ function gitBlobSha(bytes) {
 
 function createTarget() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "st-planner-checker-"));
-  const planning = path.join(root, ".planning");
-  fs.mkdirSync(planning, { recursive: true });
 
-  const checkerBytes = fs.readFileSync(checkerSource);
+  for (const relative of release.framework_managed_paths) {
+    const source = path.join(templateRoot, relative);
+    const destination = path.join(root, relative);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(source, destination);
+  }
+
   const rules = fs.readFileSync(rulesSource, "utf8");
-  fs.writeFileSync(path.join(planning, "check-framework-update.mjs"), checkerBytes);
   fs.writeFileSync(path.join(root, "AGENTS.md"), `# Target rules\n\n${rules}\nTarget-native tail\n`);
 
   const install = {
@@ -35,15 +38,18 @@ function createTarget() {
     source_repo: "LirazShay/st-planner",
     source_commit: "test-source-commit",
     installed_at: "2026-10-07",
+    managed_integrity: { ...release.managed_integrity },
     critical_integrity: {
-      checker_git_blob_sha: gitBlobSha(checkerBytes),
+      checker_git_blob_sha: release.critical_integrity.checker_git_blob_sha,
       agents_rules_git_blob_sha: gitBlobSha(rules),
       agents_rules_begin_marker: release.agents_rules.begin_marker,
       agents_rules_end_marker: release.agents_rules.end_marker,
     },
   };
-  fs.writeFileSync(path.join(planning, "ST_PLANNER_INSTALL.json"), `${JSON.stringify(install, null, 2)}\n`);
-  return { root, planning, install, rules };
+  const installPath = path.join(root, release.install_metadata_path);
+  fs.mkdirSync(path.dirname(installPath), { recursive: true });
+  fs.writeFileSync(installPath, `${JSON.stringify(install, null, 2)}\n`);
+  return { root, planning: path.join(root, ".planning"), install, rules };
 }
 
 async function serveRelease(payload) {
@@ -81,6 +87,7 @@ function remoteRelease(overrides = {}) {
     update_policy: "required",
     summary: "test release",
     upgrade_command: "upgrade now",
+    managed_integrity: { ...release.managed_integrity },
     critical_integrity: {
       checker_git_blob_sha: release.critical_integrity.checker_git_blob_sha,
       agents_rules_git_blob_sha: release.critical_integrity.agents_rules_git_blob_sha,
@@ -89,14 +96,14 @@ function remoteRelease(overrides = {}) {
   };
 }
 
-test("current release passes with local freshness-path integrity", async () => {
+test("current release passes with full local framework integrity", async () => {
   const target = createTarget();
   const server = await serveRelease(remoteRelease());
   try {
     const result = await runChecker(target.root, server.url);
     assert.equal(result.code, 0, result.output);
     assert.match(result.output, /framework is current/i);
-    assert.match(result.output, /integrity passed/i);
+    assert.match(result.output, /framework integrity passed/i);
   } finally {
     await server.close();
   }
@@ -132,9 +139,22 @@ test("same version with changed critical release content requires reconciliation
   const server = await serveRelease(remoteRelease({
     critical_integrity: {
       ...release.critical_integrity,
-      checker_git_blob_sha: "0000000000000000000000000000000000000000",
+      agents_rules_git_blob_sha: "0000000000000000000000000000000000000000",
     },
   }));
+  try {
+    const result = await runChecker(target.root, server.url);
+    assert.equal(result.code, 2, result.output);
+    assert.match(result.output, /content changed without a version change/i);
+  } finally {
+    await server.close();
+  }
+});
+
+test("same version with changed noncritical managed content also requires reconciliation", async () => {
+  const target = createTarget();
+  const managed = { ...release.managed_integrity, ".planning/FRAMEWORK.md": "0000000000000000000000000000000000000000" };
+  const server = await serveRelease(remoteRelease({ managed_integrity: managed }));
   try {
     const result = await runChecker(target.root, server.url);
     assert.equal(result.code, 2, result.output);
@@ -149,7 +169,17 @@ test("local checker drift exits 3 before source freshness can be trusted", async
   fs.appendFileSync(path.join(target.planning, "check-framework-update.mjs"), "\n// local drift\n");
   const result = await runChecker(target.root, "http://127.0.0.1:1/unreachable");
   assert.equal(result.code, 3, result.output);
-  assert.match(result.output, /update detector itself drifted/i);
+  assert.match(result.output, /framework-managed file drifted/i);
+  assert.match(result.output, /check-framework-update\.mjs/);
+});
+
+test("local noncritical framework-managed drift exits 3", async () => {
+  const target = createTarget();
+  fs.appendFileSync(path.join(target.planning, "FRAMEWORK.md"), "\nlocal drift\n");
+  const result = await runChecker(target.root, "http://127.0.0.1:1/unreachable");
+  assert.equal(result.code, 3, result.output);
+  assert.match(result.output, /framework-managed file drifted/i);
+  assert.match(result.output, /FRAMEWORK\.md/);
 });
 
 test("bounded AGENTS rules drift exits 3", async () => {
