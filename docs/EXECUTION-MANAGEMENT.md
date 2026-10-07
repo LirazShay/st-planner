@@ -165,14 +165,17 @@ On explicit Chat N startup:
 2. read `.planning/PLAN.md`;
 3. read `.planning/EXECUTION.md`;
 4. find unfinished tasks assigned to Chat N;
-5. verify real prerequisites;
-6. load only the implementation context needed for those tasks;
-7. mark the task `in_progress` when work meaningfully starts;
-8. execute the planned Tactic without inventing new material scope;
-9. verify success evidence;
-10. mark `done` with a short result/evidence reference, or `blocked` with a factual reason.
+5. verify real prerequisites and identify which of those tasks are runnable;
+6. if Chat N has no runnable assigned task, do **not** take another owner's work or silently change executor identity; report/wait on the factual prerequisite or conclude that Chat N has no current work;
+7. load only the implementation context needed for the runnable assigned work;
+8. mark a task `in_progress` when work meaningfully starts;
+9. execute the planned Tactic without inventing new material scope;
+10. verify success evidence;
+11. mark `done` with a short result/evidence reference, or `blocked` with a factual reason.
 
 If Chat N does not exist, do not invent work.
+
+Owner fidelity is intentional: repository state may reveal that another chat/agent is runnable next, but that is a recommendation for a new execution context, not permission for the current executor to become that owner.
 
 ## 5.2 Handoff
 
@@ -180,7 +183,8 @@ When an execution unit finishes:
 
 - update its task state/results;
 - identify remaining runnable work;
-- recommend the next owner/chat only when a new execution context is useful.
+- recommend the next owner/chat only when a new execution context is useful;
+- do not mutate the current executor identity merely because the next owner is known.
 
 The new context should be able to recover from repository state rather than relying on the previous conversation transcript.
 
@@ -239,6 +243,8 @@ Update the smallest affected PLAN area and affected execution rows, review the i
 ## 7.3 Material plan invalidation
 
 Pause only affected work, revise the affected S&T reasoning and downstream execution map, review it, and continue.
+
+For affected rows already marked `done`, explicitly re-check whether their existing result/evidence still proves the revised Strategy/outcome. Keep valid completed work; return invalidated work to an executable state or replace/remove obsolete work as the revised plan requires.
 
 Do not reset unrelated completed work unless the changed reasoning actually invalidates it.
 
