@@ -24,11 +24,14 @@ Target-native rules continue to own the target repository.
 
 ## 2. Read the current ST Planner source
 
-Read, from the current `LirazShay/st-planner` source:
+At the start of the planning/execution session, resolve the current `LirazShay/st-planner` source to **one exact commit** and read the framework documents used in that session from that same commit:
 
 1. `docs/SNT-METHODOLOGY.md`;
 2. `docs/EXECUTION-MANAGEMENT.md`;
-3. this `BOOTSTRAP.md`.
+3. this `BOOTSTRAP.md`;
+4. relevant `templates/` when a starting shape is useful.
+
+This commit pin is only for **session consistency** so one session cannot accidentally mix framework revisions. It is not an installed framework version, target-repository provenance system, or upgrade gate. A later session may read a newer current source.
 
 Do not copy framework scripts or framework-owned runtime files into the target repository.
 
@@ -46,6 +49,8 @@ For meaningful multi-step work, the normal default is:
 .planning/PLAN.md
 .planning/EXECUTION.md
 ```
+
+Use the source `templates/PLAN.md` and `templates/EXECUTION.md` as starting shapes when useful; adapt them to the target rather than treating template text as required schema.
 
 Create optional `.planning/STATUS.md` only when continuity across long-running work benefits from a tiny current-focus pointer.
 
@@ -79,13 +84,15 @@ Do not blindly overwrite or delete legacy state.
 For a one-time migration:
 
 1. preserve the target repository's own rules and customizations;
-2. consolidate live planning truth into `.planning/PLAN.md`;
-3. convert live execution assignment/state into `.planning/EXECUTION.md`;
-4. preserve material unresolved decisions and still-relevant success evidence;
-5. preserve `done` work and factual blockers;
-6. discard only process-only state such as freeze/authorization/validation/simulation history when it carries no project truth;
-7. remove legacy framework-owned machinery only after the replacement state has been reviewed for completeness;
-8. continue from the migrated state without restarting valid completed work.
+2. before removing a legacy framework-owned file, inspect it for project-specific rules/content that are not merely stock ST Planner machinery; move legitimate target-owned behavior into the target's normal durable source of truth first;
+3. if root `AGENTS.md` contains a clearly bounded ST Planner block, remove only that framework-owned block and preserve all text outside it; if ownership boundaries are unclear, do not guess;
+4. consolidate live planning truth into `.planning/PLAN.md`;
+5. convert live execution assignment/state into `.planning/EXECUTION.md`;
+6. preserve material unresolved decisions and still-relevant success evidence;
+7. preserve `done` work and factual blockers when their outcome/evidence remains valid;
+8. discard only process-only state such as freeze/authorization/validation/simulation history when it carries no project truth;
+9. remove legacy framework-owned machinery only after the replacement state and preserved target-owned behavior have been reviewed for completeness;
+10. continue from the migrated state without restarting valid completed work.
 
 Git history remains available for old review/process history; do not copy historical ceremony into the new live state.
 
@@ -176,10 +183,13 @@ On explicit Chat N startup:
 1. read target rules;
 2. read `.planning/PLAN.md` and `.planning/EXECUTION.md`;
 3. locate the requested owner's assigned unfinished work;
-4. check real prerequisites;
-5. load only materially necessary implementation context;
-6. execute and verify the assigned work;
-7. update work status/result.
+4. check real prerequisites and identify the owner's runnable tasks;
+5. if that owner has no runnable assigned task, do not take another owner's work or silently change identity; report/wait on the factual prerequisite or conclude that this owner has no current work;
+6. load only materially necessary implementation context;
+7. execute and verify the assigned work;
+8. update work status/result.
+
+When Chat N completes its assigned work, it may identify/recommend another runnable owner, but it does not automatically become that owner.
 
 Fresh-chat recoverability is a design property: durable repository state should be sufficient to continue correctly without depending on chat history.
 
@@ -208,7 +218,9 @@ Update the smallest affected planning area, review its impact, adjust affected e
 
 ### Material plan invalidation
 
-Stop only affected work, revise the affected S&T area and downstream execution mapping, review the changed scope, then continue. Preserve unaffected valid completed work.
+Stop only affected work, revise the affected S&T area and downstream execution mapping, review the changed scope, then continue.
+
+Re-evaluate any affected task already marked `done`: keep it `done` only when its existing result/evidence still proves the revised Strategy/outcome; otherwise return it to executable work or replace/remove it as the revised plan requires. Preserve unaffected valid completed work.
 
 Do not globally reset execution merely because one defect appeared.
 
