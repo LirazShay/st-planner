@@ -7,19 +7,22 @@ Update-path hardening release.
 ### Added
 
 - Source release-discipline CI: distributed framework changes cannot merge without a forward framework version and matching changelog entry.
-- Offline integrity metadata for the two pieces that make future updates discoverable: the installed freshness checker and the bounded root `AGENTS.md` S&T rules block.
+- Offline integrity metadata for every framework-managed `.planning` file plus the bounded root `AGENTS.md` S&T rules block.
 - Deterministic `st-planner:rules:v3:begin/end` markers so upgrades can replace only the framework-owned block while preserving target-native rules before and after it.
-- Explicit checker exit codes: `2` for a required framework update/reconciliation and `3` for damaged or drifted freshness-path integrity.
+- Explicit checker exit codes: `2` for a required framework update/reconciliation and `3` for damaged, missing, or drifted installed framework integrity.
+- Ownership classification gate: every `.planning` template file must be exactly one of protected cycle state, framework-managed material, or install metadata.
 
 ### Changed
 
 - Required framework updates now return non-zero outside GitHub Actions too; an interactive/local executor cannot mistake a required update for success merely because it is not running in CI.
-- The checker verifies local freshness-path integrity before contacting the source. If the source/network is unavailable, it reports freshness as unverified rather than claiming current, while still proving the local update detector/rules block have not drifted.
+- The checker verifies all installed framework-managed files and the bounded root rules before contacting the source. If the source/network is unavailable, it reports freshness as unverified rather than claiming current while still proving the installed framework has not drifted locally.
+- Source and installed release metadata carry managed-file Git blob IDs. Even if source release discipline were accidentally bypassed and source content changed without a version bump, a same-version integrity mismatch is treated as a required reconciliation.
+- `ST_PLANNER_INSTALL.json` is explicit install metadata, not a normally copied framework-managed file during upgrade; it is written last so a partial upgrade cannot claim completion.
 - Root S&T rules are intentionally compact and route detailed behavior to the installed `.planning` contracts, reducing duplicated instructions while keeping the update gate at the repository entry point.
 
 ### Upgrade note from 1.0.0
 
-Upgrade is **required**. Preserve all six current-cycle state files byte-for-byte. Replace framework-managed `.planning` files from one resolved source commit, migrate the old `st-planner:rules:v2` block to the bounded v3 block using the exact prior source snippet when possible, write `ST_PLANNER_INSTALL.json` last, then require `node .planning/check-framework-update.mjs` to exit `0` and report current.
+Upgrade is **required**. Preserve all six current-cycle state files byte-for-byte. Replace framework-managed `.planning` files from one resolved source commit, migrate the old `st-planner:rules:v2` block to the bounded v3 block using the exact prior source snippet when possible, then write `ST_PLANNER_INSTALL.json` last with the new managed-integrity/provenance data. Require `node .planning/check-framework-update.mjs` to exit `0` and report current before continuing S&T work.
 
 ## 1.0.0 — 2026-10-07
 
