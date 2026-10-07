@@ -32,17 +32,17 @@ Before new S&T planning or a numbered executor starts:
 node .planning/check-framework-update.mjs
 ```
 
-The checker first verifies locally that the **update detector itself** and the bounded root S&T rules still match the installed release. It then checks the current source release.
+The checker first verifies locally that **every framework-managed `.planning` file** still matches the installed release and that the bounded root S&T rules block is intact. It then checks the current source release.
 
 Exit contract:
 
 - `0` + current — continue;
 - `0` + recommended update — surface it, upgrade optionally;
 - `2` — required update/reconciliation; do not start new S&T work;
-- `3` — installed freshness path drifted/damaged; repair/upgrade first;
-- source/network unavailable — local integrity can still pass, but freshness is reported as **unverified**, never falsely as current.
+- `3` — installed framework/provenance drifted, is missing, or is damaged; repair/upgrade first;
+- source/network unavailable — local integrity can still pass, but source freshness is reported as **unverified**, never falsely as current.
 
-On the source side, CI enforces release discipline: any distributed framework change must advance `FRAMEWORK_RELEASE.json -> version` and update `CHANGELOG.md`. This prevents source behavior from changing while installed projects keep seeing the same version.
+On the source side, CI enforces release discipline: any distributed framework change must advance `FRAMEWORK_RELEASE.json -> version` and update `CHANGELOG.md`. The release manifest also carries the expected Git blob IDs of all framework-managed installed files. This gives two independent protections against a “changed source but still looks current” failure: source release discipline and same-version integrity reconciliation.
 
 Framework updates remain explicit and safe. They may refresh only declared framework-managed instructions/tooling and must never overwrite current-cycle project state:
 
@@ -54,6 +54,8 @@ Framework updates remain explicit and safe. They may refresh only declared frame
 .planning/STATUS.yaml
 .planning/EXECUTION.yaml
 ```
+
+`.planning/ST_PLANNER_INSTALL.json` is install metadata, not ordinary copied framework content during an upgrade. It is written **last**, after the managed files and bounded root rules are updated, so a partial upgrade cannot falsely identify itself as complete.
 
 Root `AGENTS.md` is never replaced wholesale. Current releases own only a bounded `st-planner:rules:v3:begin/end` block; target-native rules before/after it are preserved.
 
@@ -110,7 +112,7 @@ Every CI warning or error pauses progression until full RCA closes. A local fix 
 ## Main entry documents
 
 - `BOOTSTRAP.md` — authoritative external install/reuse/upgrade entry contract
-- `FRAMEWORK_RELEASE.json` — current framework release and ownership boundaries
+- `FRAMEWORK_RELEASE.json` — current framework release and ownership/integrity boundaries
 - `CHANGELOG.md` — release changes/upgrade notes
 - `docs/FRAMEWORK-UPDATES.md` — freshness and safe-upgrade contract
 - `docs/SNT-METHODOLOGY.md` — expanded S&T method
