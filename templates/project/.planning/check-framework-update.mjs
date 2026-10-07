@@ -1,10 +1,14 @@
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
+const checkerPath = fileURLToPath(import.meta.url);
+const here = path.dirname(checkerPath);
+const repoRoot = path.resolve(here, "..");
 const installPath = path.join(here, "ST_PLANNER_INSTALL.json");
-const releaseUrl = "https://raw.githubusercontent.com/LirazShay/st-planner/main/FRAMEWORK_RELEASE.json";
+const releaseUrl = process.env.ST_PLANNER_RELEASE_URL
+  ?? "https://raw.githubusercontent.com/LirazShay/st-planner/main/FRAMEWORK_RELEASE.json";
 
 function emit(kind, message) {
   const text = String(message).replace(/\r?\n/g, " ");
@@ -16,8 +20,84 @@ function emit(kind, message) {
   writer(message);
 }
 
+function gitBlobSha(buffer) {
+  const header = Buffer.from(`blob ${buffer.length}\0`, "utf8");
+  return crypto.createHash("sha1").update(header).update(buffer).digest("hex");
+}
+
+function compareSemver(left, right) {
+  const a = String(left).split(".").map(Number);
+  const b = String(right).split(".").map(Number);
+  if (a.length !== 3 || b.length !== 3 || [...a, ...b].some((value) => !Number.isInteger(value) || value < 0)) {
+    return null;
+  }
+  for (let index = 0; index < 3; index += 1) {
+    if (a[index] !== b[index]) return a[index] < b[index] ? -1 : 1;
+  }
+  return 0;
+}
+
 async function readJson(file) {
   return JSON.parse(await fs.readFile(file, "utf8"));
+}
+
+async function verifyCriticalIntegrity(installed) {
+  const integrity = installed.critical_integrity;
+  if (!integrity?.checker_git_blob_sha || !integrity?.agents_rules_git_blob_sha) {
+    emit("error", "Installed S&T Planner provenance lacks critical freshness-path integrity metadata. Run an explicit framework upgrade before S&T work.");
+    return false;
+  }
+
+  const checkerBytes = await fs.readFile(checkerPath);
+  const checkerActual = gitBlobSha(checkerBytes);
+  if (checkerActual !== integrity.checker_git_blob_sha) {
+    emit("error", "Installed .planning/check-framework-update.mjs does not match its recorded framework release. The update detector itself drifted; repair/upgrade it before S&T work.");
+    return false;
+  }
+
+  const begin = integrity.agents_rules_begin_marker;
+  const end = integrity.agents_rules_end_marker;
+  if (!begin || !end) {
+    emit("error", "Installed S&T Planner provenance lacks bounded AGENTS rules markers. Run an explicit framework upgrade before S&T work.");
+    return false;
+  }
+
+  let agents;
+  try {
+    agents = await fs.readFile(path.join(repoRoot, "AGENTS.md"), "utf8");
+  } catch (error) {
+    emit("error", `Cannot read AGENTS.md for S&T freshness-path integrity: ${error.message}`);
+    return false;
+  }
+
+  const start = agents.indexOf(begin);
+  const secondStart = start === -1 ? -1 : agents.indexOf(begin, start + begin.length);
+  const endIndex = start === -1 ? -1 : agents.indexOf(end, start + begin.length);
+  if (start === -1 || secondStart !== -1 || endIndex === -1) {
+    emit("error", "The bounded S&T Planner rules block in AGENTS.md is missing, duplicated, or malformed. Repair/upgrade it before S&T work.");
+    return false;
+  }
+
+  let blockEnd = endIndex + end.length;
+  if (agents.slice(blockEnd, blockEnd + 2) === "\r\n") blockEnd += 2;
+  else if (agents[blockEnd] === "\n") blockEnd += 1;
+  const block = Buffer.from(agents.slice(start, blockEnd), "utf8");
+  const agentsActual = gitBlobSha(block);
+  if (agentsActual !== integrity.agents_rules_git_blob_sha) {
+    emit("error", "The S&T Planner rules block in AGENTS.md differs from its recorded framework release. Keep target-native rules outside the bounded framework block and repair/upgrade before S&T work.");
+    return false;
+  }
+
+  return true;
+}
+
+async function fetchLatestRelease() {
+  const response = await fetch(releaseUrl, {
+    headers: { "user-agent": "st-planner-update-check" },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
 }
 
 async function main() {
@@ -26,48 +106,69 @@ async function main() {
     installed = await readJson(installPath);
   } catch (error) {
     emit("error", `Cannot read ${path.relative(process.cwd(), installPath)}: ${error.message}`);
-    process.exitCode = 1;
+    process.exitCode = 3;
     return;
   }
 
-  let response;
   try {
-    response = await fetch(releaseUrl, {
-      headers: { "user-agent": "st-planner-update-check" },
-      signal: AbortSignal.timeout(10000)
-    });
+    if (!(await verifyCriticalIntegrity(installed))) {
+      process.exitCode = 3;
+      return;
+    }
   } catch (error) {
-    emit("notice", `S&T Planner update check unavailable (${error.message}). Installed version: ${installed.framework_version ?? "unknown"}.`);
+    emit("error", `Cannot verify installed S&T Planner freshness-path integrity: ${error.message}`);
+    process.exitCode = 3;
     return;
   }
 
-  if (!response.ok) {
-    emit("notice", `S&T Planner update check unavailable (HTTP ${response.status}). Installed version: ${installed.framework_version ?? "unknown"}.`);
+  let latest;
+  try {
+    latest = await fetchLatestRelease();
+  } catch (error) {
+    emit("notice", `S&T Planner freshness could not be verified (${error.message}). Installed version: ${installed.framework_version ?? "unknown"}. Local freshness-path integrity passed; do not claim the framework is current.`);
     return;
   }
 
-  const latest = await response.json();
   const installedVersion = installed.framework_version ?? "unknown";
   const latestVersion = latest.version ?? "unknown";
-
-  if (installedVersion === latestVersion) {
-    console.log(`S&T Planner framework is current (${installedVersion}).`);
+  const relation = compareSemver(installedVersion, latestVersion);
+  if (relation === null) {
+    emit("error", `Invalid S&T Planner version metadata: installed ${installedVersion}, latest ${latestVersion}.`);
+    process.exitCode = 3;
     return;
   }
 
-  const required = latest.update_policy === "required";
+  const latestIntegrity = latest.critical_integrity ?? {};
+  const installedIntegrity = installed.critical_integrity ?? {};
+  const sameCriticalRelease = latestIntegrity.checker_git_blob_sha === installedIntegrity.checker_git_blob_sha
+    && latestIntegrity.agents_rules_git_blob_sha === installedIntegrity.agents_rules_git_blob_sha;
+
+  if (relation === 0 && sameCriticalRelease) {
+    console.log(`S&T Planner framework is current (${installedVersion}); freshness-path integrity passed.`);
+    return;
+  }
+
+  if (relation > 0) {
+    emit("warning", `Installed S&T Planner ${installedVersion} is newer than source release ${latestVersion}. Freshness is ambiguous; reconcile the installation with LirazShay/st-planner before further S&T planning/execution.`);
+    process.exitCode = 2;
+    return;
+  }
+
+  const required = latest.update_policy === "required" || relation === 0;
+  const reason = relation === 0
+    ? "The source release content changed without a version change; treat this as a required framework repair."
+    : required
+      ? "This release is marked REQUIRED before further S&T planning/execution."
+      : "This release is recommended.";
   const message = [
     `S&T Planner framework update available: installed ${installedVersion}, latest ${latestVersion}.`,
     latest.summary ? `Latest: ${latest.summary}` : null,
-    required ? "This release is marked REQUIRED before further S&T planning/execution." : "This release is recommended.",
-    latest.upgrade_command ?? "Ask the repository agent to update S&T Planner from LirazShay/st-planner."
+    reason,
+    latest.upgrade_command ?? "Ask the repository agent to update S&T Planner from LirazShay/st-planner before continuing.",
   ].filter(Boolean).join(" ");
 
   emit(required ? "warning" : "notice", message);
-
-  if (required && process.env.GITHUB_ACTIONS === "true") {
-    process.exitCode = 2;
-  }
+  if (required) process.exitCode = 2;
 }
 
 await main();
