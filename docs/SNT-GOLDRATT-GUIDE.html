@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>S&T — Strategy & Tactics Tree | מדריך מעשי</title>
+  <title>ST Planner — Strategy & Tactics | מדריך מעשי</title>
   <style>
     :root{
       --bg:#f6f8fb;--paper:#fff;--ink:#172033;--muted:#5f6b7a;--line:#dfe5ec;
       --accent:#0f766e;--accent2:#1d4ed8;--soft:#eef8f6;--soft2:#eef4ff;
-      --warn:#fff7e6;--danger:#fff1f2;--shadow:0 14px 40px rgba(20,35,55,.08);
-      --radius:18px;--mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+      --warn:#fff7e6;--shadow:0 14px 40px rgba(20,35,55,.08);--radius:18px;
+      --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Hebrew",sans-serif;line-height:1.72}
@@ -26,43 +26,36 @@
     .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}
     .span12{grid-column:span 12}.span8{grid-column:span 8}.span6{grid-column:span 6}.span4{grid-column:span 4}
     h2{font-size:29px;margin:0 0 12px} h3{font-size:21px;margin:16px 0 7px}
-    .lead{font-size:18px;color:#334155}
-    .muted{color:var(--muted)}
+    .lead{font-size:18px;color:#334155}.muted{color:var(--muted)}
     .pill{display:inline-block;background:var(--soft);color:#0f5f58;border:1px solid #cce8e3;border-radius:999px;padding:5px 10px;font-weight:700;font-size:13px;margin:3px}
     .pill.blue{background:var(--soft2);color:#1e40af;border-color:#d6e4ff}
     .big-rule{font-size:25px;font-weight:800;text-align:center;padding:18px;background:#f8fafc;border:1px dashed #b8c2cf;border-radius:14px}
     .pair{display:grid;grid-template-columns:1fr 90px 1fr;align-items:center;gap:10px;margin:18px 0}
-    .box{border-radius:14px;padding:18px;border:2px solid}
-    .strategy{background:#eef8f6;border-color:#8ad3c8}.tactic{background:#eef4ff;border-color:#8fb3ff}
+    .box{border-radius:14px;padding:18px;border:2px solid}.strategy{background:#eef8f6;border-color:#8ad3c8}.tactic{background:#eef4ff;border-color:#8fb3ff}
     .arrow{text-align:center;font-weight:800;color:#64748b;font-size:22px}
     .tree{font-family:var(--mono);direction:ltr;text-align:left;white-space:pre;overflow:auto;background:#111827;color:#e5edf7;border-radius:15px;padding:22px;line-height:1.55}
     .note{border-right:5px solid var(--accent);background:var(--soft);padding:14px 17px;border-radius:12px}
     .warning{border-right:5px solid #d97706;background:var(--warn);padding:14px 17px;border-radius:12px}
     .planner{border-right:5px solid var(--accent2);background:var(--soft2);padding:14px 17px;border-radius:12px}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{border-bottom:1px solid var(--line);padding:12px;vertical-align:top;text-align:right}
-    th{background:#f8fafc}
+    table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border-bottom:1px solid var(--line);padding:12px;vertical-align:top;text-align:right}th{background:#f8fafc}
     code{font-family:var(--mono);font-size:.92em;background:#f1f5f9;padding:2px 6px;border-radius:6px;direction:ltr}
-    ul,ol{padding-right:24px}
-    .step{display:flex;gap:14px;align-items:flex-start;margin:14px 0}
-    .num{flex:0 0 36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#0f766e;color:#fff;font-weight:800}
+    ul,ol{padding-right:24px}.step{display:flex;gap:14px;align-items:flex-start;margin:14px 0}.num{flex:0 0 36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#0f766e;color:#fff;font-weight:800}
     .footer{padding:26px 0 10px;color:#64748b;font-size:14px}
     @media(max-width:850px){.span8,.span6,.span4{grid-column:span 12}.hero{padding:30px}.hero h1{font-size:34px}.pair{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
   </style>
 </head>
 <body>
 <div class="wrap">
-
   <header class="hero">
     <div class="eyebrow">Theory of Constraints • Strategy & Tactics</div>
-    <h1>עץ Strategy & Tactics — מדריך מעשי וברור</h1>
+    <h1>Strategy & Tactics — מדריך מעשי ל־ST Planner</h1>
     <p>
       הסבר עצמאי ומפורט לרעיונות שבמאמר <strong>Strategy and Tactics</strong> מאת
-      Eli Goldratt, Rami Goldratt ו־Eli Abramov — יחד עם מיפוי ישיר לאופן שבו
-      <strong>S&T Planner</strong> שלנו משתמש בהם.
+      Eli Goldratt, Rami Goldratt ו־Eli Abramov, יחד עם האופן שבו ST Planner משתמש בהם
+      לתכנון עמוק ולניהול ביצוע קליל.
     </p>
     <div class="source">
-      <strong>המקור המקורי:</strong><br>
+      <strong>מקור הלימוד:</strong><br>
       <a href="https://public.archive.wsu.edu/engrmgmt/public_html/holt/em534/Goldratt/Strategic-Tactic.html" target="_blank" rel="noopener">
         Washington State University — Strategy and Tactics
       </a>
@@ -71,324 +64,213 @@
   </header>
 
   <main class="grid">
-
     <section class="card span12">
-      <h2>הרעיון המרכזי במשפט אחד</h2>
+      <h2>הרעיון המרכזי</h2>
       <div class="big-rule">
-        בכל רמה בעץ יש זוג: <span class="pill">Strategy = בשביל מה?</span>
+        בכל רמה משמעותית יש זוג:
+        <span class="pill">Strategy = בשביל מה?</span>
         <span class="pill blue">Tactic = איך?</span>
       </div>
       <p class="lead">
-        Strategy איננה “החלק הגבוה” ו־Tactic איננה “החלק הנמוך”.
-        ההבחנה היא לפי סוג השאלה: Strategy מתארת את <strong>היעד</strong>;
-        Tactic מתארת את <strong>הפעולה שנבחרה כדי להשיג אותו</strong>.
-        לכן בכל רמה — מהחזון ועד ליחידת עבודה מפורטת — קיימים שניהם.
+        Strategy מתארת את התוצאה הנדרשת; Tactic מתארת את הדרך שנבחרה להשיג אותה.
+        זו אינה חלוקה של “גבוה” מול “נמוך” — אותו יחס חוזר בכל רמה שבה עדיין יש החלטה מהותית.
       </p>
     </section>
 
     <section class="card span6">
       <h2>Strategy</h2>
-      <div class="box strategy">
-        <strong>What for?</strong><br>
-        מה אנחנו רוצים שיהיה נכון? מהו היעד של הפעולה?
-      </div>
-      <p>
-        כל פעולה משמעותית צריכה סיבה. כששואלים על פעולה “למה אנחנו עושים את זה?”,
-        התשובה היא ה־Strategy שלה.
-      </p>
+      <div class="box strategy"><strong>What for?</strong><br>מה חייב להיות נכון כדי שהשלב יצליח?</div>
+      <p>Strategy טובה מנוסחת כתוצאה, לא ככלי או כפעילות.</p>
     </section>
 
     <section class="card span6">
       <h2>Tactic</h2>
-      <div class="box tactic">
-        <strong>How?</strong><br>
-        מה נעשה בפועל כדי לגרום ל־Strategy להתקיים?
-      </div>
-      <p>
-        לכל יעד משמעותי צריך להיות מענה מעשי. כששואלים “איך נשיג את היעד?”,
-        התשובה היא ה־Tactic.
-      </p>
+      <div class="box tactic"><strong>How?</strong><br>איזו דרך נבחרה כדי לגרום ל־Strategy להתקיים?</div>
+      <p>ל־Tactic מהותית צריך להיות הסבר מדוע היא מתאימה למציאות ולמגבלות הנוכחיות.</p>
     </section>
 
     <section class="card span12">
       <h2>Step אחד = Strategy + Tactic</h2>
       <div class="pair">
-        <div class="box strategy"><strong>Strategy</strong><br>המצב/התוצאה שאנו חייבים להשיג</div>
+        <div class="box strategy"><strong>Strategy</strong><br>התוצאה שאנו חייבים להשיג</div>
         <div class="arrow">⇄</div>
-        <div class="box tactic"><strong>Tactic</strong><br>הפעולה שנבחרה כדי להשיג אותה</div>
+        <div class="box tactic"><strong>Tactic</strong><br>הדרך שנבחרה להשיג אותה</div>
       </div>
       <div class="note">
-        המאמר מדגיש קשר הדדי: לכל Tactic משמעותית צריך להיות Strategy שמסבירה למה היא נעשית;
-        ולכל Strategy משמעותית צריך להיות Tactic שמסבירה איך היא תושג.
+        ב־ST Planner לא מספיק לכתוב את הזוג. בהחלטה מהותית בודקים גם את ההנחות,
+        חלופות סבירות שיכולות לשנות את הבחירה, ומה יפריך או יפתח מחדש את ההחלטה.
       </div>
     </section>
 
     <section class="card span8">
-      <h2>למה העץ הוא היררכי?</h2>
+      <h2>למה העץ היררכי?</h2>
       <p>
-        יעד גבוה בדרך כלל דורש כמה תנאים הכרחיים. כל תנאי כזה הוא בעצמו Strategy של Step נמוך יותר,
-        ולכל Strategy כזאת יש Tactic משלה.
+        Tactic של אב דורשת בדרך כלל כמה תוצאות עצמאיות. כל תוצאה כזאת הופכת ל־Strategy של ילד,
+        ולה יש Tactic משלה.
       </p>
       <div class="tree">Sx / Tx
 ├── S1 / T1
 ├── S2 / T2
 └── S3 / T3
 
-S1 + S2 + S3  = necessary conditions
-together      = sufficient for Sx
-
-T1 + T2 + T3  = the detailed way Tx is performed</div>
+S1 + S2 + S3 = necessary conditions
+all together = sufficient for Sx</div>
       <p>
-        מכאן נובע עיקרון היסוד: הילדים צריכים להיות
-        <strong>הכרחיים כל אחד בפני עצמו</strong> ו־<strong>מספיקים יחד</strong>.
+        הילדים צריכים להיות <strong>הכרחיים כל אחד בפני עצמו</strong> ו־<strong>מספיקים יחד</strong>.
       </p>
     </section>
 
     <section class="card span4">
       <h2>העץ איננו ציר זמן</h2>
-      <p>
-        ירידה ברמה איננה אומרת “מה עושים קודם ומה אחר כך”.
-        הילדים הם פירוט לוגי של האופן שבו מבצעים את ה־Tactic של האב.
-      </p>
+      <p>היררכיית S&T מסבירה למה ואיך — לא את סדר הביצוע.</p>
       <div class="warning">
-        סדר ביצוע הוא שאלה אחרת. ב־S&T Planner אנחנו מייצגים תלות ביצועית בנפרד באמצעות
-        <code>depends_on</code>.
+        prerequisites אמיתיים בין משימות implementation-ready נשמרים בנפרד ב־<code>EXECUTION.md</code>
+        בעמודת <code>Depends on</code>.
       </div>
     </section>
 
     <section class="card span12">
-      <h2>כלל חשוב: Tactic אחת לכל Strategy</h2>
-      <p class="lead">
-        אם קיימות כמה דרכי פעולה שכל אחת בפני עצמה יכולה להשיג את אותה Strategy —
-        אלה <strong>חלופות</strong>, לא כמה Tactics הכרחיות של אותו Step.
-      </p>
+      <h2>Tactic אחת נבחרת לכל Strategy פעילה</h2>
       <table>
         <thead><tr><th>מצב</th><th>ייצוג נכון</th></tr></thead>
         <tbody>
-          <tr><td>פעולה אחת שנבחרה להשגת יעד</td><td>Strategy אחת + Tactic אחת</td></tr>
-          <tr><td>שתי דרכים שונות שכל אחת יכולה להשיג אותו יעד</td><td>חלופות; בוחרים אחת</td></tr>
-          <tr><td>שתי פעולות ששתיהן באמת נחוצות</td><td>שני Steps ילדים, לכל אחד Strategy/Tactic משלו</td></tr>
+          <tr><td>דרך אחת שנבחרה להשגת היעד</td><td>Strategy אחת + Tactic אחת</td></tr>
+          <tr><td>כמה דרכים שכל אחת יכולה לבדה להשיג את אותו יעד</td><td>חלופות; בוחרים את המתאימה ומצדיקים למה</td></tr>
+          <tr><td>כמה תוצאות שכולן נדרשות</td><td>ילדים נפרדים, לכל אחד Strategy/Tactic משלו</td></tr>
         </tbody>
       </table>
     </section>
 
-    <section class="card span12">
-      <h2>שלושת סוגי ההסבר הלוגי</h2>
-      <p>
-        זוג Strategy/Tactic לבדו איננו מספיק. צריך להסביר למה הקשרים בעץ תקפים.
-      </p>
-    </section>
-
     <section class="card span4">
-      <h3>1. Parallel Assumption</h3>
+      <h3>1. Tactic validity</h3>
       <p><strong>הקשר:</strong> Tactic → Strategy של אותו Step.</p>
-      <p>הוא עונה על אתגרים כמו:</p>
-      <ul>
-        <li>למה בכלל צריך פעולה?</li>
-        <li>האם הפעולה אפשרית?</li>
-        <li>למה בחרנו דווקא בה?</li>
-        <li>האם היא באמת מספיקה?</li>
-      </ul>
-      <div class="planner">
-        ב־S&T Planner: <code>parallel_assumptions</code>
-      </div>
+      <p>שואלים למה ה־Tactic יכולה לעבוד כאן, אילו הנחות מחזיקות אותה, ואיזו חלופה מהותית עשויה להיות טובה יותר.</p>
     </section>
 
     <section class="card span4">
-      <h3>2. Necessary Assumption</h3>
+      <h3>2. Necessity</h3>
       <p><strong>הקשר:</strong> Child → Parent.</p>
-      <p>
-        מסביר למה ה־Strategy של הילד הכרחית להשגת האב.
-        המבחן החזק הוא:
-      </p>
       <div class="big-rule" style="font-size:18px">אם נמחק את הילד ולא נחליף אותו — האם האב עדיין יכול להצליח?</div>
-      <div class="planner">
-        ב־S&T Planner: <code>necessary_assumptions</code> נשמרות על הילד.
-      </div>
     </section>
 
     <section class="card span4">
-      <h3>3. Sufficiency Assumption</h3>
+      <h3>3. Sufficiency</h3>
       <p><strong>הקשר:</strong> כל קבוצת הילדים → Parent.</p>
-      <p>
-        מסביר למה כל הילדים יחד מספיקים ואין תנאי פעיל נוסף שחסר.
-      </p>
-      <div class="big-rule" style="font-size:18px">נניח שכל הילדים הצליחו. האם האב עדיין יכול להיכשל בגלל עבודה שחסרה?</div>
-      <div class="planner">
-        ב־S&T Planner: <code>sufficiency_assumptions</code> נשמרות על האב.
-      </div>
+      <div class="big-rule" style="font-size:18px">נניח שכל הילדים הצליחו. איזו דרישה שהיינו אמורים לטפל בה עדיין יכולה להיות חסרה?</div>
     </section>
 
     <section class="card span12">
-      <h2>מה עושים עם תנאי נחוץ שכבר קיים?</h2>
+      <h2>תנאי נחוץ שכבר מתקיים אינו משימה חדשה</h2>
       <p>
-        לא כל תנאי הכרחי צריך להפוך ל־Step. אם תנאי כבר מתקיים ואין צורך לבצע פעולה כדי ליצור אותו,
-        אין טעם להמציא עבורו עבודה. הוא יכול להישאר כעובדה/הנחה שמסבירה למה קבוצת הילדים מספיקה.
+        אם תנאי נדרש כבר מתקיים במציאות הקיימת, אין צורך להפוך אותו ל־node או task רק כדי שהעץ ייראה שלם.
+        מתעדים אותו כ־current reality או assumption רלוונטי וממשיכים.
       </p>
-      <div class="note">
-        זה אחד המנגנונים החשובים נגד “ניפוח תוכנית”: העץ מכיל עבודה שצריך לבצע,
-        לא רשימת כל העובדות הנכונות בעולם.
-      </div>
+      <div class="note">זהו אחד ממנגנוני KISS החשובים: מתכננים את העבודה שצריך ליצור, לא את כל העובדות הנכונות בעולם.</div>
     </section>
 
     <section class="card span6">
-      <h2>איך עולים בעץ?</h2>
-      <p>מתחילים מ־Strategy קיימת ושואלים:</p>
-      <div class="big-rule" style="font-size:20px">למה אנחנו צריכים את היעד הזה? כדי להשיג מה?</div>
-      <p>
-        התשובה מרמזת על Strategy ברמה גבוהה יותר. אחר כך מגדירים לה Tactic ובודקים מחדש את הלוגיקה.
-      </p>
+      <h2>איך עולים?</h2>
+      <div class="big-rule" style="font-size:20px">בשביל מה צריך את ה־Strategy הזאת?</div>
+      <p>התשובה עוזרת למצוא את התוצאה הגבוהה יותר שמצדיקה את השלב.</p>
     </section>
 
     <section class="card span6">
-      <h2>איך יורדים בעץ?</h2>
-      <p>מתחילים מ־Tactic של האב ושואלים:</p>
-      <div class="big-rule" style="font-size:20px">איך בדיוק צריך לבצע את הפעולה הזאת?</div>
+      <h2>איך יורדים?</h2>
+      <div class="big-rule" style="font-size:20px">אילו תוצאות עצמאיות חייבות להתקיים כדי שה־Tactic הזאת תצליח?</div>
+      <p>התוצאות הנחוצות הופכות לילדים. ממשיכים עד שה־leaves decision-complete, מעשיים לביצוע ובר־אימות.</p>
+    </section>
+
+    <section class="card span12">
+      <h2>תהליך מעשי ב־ST Planner</h2>
+      <div class="step"><div class="num">1</div><div><strong>הפרד outcome מפתרון מוצע.</strong><br>הבן מה באמת צריך להיות נכון, מהי המציאות הנוכחית ומהן המגבלות.</div></div>
+      <div class="step"><div class="num">2</div><div><strong>בנה Strategy/Tactic והצדק את הבחירה.</strong><br>בבחירה מהותית בדוק assumptions, alternatives ו־invalidation.</div></div>
+      <div class="step"><div class="num">3</div><div><strong>פרק לפי Necessity.</strong><br>אל תפרק לפי תיקיות, צוותים או שלבי פיתוח אלא אם הם באמת תוצאות עצמאיות נדרשות.</div></div>
+      <div class="step"><div class="num">4</div><div><strong>בדוק Sufficiency.</strong><br>נניח שכל הילדים הצליחו — האם האב עדיין יכול להיכשל בגלל פער שהיינו אמורים לתכנן?</div></div>
+      <div class="step"><div class="num">5</div><div><strong>עצור בזמן.</strong><br>leaf מוכן כשלא נדרשת עוד החלטה מוצרית/ארכיטקטונית מהותית, הוא מעשי לביצוע ויש לו success evidence ברור.</div></div>
+      <div class="step"><div class="num">6</div><div><strong>בצע Final Planning Review.</strong><br>בדוק מבחוץ פנימה outcome, alternatives, Necessity, Sufficiency, assumptions, evidence ו־KISS.</div></div>
+      <div class="step"><div class="num">7</div><div><strong>הפוך leaves ישירות למשימות.</strong><br>ב־<code>EXECUTION.md</code> שומרים רק owner, status, prerequisites אמיתיים ו־result/evidence קצר.</div></div>
+    </section>
+
+    <section class="card span12">
+      <h2>דוגמה תוכנתית קצרה</h2>
+      <p class="muted">הדוגמה נכתבה עבור המדריך ואינה מהמאמר המקורי.</p>
+      <div class="tree">0  Strategy: user can import CSV safely and predictably
+   Tactic: bounded Parse → Validate → Persist → Report workflow
+
+   ├─ 0.1 deterministic input interpretation
+   ├─ 0.2 invalid data cannot reach persistence
+   ├─ 0.3 accepted data persists with defined atomicity
+   └─ 0.4 caller receives a deterministic outcome</div>
       <p>
-        הפעולות ההכרחיות שמתקבלות הופכות ל־Tactics של הילדים.
-        לכל אחת מנסחים את ה־Strategy הספציפית שהיא משיגה.
+        כל ילד חייב לעבור Removal Test, וכל הקבוצה Gap Test. לאחר שה־leaves מוכנים לביצוע,
+        הם יכולים להיות מוקצים ל־Chat N, agent או developer בלי ליצור task hierarchy שני.
       </p>
     </section>
 
     <section class="card span12">
-      <h2>אזהרת “ילד יחיד”</h2>
-      <p>
-        אם אב מתפרק לילד יחיד בלבד, לרוב לא באמת פירקנו את הלוגיקה — פשוט כתבנו אותה שוב במילים אחרות.
-        פירוק משמעותי אמור לחשוף כמה תנאים עצמאיים שהם הכרחיים יחד.
-      </p>
-      <div class="warning">
-        אין מספר קסם של ילדים. המבחן איננו “כמה Steps יש”, אלא Necessity + Sufficiency.
-      </div>
-    </section>
-
-    <section class="card span12">
-      <h2>איך בונים עץ מאפס — תהליך מעשי</h2>
-
-      <div class="step"><div class="num">1</div><div><strong>הגדר מטרה גבוהה.</strong><br>מה מטרת המערכת/היוזמה? למה היא קיימת? מה צריך להיות נכון בסוף?</div></div>
-      <div class="step"><div class="num">2</div><div><strong>נסח Tactic.</strong><br>מהי הפעולה שאמורה להספיק כדי ליצור את ה־Strategy?</div></div>
-      <div class="step"><div class="num">3</div><div><strong>הגן על הקשר.</strong><br>כתוב Parallel Assumptions שמסבירות למה ה־Tactic אפשרית, מתאימה ומספיקה.</div></div>
-      <div class="step"><div class="num">4</div><div><strong>צלול מטה דרך ה־Tactic.</strong><br>שאל “איך בדיוק מבצעים אותה?” והצע פעולות הכרחיות עצמאיות.</div></div>
-      <div class="step"><div class="num">5</div><div><strong>לכל פעולה צור Strategy משלה.</strong><br>מהו היעד הספציפי שמתקיים אחרי שהפעולה הזאת הצליחה?</div></div>
-      <div class="step"><div class="num">6</div><div><strong>בדוק Necessity.</strong><br>הסר כל ילד בדמיון ובדוק אם האב עדיין יכול להצליח.</div></div>
-      <div class="step"><div class="num">7</div><div><strong>בדוק Sufficiency.</strong><br>נניח שכל הילדים הצליחו — מה עדיין עלול להיות חסר?</div></div>
-      <div class="step"><div class="num">8</div><div><strong>חזור על התהליך.</strong><br>ממשיכים לרדת עד שה־leaves מספיק ברורים לביצוע בלי החלטת תכנון מהותית נוספת.</div></div>
-    </section>
-
-    <section class="card span12">
-      <h2>דוגמה תוכנתית מקורית</h2>
-      <p class="muted">הדוגמה הבאה נכתבה עבור המדריך ואינה מהמאמר המקורי.</p>
-      <div class="tree">0  Strategy: משתמש יכול לייבא CSV באופן בטוח וצפוי
-   Tactic: לבנות workflow מוגדר של Parse → Validate → Persist → Report
-
-   ├─ 0.1 Strategy: הקלט מפורש באופן דטרמיניסטי
-   │      Tactic: להגדיר חוזה CSV ולפרסר לפיו
-   │
-   ├─ 0.2 Strategy: מידע לא תקין לא מגיע ל-persistence
-   │      Tactic: להפעיל policy מפורש ושער validation
-   │
-   ├─ 0.3 Strategy: מידע תקין נשמר בסמנטיקה מוגדרת
-   │      Tactic: לממש persistence policy אטומי/מפורש
-   │
-   └─ 0.4 Strategy: המשתמש יודע מה קרה
-          Tactic: להחזיר result contract דטרמיניסטי</div>
-      <p>
-        כל ילד כאן צריך לעבור Removal Test, וכל ארבעת הילדים יחד צריכים לעבור Gap Test.
-        אם אחד מהם אינו הכרחי — הוא לא שייך לקבוצה. אם כולם מצליחים ועדיין ה־import יכול להיכשל
-        בגלל capability שחסרה — הקבוצה אינה מספיקה.
-      </p>
-    </section>
-
-    <section class="card span12">
-      <h2>איך מציגים את העץ למישהו שלא בנה אותו?</h2>
-      <p>
-        המאמר ממליץ לא לקרוא את העץ כרשימת משימות. כשעוברים מקומה גבוהה לקבוצת ילדים,
-        צריך קודם להסביר <strong>למה הילדים נחוצים</strong>, אחר כך <strong>למה הם מספיקים יחד</strong>,
-        ורק אז להיכנס ל־Strategy/Tactic של כל Step.
-      </p>
-      <ol>
-        <li>מתחילים מלמעלה.</li>
-        <li>מציגים את ה־Necessary Assumptions של הקבוצה הנמוכה.</li>
-        <li>מקשרים כל Necessary Assumption ל־Strategy של הילד המתאים.</li>
-        <li>מציגים את ה־Sufficiency Assumptions של האב.</li>
-        <li>עוברים על Strategy + Tactic + Parallel Assumptions של כל ילד.</li>
-      </ol>
-    </section>
-
-    <section class="card span12">
-      <h2>Goldratt המקורי מול S&T Planner שלנו</h2>
-      <p>
-        חשוב להפריד בין עקרונות המקור לבין הרחבות שעשינו כדי ש־AI יוכל לעבוד בצורה אמינה ומתמשכת.
-      </p>
+      <h2>Goldratt המקורי מול ההרחבות של ST Planner</h2>
+      <p>חשוב להבחין בין רעיונות S&T לבין הרחבות הנדסיות שעוזרות ל־AI לעבוד לאורך זמן.</p>
       <table>
-        <thead><tr><th>נושא</th><th>במקור</th><th>ב־S&T Planner</th></tr></thead>
+        <thead><tr><th>נושא</th><th>במקור</th><th>ב־ST Planner 2.0</th></tr></thead>
         <tbody>
-          <tr><td>Strategy / Tactic בכל רמה</td><td>ליבה מרכזית</td><td>נשמר בדיוק</td></tr>
-          <tr><td>Necessary / Sufficient</td><td>ליבה מרכזית</td><td>נשמר ומקבל שדות מפורשים</td></tr>
-          <tr><td>Parallel Assumptions</td><td>ליבה מרכזית</td><td><code>parallel_assumptions</code></td></tr>
-          <tr><td>Alternatives</td><td>לא בקשר הכרחי</td><td>נשמרות ב־DECISIONS, לא כילדים הכרחיים</td></tr>
-          <tr><td>Success evidence</td><td>לא schema פורמלי במאמר</td><td>תוספת שלנו ל־AI ולביצוע בר־אימות</td></tr>
-          <tr><td>draft / blocked / approved</td><td>לא חלק מהמודל המקורי</td><td>תוספת workflow מינימלית שלנו</td></tr>
-          <tr><td>GOAL / DECISIONS / REVIEWS / STATUS</td><td>לא חלק מהמאמר</td><td>מעטפת persistence ו־epistemic hygiene ל־AI</td></tr>
-          <tr><td>depends_on</td><td>העץ הלוגי אינו timeline</td><td>תוספת נפרדת עבור prerequisites ביצועיים</td></tr>
-          <tr><td>EXECUTION.yaml וצ'אטים ממוספרים</td><td>לא חלק מהמקור</td><td>שכבת handoff מינימלית שלנו</td></tr>
+          <tr><td>Strategy / Tactic בכל רמה</td><td>ליבה מרכזית</td><td>נשמר</td></tr>
+          <tr><td>Necessary / Sufficient</td><td>ליבה מרכזית</td><td>נשמר ונבדק במפורש</td></tr>
+          <tr><td>Assumptions</td><td>ליבה מרכזית</td><td>נשמרות בתוך reasoning קריא, ללא schema כפוי</td></tr>
+          <tr><td>Material alternatives</td><td>אינן ילדים הכרחיים</td><td>נבחנות כשיכולות לשנות החלטה; נשמרות ב־PLAN או ב־DECISIONS האופציונלי</td></tr>
+          <tr><td>Success evidence</td><td>לא schema פורמלי במאמר</td><td>הרחבה לצורך תכנון וביצוע בר־אימות</td></tr>
+          <tr><td>Durable planning state</td><td>לא חלק מהמאמר</td><td><code>PLAN.md</code> + <code>EXECUTION.md</code>; STATUS/DECISIONS רק כשמועילים</td></tr>
+          <tr><td>Execution dependencies</td><td>העץ הלוגי אינו timeline</td><td><code>Depends on</code> רק עבור prerequisite ביצועי אמיתי</td></tr>
+          <tr><td>Chats / agents / developers</td><td>לא חלק מהמקור</td><td>owners קלים ב־<code>EXECUTION.md</code>, ללא authority engine</td></tr>
+          <tr><td>Workflow state machine</td><td>לא חלק מהמקור</td><td>אינו חלק מ־ST Planner 2.0</td></tr>
         </tbody>
       </table>
     </section>
 
     <section class="card span12">
-      <h2>Checklist לביקורת Step</h2>
+      <h2>Checklist לביקורת</h2>
       <table>
         <thead><tr><th>שאלה</th><th>מה היא בודקת?</th></tr></thead>
         <tbody>
-          <tr><td>מה ה־Strategy?</td><td>האם מוגדר יעד ולא פעילות?</td></tr>
-          <tr><td>מה ה־Tactic?</td><td>האם מוגדרת פעולה ולא ניסוח חוזר של היעד?</td></tr>
-          <tr><td>למה ה־Tactic תשיג את ה־Strategy?</td><td>Parallel logic</td></tr>
-          <tr><td>למה כל ילד הכרחי?</td><td>Necessary logic</td></tr>
-          <tr><td>אם כל הילדים מצליחים — האם עדיין חסר משהו?</td><td>Sufficiency logic</td></tr>
-          <tr><td>האם חלופה הוצגה בטעות כילד הכרחי?</td><td>Alternative hygiene</td></tr>
-          <tr><td>האם תנאי שכבר קיים הומצא כעבודה חדשה?</td><td>KISS / existing condition</td></tr>
-          <tr><td>האם ירדנו מספיק עמוק כדי לבצע?</td><td>Implementation readiness</td></tr>
+          <tr><td>מה ה־Strategy?</td><td>האם הוגדרה תוצאה ולא פעילות?</td></tr>
+          <tr><td>מה ה־Tactic?</td><td>האם נבחרה דרך ולא ניסוח חוזר של היעד?</td></tr>
+          <tr><td>למה ה־Tactic הזאת?</td><td>Validity, assumptions, alternatives</td></tr>
+          <tr><td>למה כל ילד הכרחי?</td><td>Necessity</td></tr>
+          <tr><td>אם כל הילדים מצליחים — מה עדיין יכול להיות חסר?</td><td>Sufficiency</td></tr>
+          <tr><td>האם עובדה קיימת הפכה בטעות למשימה?</td><td>KISS / current reality</td></tr>
+          <tr><td>האם ה־leaf דורש עוד החלטה מהותית?</td><td>Decision completeness</td></tr>
+          <tr><td>מה מוכיח הצלחה?</td><td>Objective success evidence</td></tr>
+          <tr><td>האם מנגנון planner חדש באמת מונע כשל אמיתי?</td><td>Process ROI / anti-bureaucracy</td></tr>
         </tbody>
       </table>
     </section>
 
     <section class="card span12">
       <h2>המשפטים שכדאי לזכור</h2>
-      <div class="big-rule">Strategy: בשביל מה?</div>
-      <br>
-      <div class="big-rule">Tactic: איך?</div>
-      <br>
-      <div class="big-rule">Child: למה הוא הכרחי?</div>
-      <br>
-      <div class="big-rule">Sibling group: למה כולם יחד מספיקים?</div>
-      <br>
-      <div class="big-rule">Dive down: איך בדיוק מבצעים את ה־Tactic?</div>
-      <br>
-      <div class="big-rule">Go up: בשביל מה צריך את ה־Strategy הזאת?</div>
+      <div class="big-rule">Strategy: בשביל מה?</div><br>
+      <div class="big-rule">Tactic: איך?</div><br>
+      <div class="big-rule">Child: למה הוא הכרחי?</div><br>
+      <div class="big-rule">Sibling group: למה כולם יחד מספיקים?</div><br>
+      <div class="big-rule">Leaf: האם אפשר לבצע ולאמת בלי להמציא החלטה מהותית חדשה?</div><br>
+      <div class="big-rule">Process: האם המנגנון חוסך יותר סיכון ממה שהוא מוסיף בירוקרטיה?</div>
     </section>
 
     <section class="card span12">
       <h2>מקורות והמשך קריאה</h2>
       <p>
-        מקור עיקרי:
+        מקור לימוד עיקרי:
         <a href="https://public.archive.wsu.edu/engrmgmt/public_html/holt/em534/Goldratt/Strategic-Tactic.html" target="_blank" rel="noopener">
           Eli Goldratt, Rami Goldratt, Eli Abramov — Strategy and Tactics
         </a>.
       </p>
-      <p>
-        המאמר המקורי פורסם ללימוד באוניברסיטת Washington State ומסביר את בניית עץ S&T,
-        את שלושת סוגי ההנחות, את מבחני ההכרחיות/מספיקות, ואת השיטה לעלות ולרדת בין רמות העץ.
-      </p>
       <p class="muted">
-        המדריך הנוכחי הוא עיבוד עצמאי בעברית שמטרתו להסביר וליישם את הרעיונות ב־S&T Planner.
-        הרחבות AI/workflow מסומנות במפורש כהרחבות שלנו.
+        המדריך הנוכחי הוא עיבוד עצמאי בעברית. הרחבות כגון success evidence, durable PLAN/EXECUTION,
+        Planning Impact Test וניהול owners הן הרחבות ST Planner לצורך עבודה הנדסית עם AI.
       </p>
     </section>
-
   </main>
 
   <footer class="footer">
-    S&T Planner • explanatory guide • source concept credited to Eli Goldratt, Rami Goldratt & Eli Abramov
+    ST Planner • independent explanatory guide • Strategy & Tactics study source credited above
   </footer>
 </div>
 </body>
