@@ -4,6 +4,18 @@ S&T Planner executes an explicitly authorized frozen plan directly from S&T node
 
 The S&T leaves are already the planned work units.
 
+## Framework freshness before new execution
+
+An installed target repository should run:
+
+```text
+node .planning/check-framework-update.mjs
+```
+
+before starting new S&T planning/execution work. A newer `required` framework release must be explicitly upgraded before continuing; a `recommended` release is surfaced without becoming a hard gate. If freshness cannot be checked, report that fact and continue from the installed framework rather than claiming it is current.
+
+Framework upgrades refresh framework-managed instruction/tooling only. They must never overwrite active cycle state (`GOAL.md`, `TREE.yaml`, `DECISIONS.md`, `REVIEWS.md`, `STATUS.yaml`, `EXECUTION.yaml`). See `docs/FRAMEWORK-UPDATES.md`.
+
 After Final Planning Review passes:
 
 1. keep `.planning/STATUS.yaml -> cycle_state: active`;
@@ -51,6 +63,21 @@ If a target pointer differs from canonical runnable execution state, treat that 
 Hard failure is reserved for genuinely unsafe authority state: invalid/duplicate allocation, disabled implementation authorization, unallocated executor, broken dependency state, or a real planning defect.
 
 This avoids making correctness depend on updating several peer current-pointer files in a particular file-by-file order.
+
+## Mandatory CI warning/error RCA
+
+Every CI warning or error is a mandatory investigation gate before further implementation progress.
+
+Do not treat a local symptom fix or a green rerun as sufficient closure. Follow the installed `.planning/CI-RCA-POLICY.md` and establish:
+
+1. what happened;
+2. the causal root — not merely the first broken line;
+3. why prevention/detection allowed the problem to reach CI;
+4. the reusable prevention/detection improvement;
+5. materially analogous areas that may share the same underlying weakness;
+6. evidence that closes both the original CI signal and every analogous instance found.
+
+When reporting a CI incident, explicitly tell the user that progression is paused for RCA and that a local fix alone is not closure. Continue only after the RCA is closed.
 
 ## Allocation is not conversation activation
 
