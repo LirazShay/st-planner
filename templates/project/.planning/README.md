@@ -4,6 +4,23 @@ This directory contains the current S&T planning-cycle state, installed framewor
 
 The same installation is reused sequentially for later project/release/feature/change scopes. V1 allows one active S&T cycle per repository.
 
+## Framework freshness
+
+Before new S&T planning work or a numbered executor bootstrap, run:
+
+```text
+node .planning/check-framework-update.mjs
+```
+
+The installed framework identity is in `.planning/ST_PLANNER_INSTALL.json`.
+
+- current version — continue;
+- newer `recommended` release — tell the user the available version/summary and continue unless upgrade is chosen;
+- newer `required` release — do not start new S&T planning/execution until an explicit framework upgrade is completed and the checker reports current;
+- update check unavailable — say freshness could not be verified and continue from the installed framework without claiming it is current.
+
+Framework upgrade is separate from cycle reset. It may refresh framework-managed files only and must never overwrite current-cycle state (`GOAL.md`, `TREE.yaml`, `DECISIONS.md`, `REVIEWS.md`, `STATUS.yaml`, `EXECUTION.yaml`).
+
 ## User-facing planning command
 
 Normal usage from a planning chat can be as short as:
@@ -38,13 +55,14 @@ After Cycle Closure Review reaches `completed`, tell the user explicitly that th
 
 ## Planner read order
 
-1. project `AGENTS.md` and its routing/source-of-truth rules
-2. `FRAMEWORK.md`
-3. `.planning/STATUS.yaml`
-4. `GOAL.md`
-5. relevant `TREE.yaml` nodes
-6. `DECISIONS.md` when needed
-7. `REVIEWS.md` when needed
+1. run `check-framework-update.mjs` and resolve a required framework update
+2. project `AGENTS.md` and its routing/source-of-truth rules
+3. `FRAMEWORK.md`
+4. `.planning/STATUS.yaml`
+5. `GOAL.md`
+6. relevant `TREE.yaml` nodes
+7. `DECISIONS.md` when needed
+8. `REVIEWS.md` when needed
 
 Before replacing current-cycle state, inspect `STATUS.yaml -> cycle_state`:
 - `active` — resume/replan the current cycle; do not erase it merely because another request arrived;
@@ -66,17 +84,23 @@ This is not a QUICK/DEEP mode. The standard of proof is unchanged; only repeated
 
 ## Executor read order
 
-1. project `AGENTS.md` and its routing/source-of-truth rules
-2. `EXECUTOR_HANDOFF.md`
-3. establish the explicitly requested Chat N executor context; generic continue is not startup
-4. `.planning/STATUS.yaml` — require `cycle_state: active`, `plan_state: frozen`, and `implementation_authorized: true`
-5. `EXECUTION.yaml` — confirm Chat N allocation/state
-6. only assigned `TREE.yaml` nodes for Chat N
-7. dependency states from EXECUTION
-8. derive runnable work from TREE + EXECUTION (`execution-guidance.mjs` when useful)
-9. only referenced/materially required decisions, ancestor reasoning, and target-project context
+1. run `check-framework-update.mjs` and resolve a required framework update
+2. project `AGENTS.md` and its routing/source-of-truth rules
+3. `EXECUTOR_HANDOFF.md`
+4. `CI-RCA-POLICY.md`
+5. establish the explicitly requested Chat N executor context; generic continue is not startup
+6. `.planning/STATUS.yaml` — require `cycle_state: active`, `plan_state: frozen`, and `implementation_authorized: true`
+7. `EXECUTION.yaml` — confirm Chat N allocation/state
+8. only assigned `TREE.yaml` nodes for Chat N
+9. dependency states from EXECUTION
+10. derive runnable work from TREE + EXECUTION (`execution-guidance.mjs` when useful)
+11. only referenced/materially required decisions, ancestor reasoning, and target-project context
 
 A differing target-owned current pointer is advisory; it does not activate another identity and does not by itself block safe assigned work.
+
+## CI warning/error gate
+
+Every CI warning or error pauses progression until the RCA in `CI-RCA-POLICY.md` is closed. A local symptom fix or green rerun alone is not enough. The executor must establish root cause, why prevention/detection failed, reusable recurrence prevention, materially analogous areas at risk, and closing verification evidence, and must explicitly tell the user that progression is paused for this RCA.
 
 ## Ownership
 
@@ -85,6 +109,9 @@ A differing target-owned current pointer is advisory; it does not activate anoth
 - `README.md` — this installed state/read-order map.
 - `FRAMEWORK.md` — portable S&T planning/execution/cycle contract.
 - `EXECUTOR_HANDOFF.md` — stable executor bootstrap/read-order and handoff-verification contract; never task content.
+- `CI-RCA-POLICY.md` — mandatory root-cause/recurrence/analogous-area procedure for every CI warning/error.
+- `ST_PLANNER_INSTALL.json` — installed framework version/provenance.
+- `check-framework-update.mjs` — detects newer source framework releases.
 - `executor-authority.mjs` — executable reference for explicit activation/re-bootstrap vs accidental rollover; framework tooling, not project state.
 - `execution-guidance.mjs` — derives canonical runnable work from TREE + EXECUTION and classifies target-pointer drift as advisory unless authoritative execution itself is invalid.
 - `validate-allocation.mjs` — portable mechanical validator for TREE/EXECUTION allocation invariants; framework tooling, not project state.
@@ -150,6 +177,8 @@ Do not create `.planning/archive/`, plan-version registries, or parallel active 
 
 - One planning chat is preferred; later planning chats are continuation only.
 - V1 allows one active S&T cycle per repository.
+- Run the framework freshness checker before new planning/execution; a required framework release blocks new S&T work until explicit upgrade.
+- Framework upgrades never overwrite the six current-cycle state files.
 - Do not implement while `cycle_state` is terminal or `plan_state: active`.
 - The whole intended plan must pass Final Planning Review before `plan_state: frozen`.
 - `plan_state: frozen` does **not** authorize implementation.
@@ -158,6 +187,7 @@ Do not create `.planning/archive/`, plan-version registries, or parallel active 
 - `EXECUTION.yaml` + TREE dependencies are execution authority; target current pointers are projections.
 - Target pointer drift should normally warn/repair, not stop development by itself.
 - Generic continue never activates a different Chat N implicitly.
+- Every CI warning/error requires RCA closure before further progress.
 - After handoff, explicit Chat N startup may intentionally re-bootstrap in the same conversation when repository authority confirms it.
 - After freeze, assign every implementation-ready leaf exactly once in EXECUTION.
 - Before first authorization run `node .planning/validate-allocation.mjs --initial`. Authoritative validation failures block authorization.
