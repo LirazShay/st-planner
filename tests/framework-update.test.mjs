@@ -78,7 +78,6 @@ test("all framework-managed integrity metadata matches canonical LF source bytes
 
 test("framework upgrades can never classify cycle state as framework-managed", () => {
   assert.deepEqual(release.state_paths_never_overwrite, protectedState);
-
   for (const statePath of protectedState) {
     assert.equal(release.framework_managed_paths.includes(statePath), false, `${statePath} must never be framework-managed`);
     assert.equal(Object.hasOwn(release.managed_integrity, statePath), false, `${statePath} must never have framework integrity ownership`);
@@ -119,24 +118,41 @@ test("freshness and mandatory CI RCA contracts are wired into entry points", () 
     assert.match(text, /check-framework-update\.mjs/);
     assert.match(text, /required/i);
   }
-
   for (const text of [agents, handoff, executorPrompt]) {
     assert.match(text, /warning or error/i);
     assert.match(text, /RCA/);
     assert.match(text, /CI-RCA-POLICY\.md/);
   }
-
   assert.match(policy, /Where else could the same failure mode exist\?/);
   assert.match(policy, /local symptom fix alone is not considered closure/i);
 });
 
-test("source CI enforces release discipline for all distributed framework surfaces", () => {
+test("upgrade contract requires divergence audit before managed-file overwrite", () => {
+  const bootstrap = fs.readFileSync(path.join(repoRoot, "BOOTSTRAP.md"), "utf8");
+  const updates = fs.readFileSync(path.join(repoRoot, "docs", "FRAMEWORK-UPDATES.md"), "utf8");
+
+  for (const text of [bootstrap, updates]) {
+    assert.match(text, /pre-upgrade.*(?:customization|divergence)|divergence.*audit/is);
+    assert.match(text, /source_commit/);
+    assert.match(text, /historical.*source/is);
+    assert.match(text, /target-owned customization/i);
+    assert.match(text, /before.*overwrite|before.*replac/is);
+    assert.match(text, /stop.*(?:conflict|guess)|never guess/is);
+  }
+});
+
+test("release-sensitive source upgrade contracts are version-gated", () => {
+  assert.deepEqual(release.release_sensitive_source_paths, ["BOOTSTRAP.md", "docs/FRAMEWORK-UPDATES.md"]);
+  for (const relative of release.release_sensitive_source_paths) {
+    assert.equal(fs.existsSync(path.join(repoRoot, relative)), true, `${relative} must exist`);
+  }
+
   const workflow = fs.readFileSync(path.join(repoRoot, ".github", "workflows", "framework-tests.yml"), "utf8");
   const verifier = fs.readFileSync(path.join(repoRoot, "scripts", "verify-release-discipline.mjs"), "utf8");
-
   assert.match(workflow, /fetch-depth:\s*0/);
   assert.match(workflow, /verify-release-discipline\.mjs/);
-  assert.match(verifier, /distributed framework changed without a forward version bump/);
+  assert.match(verifier, /release_sensitive_source_paths/);
+  assert.match(verifier, /release-sensitive framework content changed without a forward version bump/);
   assert.match(verifier, /install_metadata_path/);
   assert.match(verifier, /agents_rules/);
   assert.match(verifier, /CHANGELOG\.md/);
@@ -152,7 +168,6 @@ test("superseded unbounded AGENTS snippet is referenced only as historical migra
     "docs/FRAMEWORK-UPDATES.md",
     "scripts/verify-release-discipline.mjs",
   ]);
-
   const offenders = [];
   for (const file of walkTextFiles(repoRoot)) {
     const relative = path.relative(repoRoot, file).replaceAll(path.sep, "/");
