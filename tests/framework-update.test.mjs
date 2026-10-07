@@ -63,8 +63,9 @@ test("freshness and mandatory CI RCA contracts are wired into executor entry poi
   }
 
   for (const text of [agents, handoff, executorPrompt]) {
-    assert.match(text, /CI warning or error/i);
+    assert.match(text, /warning or error/i);
     assert.match(text, /RCA/);
+    assert.match(text, /CI-RCA-POLICY\.md/);
   }
 
   assert.match(policy, /Where else could the same failure mode exist\?/);
