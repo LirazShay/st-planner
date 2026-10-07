@@ -52,22 +52,24 @@ test("template install metadata matches the current source release", () => {
   });
 });
 
-test("all framework-managed integrity metadata matches source bytes", () => {
+test("all framework-managed integrity metadata matches canonical LF source bytes", () => {
   assert.deepEqual(Object.keys(release.managed_integrity).sort(), [...release.framework_managed_paths].sort());
 
   for (const managedPath of release.framework_managed_paths) {
     const source = path.join(repoRoot, "templates", "project", managedPath);
+    const text = fs.readFileSync(source, "utf8");
+    assert.doesNotMatch(text, /\r\n/, `${managedPath} source must be canonical LF so working-tree CRLF can normalize safely`);
     assert.equal(release.managed_integrity[managedPath], gitBlobSha(source), `${managedPath} integrity is stale`);
   }
 
   const checker = path.join(planningDir, "check-framework-update.mjs");
   const agentsRules = path.join(repoRoot, release.agents_rules.source_path);
+  const rules = fs.readFileSync(agentsRules, "utf8");
+  assert.doesNotMatch(rules, /\r\n/, "AGENTS rules source must be canonical LF");
   assert.equal(release.critical_integrity.checker_git_blob_sha, gitBlobSha(checker));
   assert.equal(release.critical_integrity.checker_git_blob_sha, release.managed_integrity[".planning/check-framework-update.mjs"]);
   assert.equal(release.critical_integrity.agents_rules_git_blob_sha, gitBlobSha(agentsRules));
   assert.equal(release.agents_rules.git_blob_sha, gitBlobSha(agentsRules));
-
-  const rules = fs.readFileSync(agentsRules, "utf8");
   assert.equal(rules.split(release.agents_rules.begin_marker).length - 1, 1);
   assert.equal(rules.split(release.agents_rules.end_marker).length - 1, 1);
   assert.ok(rules.startsWith(release.agents_rules.begin_marker));
@@ -128,13 +130,15 @@ test("freshness and mandatory CI RCA contracts are wired into entry points", () 
   assert.match(policy, /local symptom fix alone is not considered closure/i);
 });
 
-test("source CI enforces release discipline for distributed framework changes", () => {
+test("source CI enforces release discipline for all distributed framework surfaces", () => {
   const workflow = fs.readFileSync(path.join(repoRoot, ".github", "workflows", "framework-tests.yml"), "utf8");
   const verifier = fs.readFileSync(path.join(repoRoot, "scripts", "verify-release-discipline.mjs"), "utf8");
 
   assert.match(workflow, /fetch-depth:\s*0/);
   assert.match(workflow, /verify-release-discipline\.mjs/);
   assert.match(verifier, /distributed framework changed without a forward version bump/);
+  assert.match(verifier, /install_metadata_path/);
+  assert.match(verifier, /agents_rules/);
   assert.match(verifier, /CHANGELOG\.md/);
 });
 
