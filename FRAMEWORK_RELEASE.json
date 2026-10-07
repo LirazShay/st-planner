@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "version": "1.0.0",
+  "released_at": "2026-10-07",
+  "update_policy": "required",
+  "summary": "First versioned S&T Planner release: mandatory CI warning/error RCA gate, explicit framework provenance, and update detection for installed projects.",
+  "upgrade_command": "Ask the repository agent to update S&T Planner from LirazShay/st-planner before continuing.",
+  "state_paths_never_overwrite": [
+    ".planning/GOAL.md",
+    ".planning/TREE.yaml",
+    ".planning/DECISIONS.md",
+    ".planning/REVIEWS.md",
+    ".planning/STATUS.yaml",
+    ".planning/EXECUTION.yaml"
+  ],
+  "framework_managed_paths": [
+    ".planning/README.md",
+    ".planning/FRAMEWORK.md",
+    ".planning/EXECUTOR_HANDOFF.md",
+    ".planning/CI-RCA-POLICY.md",
+    ".planning/executor-authority.mjs",
+    ".planning/execution-guidance.mjs",
+    ".planning/validate-allocation.mjs",
+    ".planning/verify-freeze-baseline.mjs",
+    ".planning/check-framework-update.mjs",
+    ".planning/ST_PLANNER_INSTALL.json"
+  ]
+}

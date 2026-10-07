@@ -33,6 +33,23 @@ Target-owned `current_chat/current_node` pointers are projections/navigation aid
 
 Use `.planning/execution-guidance.mjs` to derive canonical runnable work when useful.
 
+## CI warning/error RCA gate
+
+Any CI warning or error encountered during execution is a mandatory investigation gate before progressing to further implementation work.
+
+Do not treat a local symptom fix as sufficient. Before continuing, the executor must perform a proportionate but complete root-cause analysis (RCA) that answers all of the following:
+
+1. **What happened?** Identify the exact failing/warning check, observed symptom, and affected state/path.
+2. **Why did it happen?** Trace the causal chain to the underlying process, design, contract, test, tooling, synchronization, migration, or implementation weakness rather than stopping at the first broken line.
+3. **Why was it not prevented or detected earlier?** Identify the missing guardrail, invariant, validation, ownership rule, test, migration step, or documentation that allowed the defect to reach CI.
+4. **How will recurrence be prevented?** Add or strengthen the systemic prevention/detection mechanism when practical; do not rely only on manually remembering the incident.
+5. **Where else could the same failure mode exist?** Search materially similar code paths, validators, copied planning files, status projections, workflows, tests, scripts, generated artifacts, and integrations for the same underlying weakness.
+6. **What evidence closes the investigation?** Verify the original CI signal is resolved, relevant regression coverage/guardrails are in place, and the analogous-area search found no unresolved instances (or record and address those that were found).
+
+Only after this RCA is complete may execution proceed beyond the incident. The scope of the investigation should be proportional to the signal, but `warning` does not mean “ignore”: if CI emitted it, the executor must understand and close it before moving on.
+
+When reporting a CI warning/error to the user, explicitly state that progression is paused pending this RCA and that a local fix alone is not considered closure.
+
 ## Handoff without unnecessary locking
 
 A new-chat handoff recommends a fresh conversation for cleaner context.
