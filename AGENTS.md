@@ -1,184 +1,161 @@
-# AGENTS.md — S&T Planner Contract
+# AGENTS.md — S&T Planner Source Contract
 
-This repository builds a reusable S&T planning framework for GPT.
+This repository builds the reusable S&T Planner framework. Keep it small, explicit, deeply reasoned, externally usable, and safe to upgrade in target repositories.
 
-## One-command planning trigger
+## User-facing goal
 
-If the user asks to plan something with **S&T Planner** / **ST Planner** / **S T Planner**, that request activates the full framework automatically.
+A user working in another repository should be able to say:
 
-The user should not have to provide the workflow. The agent must read the repository and planning instructions, determine the requested goal, progressively load relevant project context, build/review the complete S&T plan, persist it in `.planning/`, record the reviewed baseline and verify no material drift before freeze, allocate implementation-ready leaves in `EXECUTION.yaml`, run the mandatory repository-only execution/handoff verification from `EXECUTOR_HANDOFF.md`, and explicitly authorize implementation only after all hard gates pass.
+> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
-Do not require the user to paste `START-PROMPT.md`, choose a phase count, or explain which planning files to update.
+and the agent should be able to bootstrap/reuse/update the framework, plan fully, hand off execution, and recover from later chats using repository state rather than chat history.
 
-## Core rule
+## Source-of-truth hierarchy
 
-For meaningful work, **plan completely before implementation**.
+- `BOOTSTRAP.md` — external install/reuse/upgrade entry contract.
+- `FRAMEWORK_RELEASE.json` — current distributed framework release, ownership boundaries, and critical update-path integrity.
+- `CHANGELOG.md` — release changes/upgrade notes.
+- `templates/project/.planning/` — installed framework/tooling + fresh-cycle templates.
+- `templates/project/AGENTS.rules.md` — bounded root rules block merged into target `AGENTS.md`.
+- `docs/FRAMEWORK-UPDATES.md` — update/freshness contract.
+- planning/execution methodology docs — deeper framework behavior.
+- `tests/` + `.github/workflows/framework-tests.yml` — mechanical regression/release gates.
 
-Do not release individual executable leaves while the overall intended plan is still being designed.
+Do not create a second authoritative copy of the same rule.
 
-## Planning method
+## Framework release discipline — mandatory
 
-Every S&T node has:
+Anything distributed into target repositories is a release-sensitive contract.
 
-- Strategy — what objective must exist?
-- Tactic — how will it be achieved?
-- Parallel assumptions — why can this tactic achieve this strategy?
-- Necessary assumptions — why is a child required for its parent?
-- Sufficiency assumptions — why are the children enough together?
-- Success evidence — how will we recognize the strategy as achieved?
-- Children — lower-level required steps.
+Before changing a distributed path, expect to update the release in the **same PR**:
 
-Do not choose a fixed number of phases in advance.
+1. advance `FRAMEWORK_RELEASE.json -> version` using forward semver;
+2. update `CHANGELOG.md` with that version and material upgrade behavior;
+3. keep `FRAMEWORK_RELEASE.json -> framework_managed_paths`, protected state, root-rules metadata, and critical-integrity values truthful;
+4. keep template `ST_PLANNER_INSTALL.json` version/integrity aligned with the release;
+5. run the full test suite and `scripts/verify-release-discipline.mjs`.
 
-## Efficient deep-planning flow
+Source CI enforces this. Do not bypass it with a local-only fix or by changing tests to accept stale release metadata.
 
-Efficiency must come from ordering and batching the reasoning, never from reducing S&T depth.
+If the checker or bounded root rules change, their Git blob IDs in release/install metadata must change too. If another framework-managed target file changes, a forward release version/changelog is still required even though that file is not part of the critical freshness-path hash.
 
-Before deep node-by-node planning, make a short structural map of the current scope: outcome/boundary, material questions and decisions that must be resolved, dependencies between those questions, material current-reality evidence still needed, and the likely major tree areas. This map is orientation only. It does not approve tactics, skip decisions, weaken necessity/sufficiency, or replace full justification.
+## Update-path invariants
 
-Then plan in coherent slices. Within a slice, perform the full S&T reasoning for the related decisions and nodes, persist the rationale in the normal planning artifacts, run mechanical validation where available, and review the coherent slice. Do not force a full read/edit/review/status cycle after every small edit.
+Installed projects must discover later releases without becoming a package-management system.
 
-Once a material decision has been justified and durably recorded in the current cycle, do not reopen the same reasoning merely for reassurance. Reopen it only when new evidence, a contradiction, a changed assumption, or a review finding can materially change the decision.
+The critical chain is:
 
-Existing project patterns, prior designs, or reusable mechanisms are evidence about current reality and candidate alternatives; they are never sufficient justification by themselves. Every material tactic must still stand on the current scope's evidence, assumptions, alternatives, and consequences.
+```text
+bounded root AGENTS rules
+→ run .planning/check-framework-update.mjs
+→ verify local freshness-path integrity
+→ compare installed provenance to source FRAMEWORK_RELEASE.json
+→ explicit safe upgrade when required
+```
 
-Keep deterministic checks mechanical where practical (for example schema/structure/dependency/allocation consistency) and reserve deep reasoning for judgments that actually require it. Whole-plan coverage and Final Planning Review remain mandatory.
+Rules:
 
-## Decomposition
+- required updates return non-zero even outside GitHub Actions;
+- local corruption/drift of the checker or bounded root rules returns a distinct non-zero code;
+- source/network failure must never be reported as "current";
+- root target `AGENTS.md` is never replaced wholesale;
+- only the bounded S&T rules block is framework-owned;
+- framework upgrade never overwrites current-cycle project state:
+  - `.planning/GOAL.md`
+  - `.planning/TREE.yaml`
+  - `.planning/DECISIONS.md`
+  - `.planning/REVIEWS.md`
+  - `.planning/STATUS.yaml`
+  - `.planning/EXECUTION.yaml`
+- write installed provenance metadata last during upgrade so a partial update cannot claim completion.
 
-To go down:
-> How exactly must the parent tactic be performed?
+## Core planning rule
 
-A child belongs at that level only if it is independently necessary for the parent.
+For meaningful work, plan completely before implementation.
 
-For every group:
-- remove each child mentally to test necessity;
-- assume all children succeed to test sufficiency.
+Every material S&T node has:
 
-Stop when leaves are detailed enough that execution does not require another material design decision.
+- Strategy — required objective/outcome;
+- Tactic — selected way to achieve it;
+- parallel assumptions — why the tactic can achieve the Strategy;
+- necessary assumptions — why each child is required for its parent;
+- sufficiency assumptions — why the children are enough together;
+- success evidence — objective proof of achievement;
+- children / execution prerequisites where needed.
 
-## Information ownership
+Do not choose a fixed phase count or QUICK/DEEP mode. Difficulty determines natural depth.
 
-- `GOAL.md` — desired outcome, established current reality, constraints, non-goals.
-- `TREE.yaml` — S&T logic and node planning status; `depends_on` owns execution prerequisites.
-- `DECISIONS.md` — material unresolved questions and decisions.
-- `REVIEWS.md` — review history.
-- `.planning/STATUS.yaml` — S&T Planner-owned cycle/planning/implementation-authorization state.
-- `.planning/EXECUTION.yaml` — authoritative executor allocation + node execution state after freeze.
+## Efficient deep planning
 
-S&T Planner owns **only** `.planning/STATUS.yaml` for lifecycle/planning authorization. A target repository may have its own root/operational `STATUS.yaml`, phase file, release state, `current_chat`, `current_node`, or workstream status; that remains target-owned.
+Efficiency comes from ordering and batching rigorous reasoning, never from reducing it.
 
-Target-owned execution pointers are projections/navigation aids, not peer S&T execution authorities. Runnable executor work is derived from `TREE.yaml -> depends_on` plus `.planning/EXECUTION.yaml`. A projection mismatch should be diagnosed/repaired when useful, but it must not by itself stop otherwise-safe implementation or redefine conversation identity.
+- map the scope/questions/dependencies/evidence briefly before deep decomposition;
+- treat that map as orientation only, never approval;
+- plan/review coherent slices instead of repeating a full ceremony after every small edit;
+- once a material decision is justified and durably recorded, reopen it only when new evidence/contradiction/changed assumptions/review findings can change it materially;
+- keep deterministic invariants mechanical and reserve deep reasoning for material judgments;
+- whole-plan outside-in coverage and Final Planning Review remain mandatory.
 
-Do not duplicate authoritative execution state in multiple framework-owned files.
+Existing patterns/prior designs are evidence and candidate alternatives, never sufficient justification by themselves.
 
-## Planning conversation
+## Planning completion
 
-Prefer one continuous planner chat.
+The whole intended plan must be decision-complete to implementation-ready leaves and pass tactic validity, necessity, sufficiency, assumptions, KISS, whole-plan coverage, and Final Planning Review.
 
-Repository state exists for:
-- durability;
-- auditability;
-- recovery;
-- optional continuation in a new chat;
-- optional independent review.
+Then:
 
-Do not split planning into multiple chats merely because the framework supports continuation.
+1. record reviewed-baseline evidence;
+2. verify no material GOAL/TREE/DECISIONS drift;
+3. freeze with implementation still unauthorized;
+4. allocate every implementation-ready leaf exactly once in `EXECUTION.yaml`;
+5. validate allocation mechanically;
+6. run repository-only handoff simulations;
+7. explicitly authorize implementation only after all hard gates pass.
 
-## Completion
+Freeze/allocation do not themselves authorize execution.
 
-Planning is complete only when the **whole intended plan**:
-
-- covers the intended scope;
-- is decomposed to implementation-ready leaves;
-- has no unresolved material decision that execution would have to invent;
-- passes necessity and sufficiency checks;
-- passes KISS and structural review;
-- passes a Final Planning Review.
-
-Then record the reviewed baseline in `.planning/REVIEWS.md`, verify no material drift with `.planning/verify-freeze-baseline.mjs` (or equivalent reproducible evidence), freeze only that verified baseline while keeping `.planning/STATUS.yaml -> implementation_authorized: false`, allocate every implementation-ready leaf exactly once to a numbered executor chat in `.planning/EXECUTION.yaml`, mechanically validate that allocation with `.planning/validate-allocation.mjs`, run and record the mandatory execution/handoff verification from `.planning/EXECUTOR_HANDOFF.md`, and only then set `.planning/STATUS.yaml -> implementation_authorized: true`.
-
-## Execution handoff
+## Execution authority
 
 After freeze:
 
-- keep `.planning/STATUS.yaml -> implementation_authorized: false` until hard handoff verification gates pass;
-- create/populate `.planning/EXECUTION.yaml`;
-- assign every implementation-ready leaf to exactly one numbered chat;
-- do not copy Strategy/Tactic text into EXECUTION — node IDs point back to TREE;
-- keep execution prerequisites only in `TREE.yaml -> depends_on`;
-- use execution states only in EXECUTION: `pending / in_progress / done / blocked`;
-- after allocation is complete, run `node .planning/validate-allocation.mjs --initial`; any authoritative allocation failure keeps implementation unauthorized;
-- if the target explicitly uses serial numbered chats, add `--serial-chats`;
-- derive runnable executor work from TREE + EXECUTION (`execution-guidance.mjs` is the executable reference); target-owned current pointers are advisory projections;
-- run the representative repository-only execution/handoff simulations defined in `.planning/EXECUTOR_HANDOFF.md`, including projection drift, accidental old-conversation rollover, explicit post-handoff re-bootstrap, and fresh-conversation activation;
-- record the result in `.planning/REVIEWS.md`;
-- warnings such as projection drift should be repaired when useful but do not keep implementation blocked; only failed authoritative allocation/authorization/dependency/context checks do.
+- `.planning/EXECUTION.yaml` owns numbered-chat allocation and node execution state;
+- `TREE.yaml -> depends_on` owns execution prerequisites;
+- `.planning/STATUS.yaml` owns cycle/planning/implementation authorization;
+- target-owned root status/current pointers are projections only.
 
-### Executor identity is separate from repository projections
+Projection drift may be warned/repaired but must not alone become a hard blocker or change executor identity.
 
-Chat allocation is not chat activation.
+A numbered executor is activated only by explicit startup such as `אני צאט N תתחיל` / `I am chat N`. Generic `continue`, `NEXT_CHAT_PROMPT`, target pointers, or newly runnable allocation never activate another executor implicitly.
 
-A numbered executor context starts only after an explicit executor startup message, for example `אני צאט 17 תתחיל` (established forms such as `אני צ'אט מספר 17` / `I am chat 17` remain valid explicit startup forms).
+If execution proves the plan materially wrong, revoke authorization and reopen only the smallest affected S&T area. Preserve completed work only when its Strategy/evidence/outcome remains valid under the correction.
 
-A repository allocation, target-owned `current_chat`, newly runnable chat, `NEXT_CHAT_PROMPT`, `תמשיך לשלב הבא`, or `continue` may never **implicitly** create, advance, or replace executor identity.
+## CI warning/error RCA
 
-While an executor is actively working before a handoff boundary, do not switch the conversation to another Chat N. Finish/handoff the active executor first.
+Every CI warning or error is a mandatory RCA gate before progress continues.
 
-A new-chat handoff recommends a fresh conversation for clean context but does not permanently lock the old conversation. After handoff:
+A local symptom fix or green rerun alone is not closure. Establish:
 
-- generic `continue` must not silently bootstrap the next chat;
-- if the user explicitly sends `אני צאט N תתחיל`, the same conversation may intentionally re-bootstrap that allocated Chat N after fresh repository authorization/allocation/dependency checks pass.
+1. what happened;
+2. causal root;
+3. why prevention/detection allowed it;
+4. reusable prevention/detection improvement;
+5. materially analogous areas at risk;
+6. evidence closing original and analogous findings.
 
-This prevents accidental rollover without forcing a new chat when the user prefers continuity.
+This applies to failures in the framework's own tests/release tooling too.
 
-Before executor-side branch/code/status/EXECUTION mutation:
+## Editing discipline
 
-1. determine the explicit executor identity for this active/bootstrap context;
-2. confirm `.planning/STATUS.yaml` still authorizes implementation;
-3. confirm that same Chat N is allocated in `.planning/EXECUTION.yaml`;
-4. check its TREE dependencies against EXECUTION states;
-5. ignore target-owned current-pointer drift as an authority decision; warn/repair it separately;
-6. only then mutate target code or authoritative execution state.
-
-`.planning/executor-authority.mjs` is the executable reference for activation/re-bootstrap semantics. `.planning/execution-guidance.mjs` is the executable reference for canonical runnable-work derivation and advisory target-pointer comparison.
-
-### Completion transitions
-
-Node completion must first make authoritative EXECUTION truthful:
-
-- re-read current authoritative state before writing;
-- confirm this chat still owns the node and its prerequisites remain valid;
-- verify `success_evidence`;
-- write `done` + short result to `.planning/EXECUTION.yaml`;
-- re-derive runnable work from TREE + EXECUTION;
-- only then update optional target-owned status/current projections as secondary summaries when the target project requires them.
-
-Do not make correctness depend on manually advancing several peer `current` representations in a particular file-by-file order. If a target projection temporarily lags, diagnose/repair it without stopping unrelated safe development.
-
-If execution exposes a material planning defect:
-- do not improvise;
-- mark the affected execution node `blocked` with a short factual reason;
-- set `.planning/STATUS.yaml -> plan_state: active`;
-- set `.planning/STATUS.yaml -> implementation_authorized: false`;
-- stop starting new execution work;
-- reopen only the smallest affected S&T area;
-- preserve previously `done` work only when its Strategy/evidence/outcome remains valid after the correction;
-- after focused re-review, repair only affected EXECUTION assignments/states and set `.planning/STATUS.yaml -> plan_state: frozen` again;
-- run `node .planning/validate-allocation.mjs --resume` (plus `--serial-chats` only when that mode is used);
-- rerun and record the mandatory execution/handoff verification;
-- do not resume execution until hard gates pass and `.planning/STATUS.yaml -> implementation_authorized: true` is explicitly restored.
-
-Do not create plan-version machinery; Git history and REVIEWS are enough.
+- use literal-safe programmatic replacements;
+- require expected source text before replacing;
+- reread rendered files/full diff after programmatic edits;
+- use focused branches/PRs for meaningful changes;
+- do not merge until required CI is green;
+- after merge, verify `main` CI;
+- keep repository docs clean—remove superseded temporary/pilot material once lessons are integrated.
 
 ## KISS
 
-Do not add framework machinery unless real usage proves it necessary.
+Do not add databases, services, registries, daemons, speculative schemas, orchestration layers, or automatic multi-agent machinery unless real use proves they are necessary.
 
-Avoid:
-- databases;
-- services;
-- custom orchestration;
-- speculative schemas;
-- automatic multi-agent systems;
-- rich special-case modeling before it is needed.
+For framework updates specifically, prefer version + provenance + small checker + CI discipline over building a package manager.
