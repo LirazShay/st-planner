@@ -1,11 +1,6 @@
-Use S&T Planner from LirazShay/st-planner for the current target repository and plan:
+Use the current ST Planner from `LirazShay/st-planner` for this repository.
+Resolve one current ST Planner source commit for this session and read `LirazShay/st-planner/BOOTSTRAP.md` from that same commit first. Then plan and manage execution for:
 
-<WRITE THE GOAL HERE>
+<WRITE THE OUTCOME / REQUEST HERE>
 
-Fetch and follow LirazShay/st-planner/BOOTSTRAP.md first.
-
-This template is optional. A natural request such as:
-
-"תעבוד עם S&T Planner מ-LirazShay/st-planner ותתכנן לי לפי הריפו: ..."
-
-is enough.
+A natural request such as "תעבוד עם ST Planner מ-LirazShay/st-planner ותתכנן ותנהל לי את הביצוע לפי הריפו: ..." is also enough.
