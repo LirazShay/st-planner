@@ -168,5 +168,5 @@ test("source unavailable remains non-blocking but never claims current", async (
   assert.equal(result.code, 0, result.output);
   assert.match(result.output, /could not be verified/i);
   assert.match(result.output, /do not claim.*current/i);
-  assert.doesNotMatch(result.output, /framework is current/i);
+  assert.doesNotMatch(result.output, /^S&T Planner framework is current/m);
 });
