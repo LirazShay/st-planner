@@ -26,7 +26,7 @@ The target repository does **not** need ST Planner installed beforehand.
 
 In a chat working on that repository, say for example:
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
+> תעבוד עם ST Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
 The agent reads the current `BOOTSTRAP.md`, follows the current methodology, investigates the target repository, and creates only the project-owned planning artifacts that the work actually needs.
 
