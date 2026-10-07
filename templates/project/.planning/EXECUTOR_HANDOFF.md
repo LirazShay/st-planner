@@ -4,6 +4,21 @@ This file is the portable entry contract for executor conversations.
 
 It explains **how to resume execution from repository state only**. It does not duplicate task content from `TREE.yaml` or allocation/state from `EXECUTION.yaml`.
 
+## Framework freshness gate
+
+Before starting or resuming S&T execution, run:
+
+```text
+node .planning/check-framework-update.mjs
+```
+
+- if it reports the installed framework is current, continue;
+- if it reports a newer `recommended` release, surface the version/summary to the user and continue unless an upgrade is chosen;
+- if it reports a newer `required` release, do not start new S&T planning/execution work until the explicit framework upgrade is completed and the checker reports current;
+- if network access is unavailable, report that freshness could not be verified and continue from the installed framework rather than claiming it is current.
+
+Framework upgrade is an explicit operation. It may replace only framework-managed files and must never overwrite active cycle state (`GOAL.md`, `TREE.yaml`, `DECISIONS.md`, `REVIEWS.md`, `STATUS.yaml`, `EXECUTION.yaml`). See `.planning/ST_PLANNER_INSTALL.json` and the source `docs/FRAMEWORK-UPDATES.md`.
+
 ## Authorization gate
 
 Before reading implementation details, read `.planning/STATUS.yaml`.
@@ -104,12 +119,13 @@ For an explicit Chat N startup or re-bootstrap:
 
 1. read target `AGENTS.md` and its routing/source-of-truth rules;
 2. read this `.planning/EXECUTOR_HANDOFF.md`;
-3. establish the explicitly requested conversation executor identity N;
-4. read `.planning/STATUS.yaml` and confirm the authorization gate;
-5. read `.planning/EXECUTION.yaml` and confirm Chat N is allocated;
-6. read only Chat N's assigned `TREE.yaml` leaves and their `depends_on` prerequisites;
-7. derive runnable work from authoritative TREE/EXECUTION state, not a target `current_chat` projection;
-8. load only decisions/specs/code/tests materially required by the assigned runnable work.
+3. run `.planning/check-framework-update.mjs` and resolve any required framework update;
+4. establish the explicitly requested conversation executor identity N;
+5. read `.planning/STATUS.yaml` and confirm the authorization gate;
+6. read `.planning/EXECUTION.yaml` and confirm Chat N is allocated;
+7. read only Chat N's assigned `TREE.yaml` leaves and their `depends_on` prerequisites;
+8. derive runnable work from authoritative TREE/EXECUTION state, not a target `current_chat` projection;
+9. load only decisions/specs/code/tests materially required by the assigned runnable work.
 
 Do not preload all planning history or the whole repository.
 
@@ -151,6 +167,21 @@ Before marking a node `done`:
 - execute within the assigned node's planned scope;
 - verify its `success_evidence` using the target project's appropriate tests/inspection;
 - write only a short result/evidence reference to `EXECUTION.yaml`.
+
+## Mandatory CI warning/error RCA gate
+
+If CI emits **any warning or error**, pause progression before the next implementation step and follow `.planning/CI-RCA-POLICY.md`.
+
+A green rerun after changing the immediately failing line is not sufficient closure. The executor must establish:
+
+1. what happened;
+2. why it happened at root cause level;
+3. why existing prevention/detection allowed it to reach CI;
+4. the smallest reusable prevention/detection improvement;
+5. materially analogous areas that may contain the same underlying weakness;
+6. verification evidence that closes the original signal and every analogous instance found.
+
+When reporting the incident to the user, explicitly say that progression is paused for RCA and that a local symptom fix alone is not considered closure. Only continue implementation after the RCA is closed.
 
 ## Completion transition and projections
 
