@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
-  "version": "1.0.0",
+  "schema_version": 2,
+  "version": "1.1.0",
   "released_at": "2026-10-07",
   "update_policy": "required",
-  "summary": "First versioned S&T Planner release: mandatory CI warning/error RCA gate, explicit framework provenance, and update detection for installed projects.",
+  "summary": "Hardens framework updates with source release-discipline checks, offline integrity for the freshness path, deterministic bounded AGENTS rules, and non-zero local exit codes for required updates.",
   "upgrade_command": "Ask the repository agent to update S&T Planner from LirazShay/st-planner before continuing.",
   "state_paths_never_overwrite": [
     ".planning/GOAL.md",
@@ -24,5 +24,15 @@
     ".planning/verify-freeze-baseline.mjs",
     ".planning/check-framework-update.mjs",
     ".planning/ST_PLANNER_INSTALL.json"
-  ]
+  ],
+  "agents_rules": {
+    "source_path": "templates/project/AGENTS.rules.md",
+    "begin_marker": "<!-- st-planner:rules:v3:begin -->",
+    "end_marker": "<!-- st-planner:rules:v3:end -->",
+    "git_blob_sha": "42bd735770b5846e413f969595c7347d086e4f10"
+  },
+  "critical_integrity": {
+    "checker_git_blob_sha": "7cc3b31536b0d44099af83eda015180a1656edb0",
+    "agents_rules_git_blob_sha": "42bd735770b5846e413f969595c7347d086e4f10"
+  }
 }
