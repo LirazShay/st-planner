@@ -1,4 +1,4 @@
-# External Bootstrap — S&T Planner
+# External Bootstrap — ST Planner
 
 This is the authoritative entry point for an AI agent using `LirazShay/st-planner` from another repository.
 
@@ -8,123 +8,58 @@ A user request such as:
 
 is enough. The user does not need to restate framework mechanics.
 
-## Non-negotiable setup rule
+## 1. Read target rules first
 
-Treat the repository you are currently working on as the **target repository**. Before writing anything, read its existing `AGENTS.md`, routing/source-of-truth rules, and branch/PR/verification workflow. Framework bootstrap/upgrade must obey those target-native rules.
+Treat the repository you are currently working on as the **target repository**.
 
-Resolve `LirazShay/st-planner` default-branch HEAD to **one exact source commit SHA** and read the release manifest, changelog, update contract, and copied files from that same commit. Never mix files from moving refs.
+Before changing anything, read its existing:
 
-## Detect existing installation
+- `AGENTS.md` or equivalent agent instructions;
+- architecture/source-of-truth/routing rules;
+- branch/PR policy;
+- verification/testing rules;
+- relevant implementation and product context.
 
-Classify the target before writing:
+Target-native rules continue to own the target repository.
 
-- no recognizable S&T `.planning/` installation → fresh install;
-- recognizable S&T installation + `.planning/ST_PLANNER_INSTALL.json` → installed/versioned;
-- recognizable S&T installation without install metadata → legacy/unversioned; explicit upgrade required before relying on freshness;
-- conflicting `.planning` files for another purpose → do not overwrite; report the exact conflict.
+## 2. Read the current ST Planner source
 
-For an installed/versioned target, run before new planning or numbered execution:
+Read, from the current `LirazShay/st-planner` source:
+
+1. `docs/SNT-METHODOLOGY.md`;
+2. `docs/EXECUTION-MANAGEMENT.md`;
+3. this `BOOTSTRAP.md`.
+
+Do not copy framework scripts or framework-owned runtime files into the target repository.
+
+The target stores project planning **data**, not an installed copy of ST Planner.
+
+## 3. Detect planning state
+
+### Fresh target
+
+If no ST Planner state exists, create only what the work needs.
+
+For meaningful multi-step work, the normal default is:
 
 ```text
-node .planning/check-framework-update.mjs
+.planning/PLAN.md
+.planning/EXECUTION.md
 ```
 
-Exit contract:
+Create optional `.planning/STATUS.md` only when continuity across long-running work benefits from a tiny current-focus pointer.
 
-- `0` + current — continue;
-- `0` + recommended update — surface it; upgrade is optional;
-- `2` — required framework update/reconciliation; do not start new S&T work;
-- `3` — installed framework/provenance is missing, damaged, or drifted; repair/upgrade before S&T work;
-- network/source unavailable with exit `0` — installed integrity passed but source freshness is **unverified**; continue only from the installed framework and never claim it is current.
+Create optional `.planning/DECISIONS.md` only when material decisions make `PLAN.md` materially harder to read.
 
-## Fresh install
+For genuinely tiny work that does not need durable decomposition or handoff, do not create planning artifacts merely to satisfy a framework ritual.
 
-Current `.planning` bundle:
+### Existing ST Planner 2.x state
 
-- `README.md`
-- `FRAMEWORK.md`
-- `GOAL.md`
-- `TREE.yaml`
-- `DECISIONS.md`
-- `REVIEWS.md`
-- `STATUS.yaml`
-- `EXECUTION.yaml`
-- `EXECUTOR_HANDOFF.md`
-- `CI-RCA-POLICY.md`
-- `executor-authority.mjs`
-- `execution-guidance.mjs`
-- `validate-allocation.mjs`
-- `verify-freeze-baseline.mjs`
-- `check-framework-update.mjs`
-- `ST_PLANNER_INSTALL.json`
+Read the current project-owned planning artifacts and continue from them. Do not reset completed work merely because a new chat starts.
 
-For a permitted fresh install:
+### Legacy V1 installation
 
-1. Copy all sixteen files from `templates/project/.planning/` at the resolved source commit.
-2. Merge `templates/project/AGENTS.rules.md` exactly once into root `AGENTS.md` while preserving all target-native text.
-3. Populate `.planning/ST_PLANNER_INSTALL.json` from the same release: version, source repo, exact source commit, install timestamp when available, `managed_integrity`, and `critical_integrity`/root-rules markers from `FRAMEWORK_RELEASE.json`.
-4. Do not change target product/runtime files merely to install the planner.
-
-### Fresh install verification
-
-Require all of the following before planning:
-
-- all sixteen `.planning` files exist;
-- every `.planning` file matches its declared ownership class;
-- every framework-managed installed file matches the release `managed_integrity` value;
-- the bounded S&T rules block appears exactly once in root `AGENTS.md` and matches the release integrity;
-- installed framework/tooling came from one resolved source commit;
-- install metadata version/integrity matches that release manifest;
-- `node .planning/check-framework-update.mjs` exits `0` and reports current when source access is available;
-- no pre-existing target file was overwritten except the intentional bounded merge into root `AGENTS.md`.
-
-## Explicit framework upgrade
-
-A framework upgrade is separate from project planning, execution, and cycle reset.
-
-Before upgrading:
-
-1. Read target repository workflow rules.
-2. Read installed `.planning/ST_PLANNER_INSTALL.json`.
-3. Resolve one target source commit and read `FRAMEWORK_RELEASE.json`, `CHANGELOG.md`, and `docs/FRAMEWORK-UPDATES.md` from that commit.
-4. Tell the user installed → target framework versions and summarize material changes.
-5. Snapshot/hash the six protected cycle-state files so preservation can be proved after the upgrade.
-6. **Audit the existing installed framework before replacing any managed file.** The purpose is to distinguish framework bytes from target-owned customization so an upgrade cannot silently delete project behavior.
-
-### Mandatory pre-upgrade customization/drift audit
-
-Do this before the first managed-file overwrite:
-
-**For installations with `managed_integrity`:**
-
-- verify every currently installed framework-managed file against the installed integrity metadata;
-- if any managed file differs, do not overwrite it blindly;
-- inspect the difference and classify it as either target-owned customization that must be preserved/migrated, known framework drift/repair, or unresolved conflict;
-- an unresolved conflict blocks the upgrade.
-
-**For older versioned installations without `managed_integrity` (including 1.0.0):**
-
-1. require installed `source_commit`;
-2. fetch the historical `FRAMEWORK_RELEASE.json` and historical framework-managed template files from that exact source commit;
-3. compare every existing target framework-managed file with the exact historical source file it was based on, using canonical LF text comparison so ordinary CRLF checkout conversion is ignored;
-4. exclude instance-specific install metadata from byte-equality comparison;
-5. any difference is pre-existing local divergence and must be classified before overwrite.
-
-If historical source cannot be resolved, or a divergence cannot be understood safely, stop and report the conflict instead of guessing.
-
-**When divergence is legitimate target-owned customization:**
-
-- move the target-owned rule/routing/contract to a target-owned durable location first (for example target `AGENTS.md` outside the bounded S&T block, or a target-owned docs/routing file referenced from it);
-- verify the moved contract still routes/behaves equivalently;
-- only then replace the framework-managed file with the exact target-release source file.
-
-After 1.1.x integrity metadata is installed, target-owned customization must stay outside framework-managed files. Future local edits to managed files are intentionally detected as drift rather than silently carried forward.
-
-Upgrade only paths listed in `FRAMEWORK_RELEASE.json -> framework_managed_paths`, from that same resolved source commit.
-
-`.planning/ST_PLANNER_INSTALL.json` is the special `install_metadata_path`; do **not** treat it as a normal managed-file copy during upgrade. Write it last after all managed files and root rules have been updated successfully.
-
-**Never overwrite current-cycle state:**
+A legacy installation may contain files such as:
 
 ```text
 .planning/GOAL.md
@@ -133,51 +68,181 @@ Upgrade only paths listed in `FRAMEWORK_RELEASE.json -> framework_managed_paths`
 .planning/REVIEWS.md
 .planning/STATUS.yaml
 .planning/EXECUTION.yaml
+.planning/ST_PLANNER_INSTALL.json
+.planning/FRAMEWORK.md
 ```
 
-### Root AGENTS.md replacement
+and framework scripts or a bounded ST Planner block in root `AGENTS.md`.
 
-Root `AGENTS.md` is not framework-owned wholesale.
+Do not blindly overwrite or delete legacy state.
 
-For v3+ installations, replace only the exact text between the manifest's S&T begin/end markers, including the markers, with `templates/project/AGENTS.rules.md` from the target release. Preserve target-native text before and after the block byte-for-byte.
+For a one-time migration:
 
-For a v2 installation that has only `<!-- st-planner:rules:v2 -->` and no end marker:
+1. preserve the target repository's own rules and customizations;
+2. consolidate live planning truth into `.planning/PLAN.md`;
+3. convert live execution assignment/state into `.planning/EXECUTION.md`;
+4. preserve material unresolved decisions and still-relevant success evidence;
+5. preserve `done` work and factual blockers;
+6. discard only process-only state such as freeze/authorization/validation/simulation history when it carries no project truth;
+7. remove legacy framework-owned machinery only after the replacement state has been reviewed for completeness;
+8. continue from the migrated state without restarting valid completed work.
 
-1. use installed `source_commit` to fetch the exact historical `templates/project/AGENTS.snippet.md` that was installed;
-2. replace that **exact prior snippet substring** inside target `AGENTS.md` with the new bounded rules block;
-3. if the exact historical snippet is not present, do not guess where the old framework block ends—report the conflict and require explicit repair.
+Git history remains available for old review/process history; do not copy historical ceremony into the new live state.
 
-This makes the v2 → v3 migration deterministic even when target-native rules exist after the old block.
+## 4. Understand before decomposing
 
-### Upgrade completion
+Before deep planning, establish only the current reality that can change the plan:
 
-Write `.planning/ST_PLANNER_INSTALL.json` **last**, with the new version, exact source commit, install timestamp, `managed_integrity`, and current critical/root-rules integrity metadata.
+- desired outcome;
+- relevant existing behavior/components/contracts;
+- constraints and non-goals;
+- materially relevant prior decisions;
+- important unknowns/risks;
+- proposed solution versus actual required outcome.
 
-Then require:
+A proposed technology or feature is normally a candidate Tactic unless the user or durable target contract makes it a fixed constraint.
 
-1. `node .planning/check-framework-update.mjs` exits `0` and reports current;
-2. framework/tooling validations affected by the release pass;
-3. every managed installed file matches release integrity;
-4. the bounded S&T rules block occurs exactly once and matches release integrity;
-5. the six protected state files match the pre-upgrade snapshots byte-for-byte;
-6. target-native `AGENTS.md` text outside the bounded block is unchanged except for explicitly reviewed migration of pre-existing target customization out of managed framework files;
-7. every pre-upgrade managed-file divergence has a recorded disposition: migrated target-owned contract, repaired framework drift, or explicit blocker resolved before completion.
+A brief structural map may be used to identify the material questions and dependencies before deep S&T reasoning. It is orientation only, not approval.
 
-If upgrade/CI emits any warning or error, the mandatory `.planning/CI-RCA-POLICY.md` gate applies before further progress.
+## 5. Build the S&T plan
 
-## Reuse and cycle lifecycle
+Use the method in `docs/SNT-METHODOLOGY.md`.
 
-Ordinary reuse never recopies framework templates. Run the freshness check, then follow the installed `.planning/README.md` and `.planning/FRAMEWORK.md`.
+For every material step, establish:
 
-One active S&T cycle is supported per repository. A new independent cycle is not an upgrade: only after the previous cycle is `completed` or `abandoned`, reset the six current-cycle state files while preserving installed framework/tooling and root S&T rules.
+- Strategy;
+- selected Tactic;
+- tactic-validity assumptions;
+- materially plausible alternatives when they could change the decision;
+- invalidation conditions when useful;
+- necessary children;
+- sufficiency of the child set;
+- objective success evidence.
 
-Planning implementation authorization and numbered executor behavior are defined by the installed framework. In particular:
+Continue until leaves are decision-complete and practical execution units.
 
-- planning must complete/review/freeze before implementation;
-- `.planning/EXECUTION.yaml` + TREE dependencies are execution authority;
-- target-owned current chat/node fields are projections only;
-- a numbered executor starts only from an explicit request such as `אני צאט N תתחיל` / `I am chat N`;
-- generic `continue` never activates another executor implicitly;
-- every CI warning/error requires full RCA closure, not merely a local fix/green rerun.
+Do not force implementation trivia into the S&T decomposition.
 
-After bootstrap/reuse/upgrade, continue the user's requested S&T work in the same conversation unless the target workflow or user explicitly requires a handoff.
+## 6. Review the selected planning scope
+
+Before implementation of the selected scope, perform an outside-in review:
+
+- is the outcome boundary correct?
+- are material Tactics justified?
+- were materially plausible alternatives handled?
+- is every required child necessary?
+- are sibling groups sufficient together?
+- are assumptions honest about fact/unknown/decision/risk?
+- are leaves executable without new material design decisions?
+- is success evidence objective enough?
+- is the plan simpler than an equally effective alternative?
+
+Correct findings directly in the plan.
+
+Do not create freeze/unfreeze, reviewed-baseline, implementation-authorization, or no-drift state merely to mark that review happened.
+
+## 7. Build the lightweight execution map
+
+Implementation-ready S&T leaves become the work items.
+
+Create/update `.planning/EXECUTION.md` with only useful execution facts:
+
+- task/leaf ID;
+- owner (`Chat N`, agent, developer, team, etc.);
+- `pending | in_progress | done | blocked`;
+- real execution prerequisite when one exists;
+- short result/evidence reference.
+
+Group tasks into the fewest coherent execution units that remain practical. Prefer shared context and dependency compatibility over arbitrary equal sizing. Preserve useful parallelism without multiplying handoffs unnecessarily.
+
+Do not add an allocation validator or duplicate task descriptions unless repeated real failures prove a need.
+
+## 8. Numbered chats and fresh execution
+
+Numbered chats are supported but not required.
+
+A new executor identity starts only through explicit activation such as:
+
+> אני צאט 12 תתחיל
+
+or:
+
+> I am chat 12.
+
+A generic `continue` / `תמשיך לשלב הבא`, a status pointer, or newly runnable work must not silently transform the current conversation into another Chat N.
+
+On explicit Chat N startup:
+
+1. read target rules;
+2. read `.planning/PLAN.md` and `.planning/EXECUTION.md`;
+3. locate the requested owner's assigned unfinished work;
+4. check real prerequisites;
+5. load only materially necessary implementation context;
+6. execute and verify the assigned work;
+7. update work status/result.
+
+Fresh-chat recoverability is a design property: durable repository state should be sufficient to continue correctly without depending on chat history.
+
+## 9. Execution incidents and replanning
+
+When implementation exposes a problem, run the Planning Impact Test:
+
+> Does the new fact materially invalidate an existing Strategy, Tactic, assumption, contract, dependency, or success criterion?
+
+### Implementation defect
+
+If not, keep planning stable:
+
+```text
+understand root cause
+→ regression/prevention as justified
+→ smallest correct fix
+→ materially analogous-area check when justified
+→ affected verification
+→ continue
+```
+
+### Local planning correction
+
+Update the smallest affected planning area, review its impact, adjust affected execution entries, then continue.
+
+### Material plan invalidation
+
+Stop only affected work, revise the affected S&T area and downstream execution mapping, review the changed scope, then continue. Preserve unaffected valid completed work.
+
+Do not globally reset execution merely because one defect appeared.
+
+## 10. CI warning/error handling
+
+Do not ignore CI warnings/errors and do not treat a local symptom fix or a green rerun as sufficient by itself.
+
+Understand proportionately:
+
+1. what happened;
+2. causal root;
+3. why prevention/detection did not catch it earlier;
+4. reusable prevention/detection improvement when justified;
+5. materially analogous exposure;
+6. closing evidence.
+
+If the check itself is obsolete, brittle, or noisy without protecting a real invariant, fixing/removing the check may be the correct systemic action.
+
+CI incidents do not automatically create planning state transitions.
+
+## 11. Completion
+
+A task is `done` when its relevant success evidence has been verified.
+
+The overall scope is complete when the intended outcome is verified, not merely when every row says `done`.
+
+Promote durable product/architecture contracts discovered during planning/execution into the target repository's normal source of truth when future work must obey them. Do not keep ST Planner artifacts as a shadow architecture documentation system.
+
+## Anti-bureaucracy test
+
+At every point ask:
+
+> Is the planning/management machinery costing more than the engineering uncertainty it is reducing?
+
+Before adding a mechanism, identify the real failure it prevents and whether a simpler instruction or existing target-repository mechanism is enough.
+
+**Model the work, not the management of the work.**
