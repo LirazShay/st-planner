@@ -1,98 +1,141 @@
 # Framework Updates
 
-S&T Planner is copied into target repositories, so the source framework and an installed project can drift over time. The update mechanism must make that drift visible without turning S&T Planner into a package manager.
+S&T Planner is copied into target repositories. The update design therefore has to solve two problems without becoming a package manager:
+
+1. **source drift** — a newer framework exists;
+2. **installed freshness-path drift** — the local checker or root S&T rules that trigger it were accidentally modified.
 
 ## KISS model
 
-The framework uses four small pieces:
+The mechanism remains small:
 
-1. `FRAMEWORK_RELEASE.json` in `LirazShay/st-planner` declares the current framework version, update policy, summary, and the boundary between framework-managed files and project-owned cycle state.
-2. `.planning/ST_PLANNER_INSTALL.json` in each installed target records which framework version was installed and, when bootstrap/upgrade can write it, the exact source commit used.
-3. `.planning/check-framework-update.mjs` compares the installed version with the current source release manifest.
-4. `CHANGELOG.md` explains what changed and whether an older installation needs an explicit upgrade.
+- source `FRAMEWORK_RELEASE.json` — release version, policy, protected state, managed paths, bounded root-rules metadata, and critical freshness-path integrity;
+- source `CHANGELOG.md` — material changes and upgrade notes;
+- target `.planning/ST_PLANNER_INSTALL.json` — installed version, exact source commit, and critical integrity expected locally;
+- target `.planning/check-framework-update.mjs` — zero-dependency local integrity + source freshness checker;
+- bounded root `AGENTS.md` S&T rules — the repository entry point that requires the checker before planning/execution;
+- source CI release-discipline gate — distributed framework changes cannot merge without a forward version and changelog entry.
 
-No daemon, registry, package manager, database, or background service is required.
+No daemon, registry, database, background service, or package manager is required.
 
-## Fresh install
+## Why source release discipline matters
 
-Bootstrap resolves one source commit, installs all framework files from that commit, and writes `.planning/ST_PLANNER_INSTALL.json` with:
+A target checker can only discover a new release if the source identifies it as new. Therefore source CI treats every path distributed to target repositories as release-sensitive.
 
-- `framework_version` from `FRAMEWORK_RELEASE.json`;
-- `source_repo: LirazShay/st-planner`;
-- the resolved `source_commit` when available;
-- `installed_at` when available.
+If a distributed framework path changes, CI requires:
 
-The install is then self-identifying.
+- `FRAMEWORK_RELEASE.json -> version` to advance;
+- `CHANGELOG.md` to change and contain the new version heading;
+- the release manifest to remain internally consistent with critical source bytes.
 
-## Detecting updates
+This prevents the failure mode where framework behavior changes on `main` while every installed project still reports the old version as current.
 
-At the start of S&T planning or an executor bootstrap, run:
+## Installed freshness-path integrity
+
+Before contacting the source, the installed checker validates the two pieces required for future update discovery:
+
+1. `.planning/check-framework-update.mjs` itself;
+2. the bounded S&T Planner rules block inside root `AGENTS.md`.
+
+`ST_PLANNER_INSTALL.json` records the expected Git blob IDs for those exact bytes. This check is local/offline and detects accidental edits even when source/network access is unavailable.
+
+Target-native `AGENTS.md` instructions are not hashed and are expected to evolve. Only the text inside the framework begin/end markers is framework-owned.
+
+## Freshness command and exit contract
+
+Run at the start of new S&T planning and every numbered executor bootstrap:
 
 ```text
 node .planning/check-framework-update.mjs
 ```
 
-The checker is zero-dependency and reads the latest public `FRAMEWORK_RELEASE.json` from `LirazShay/st-planner`.
-
 Results:
 
-- same version — report current and continue;
-- newer `recommended` release — report the available version and summary, then continue unless the target/user chooses to upgrade;
-- newer `required` release — report that the framework must be upgraded before further S&T planning/execution; in GitHub Actions the checker exits non-zero so CI cannot silently ignore the required upgrade;
-- network unavailable — report that freshness could not be checked and continue from the installed framework rather than pretending it is current.
+- exit `0`, current — installed release and local freshness path are valid;
+- exit `0`, recommended update — surface it; upgrade is optional;
+- exit `2` — required source update/reconciliation; do not start new S&T planning/execution;
+- exit `3` — local provenance/freshness-path integrity is invalid; repair/upgrade before S&T work;
+- exit `0`, source unavailable — local freshness-path integrity passed, but source freshness is **unverified**; continue only from the installed framework and never claim it is current.
 
-An update-available message is framework freshness information, not evidence that target-project implementation itself is defective. If CI is configured to enforce a required framework upgrade and therefore emits a CI warning/error, the normal CI RCA policy still applies to the CI incident, with the root cause being framework-version drift and the prevention being the installed update-detection mechanism.
+Required updates return non-zero in local/interactive use as well as GitHub Actions. The behavioral contract does not depend on CI-specific environment variables.
 
 ## Safe explicit upgrade
 
-Framework upgrades are explicit. Never silently replace target project data merely because a newer source version exists.
+Framework upgrades are explicit. Never silently replace target project data merely because a newer source exists.
 
 Before upgrading:
 
-1. read the target repository's Git/branch/PR/workflow rules;
-2. read target `.planning/ST_PLANNER_INSTALL.json`;
-3. fetch the latest `FRAMEWORK_RELEASE.json`, `CHANGELOG.md`, and `BOOTSTRAP.md` from one resolved source commit;
-4. tell the user which installed and target framework versions are involved and summarize material changes;
-5. preserve the active planning/execution cycle.
+1. read target repository workflow/routing rules;
+2. read installed `ST_PLANNER_INSTALL.json`;
+3. resolve source default-branch HEAD to one exact commit;
+4. read `FRAMEWORK_RELEASE.json`, `CHANGELOG.md`, and upgrade instructions from that commit;
+5. report installed → target versions and material changes;
+6. snapshot/hash protected current-cycle state.
 
-### Files that may be replaced by a framework upgrade
+Refresh only `FRAMEWORK_RELEASE.json -> framework_managed_paths`, using matching files from that same resolved source commit.
 
-Only paths listed in `FRAMEWORK_RELEASE.json -> framework_managed_paths` may be refreshed automatically/agentically from the matching source release.
+### Protected state
 
-These are framework instructions/tooling, not cycle content.
+A framework upgrade must preserve these byte-for-byte:
 
-### Files that must never be overwritten by framework upgrade
+```text
+.planning/GOAL.md
+.planning/TREE.yaml
+.planning/DECISIONS.md
+.planning/REVIEWS.md
+.planning/STATUS.yaml
+.planning/EXECUTION.yaml
+```
 
-The release manifest explicitly lists `state_paths_never_overwrite`. At minimum:
+Those files are target-project cycle state, not framework distribution files.
 
-- `.planning/GOAL.md`
-- `.planning/TREE.yaml`
-- `.planning/DECISIONS.md`
-- `.planning/REVIEWS.md`
-- `.planning/STATUS.yaml`
-- `.planning/EXECUTION.yaml`
+## Root AGENTS.md ownership
 
-Those are target-project planning/execution state. An upgrade must preserve them byte-for-byte unless a separate legitimate planning/execution operation changes them.
+Root `AGENTS.md` is a merge surface, never a framework-owned file.
 
-### Root `AGENTS.md`
+Current releases use a bounded block declared by the release manifest:
 
-The S&T rules embedded in root `AGENTS.md` are a merged integration point, not a file the framework owns wholesale. An upgrade may update only the S&T Planner rules block while preserving every target-native instruction before/after it. Never replace the complete target `AGENTS.md` from a template.
+```text
+<!-- st-planner:rules:v3:begin -->
+...
+<!-- st-planner:rules:v3:end -->
+```
+
+An upgrade replaces only that bounded substring and preserves all target-native text before and after it byte-for-byte.
+
+### v2 → v3 migration
+
+The 1.0.0 v2 block had only a start marker. Do **not** infer its end from headings or position.
+
+Use installed `source_commit` to fetch the exact historical `templates/project/AGENTS.snippet.md` that produced the v2 block, locate that exact byte sequence inside target `AGENTS.md`, and replace exactly that sequence with the bounded v3 rules source. If the historical sequence is not present exactly, stop and report a repair conflict rather than risking target-native text.
+
+After v3 is installed, future replacements are deterministic from markers alone.
+
+## Write provenance last
+
+`.planning/ST_PLANNER_INSTALL.json` is written last. It records:
+
+- installed framework version;
+- `source_repo`;
+- exact resolved `source_commit`;
+- installation timestamp when available;
+- current release `critical_integrity` values and root-rules markers.
+
+Writing provenance last prevents a partially applied upgrade from falsely identifying itself as complete.
 
 ## Upgrade verification
 
-After upgrading:
+Before further S&T work:
 
-1. update `.planning/ST_PLANNER_INSTALL.json` to the installed release version and resolved source commit;
-2. run `node .planning/check-framework-update.mjs` and require it to report current;
-3. run the framework/tooling tests/validators materially affected by the release;
-4. verify the six protected cycle-state files were not overwritten by the framework upgrade;
-5. verify the S&T rules block exists exactly once in root `AGENTS.md`;
-6. if the upgrade was triggered by a CI warning/error, complete the mandatory CI RCA before proceeding.
+1. run the checker and require exit `0` + current;
+2. run materially affected framework/tooling validators;
+3. prove all six protected state files match their pre-upgrade snapshots;
+4. prove the bounded root S&T block occurs exactly once;
+5. prove target-native `AGENTS.md` text outside the block is unchanged;
+6. if any CI warning/error occurred, close the mandatory CI RCA including analogous-area review.
 
 ## Legacy installations
 
-Repositories installed before the version/provenance mechanism have no `.planning/ST_PLANNER_INSTALL.json` and cannot discover updates by themselves.
+Installations from before version/provenance support cannot discover updates by themselves. They need one explicit upgrade. This is unavoidable: code that was never installed cannot execute itself.
 
-They require one explicit upgrade from the current `LirazShay/st-planner`. That upgrade installs the provenance metadata and checker. Every later release can then be detected automatically.
-
-This one-time legacy step is unavoidable: a repository cannot execute an update checker that did not exist when it was installed.
+After versioned metadata + checker + bounded rules are installed, later releases are self-discoverable at every S&T planning/executor entry point.
