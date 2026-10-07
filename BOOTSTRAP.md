@@ -4,7 +4,7 @@ This is the authoritative entry point for an AI agent using `LirazShay/st-planne
 
 A user request such as:
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
+> תעבוד עם ST Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
 is enough. The user does not need to restate framework mechanics.
 
