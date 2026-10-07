@@ -1,42 +1,51 @@
 # Worked Example — Safe CSV Import
 
-This example demonstrates S&T planning on a small software change.
+This example demonstrates ST Planner 2.0 on a small but non-trivial software change.
 
 ## Scenario
 
 A backend service must let users import customer records from CSV files safely and predictably.
 
-## Current planning state
+The example deliberately makes several material V1 product choices explicit (for example duplicate rejection, whole-file structural rejection, and all-or-nothing persistence) so the plan can be completed end-to-end. Those choices are example decisions, not universal CSV-import guidance.
 
-- The root is decomposed.
-- Branch `0.1` has passed local review.
-- Branch `0.2` has been decomposed.
-- `0.2.1` is blocked by open decision `D-002` about duplicate-customer behavior.
-- Branches `0.3` and `0.4` still require deeper planning.
-- The overall plan is therefore still `active`.
-- **Nothing from this example is released for implementation yet.**
+## What this example proves
 
-This demonstrates an important rule:
+The example uses only two live project-owned planning artifacts:
 
-> A locally approved/executable branch does not authorize implementation while the complete intended plan is still being built. Even after final freeze, explicit implementation authorization is still required after handoff.
+- `PLAN.md` — outcome, current reality, material decisions, complete S&T reasoning, implementation-ready leaves, and Final Planning Review.
+- `EXECUTION.md` — leaf assignment to numbered chats, real execution prerequisites, work status, and short results/evidence.
 
-## Optional fresh-chat continuation
+It demonstrates that ST Planner can still:
 
-The example also proves that, if planning ever must move to a new chat, repository state is enough to recover:
+- reason deeply with Strategy/Tactic, material alternatives, Necessity, Sufficiency, and success evidence;
+- decompose the scope into implementation-ready work;
+- assign work coherently across numbered chats;
+- expose parallelism and real prerequisites;
+- support a fresh executor from repository state;
+- avoid a second task-description system and avoid framework lifecycle/authorization state.
 
-- the goal;
-- the current S&T area;
-- the open material decision;
-- the next planning action.
+## Execution shape
 
-That capability is a fallback, not a requirement to split planning across chats.
+The nine implementation-ready leaves are grouped into four coherent execution units:
 
-## Files
+- Chat 1 — CSV contract and parsing;
+- Chat 2 — admissibility and persistence protection;
+- Chat 3 — atomic persistence;
+- Chat 4 — result contract and terminal outcome mapping.
 
-- `GOAL.md` — stable goal boundary.
-- `TREE.yaml` — S&T structure, assumptions, local planning status, and success evidence.
-- `DECISIONS.md` — material open questions and decisions.
-- `REVIEWS.md` — planning review history.
-- `STATUS.yaml` — current planning pointer plus explicit implementation-authorization gate.
+Chat numbering is ownership, not proof of planning validity and not an implicit global sequence.
 
-The example should reach implementation only after the remaining branches are completed, a Final Planning Review passes for the whole tree, post-freeze handoff is complete, and implementation is explicitly authorized.
+## Fresh-chat recovery
+
+A fresh Chat N needs only the target repository's normal rules plus `PLAN.md` and `EXECUTION.md` to determine:
+
+- what its assigned work means and why it exists;
+- which prerequisites must already be satisfied;
+- what success evidence closes the task;
+- what work remains afterward.
+
+No freeze state, implementation-authorization flag, handoff validator, or chat-authority script is required.
+
+## Historical V1 form
+
+This example originally used separate `GOAL.md`, `TREE.yaml`, `DECISIONS.md`, `REVIEWS.md`, and `STATUS.yaml` files. Git history preserves that form. The live example intentionally consolidates the same useful planning truth into the smaller ST Planner 2.0 model instead of preserving process-only history as current state.
