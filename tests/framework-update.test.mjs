@@ -83,6 +83,21 @@ test("framework upgrades can never classify cycle state as framework-managed", (
   }
 });
 
+test("every planning template file has exactly one ownership class", () => {
+  const actual = fs.readdirSync(planningDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => `.planning/${entry.name}`)
+    .sort();
+  const classified = [
+    ...release.state_paths_never_overwrite,
+    ...release.framework_managed_paths,
+    release.install_metadata_path,
+  ].sort();
+
+  assert.equal(classified.length, new Set(classified).size, "planning ownership classes must not overlap");
+  assert.deepEqual(actual, classified, "every .planning template file must be protected state, framework-managed, or install metadata");
+});
+
 test("every framework-managed .planning path exists in the installation template", () => {
   for (const managedPath of release.framework_managed_paths) {
     assert.match(managedPath, /^\.planning\//);
