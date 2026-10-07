@@ -1,5 +1,36 @@
 # S&T Planner Changelog
 
+## 2.0.0 — Unreleased
+
+Major simplification redesign: preserve deep S&T reasoning and lightweight execution management while removing framework-owned workflow machinery that had become costly to maintain and operate.
+
+### Changed
+
+- Target repositories now store project-owned planning state instead of an installed copy of ST Planner.
+- Default durable planning state is `.planning/PLAN.md` + `.planning/EXECUTION.md`; `STATUS.md` and `DECISIONS.md` are optional only when they solve a real continuity/readability need.
+- Implementation-ready S&T leaves are the execution tasks; execution tracking keeps only owner, status, real prerequisites, and short result/evidence.
+- Numbered chats remain supported as execution owners, but chat activation is an explicit convention rather than an authority/state-machine mechanism.
+- CI warnings/errors remain learning signals that require proportionate RCA; they no longer trigger planner authorization/freeze state transitions automatically.
+- Replanning now follows the Planning Impact Test: ordinary implementation defects stay local, bounded planning gaps update only the affected area, and only material plan invalidation reopens affected S&T reasoning.
+
+### Added
+
+- `docs/EXECUTION-MANAGEMENT.md` as the lightweight execution-management contract.
+- `templates/PLAN.md`, `templates/EXECUTION.md`, and optional `templates/STATUS.md` / `templates/DECISIONS.md`.
+- Permanent anti-bureaucracy rules: Process ROI, burden of proof for new process mechanisms, and “model the work, not the management of the work.”
+- A complete ST Planner 2.0 worked example under `examples/csv-import/` using only `PLAN.md` + `EXECUTION.md` for planning/execution state.
+
+### Removed
+
+- Framework installation/update package machinery: `FRAMEWORK_RELEASE.json`, installed provenance/integrity metadata, update checker, root-rules injection, release-discipline script, and framework-update CI.
+- Freeze/unfreeze, global implementation authorization, no-drift verification, allocation validation, mandatory fresh-chat handoff simulations, lifecycle state machine, and related executor scripts.
+- Legacy installed-project bundle under `templates/project/` and tests whose only purpose was to protect the removed V1 machinery.
+- Superseded V1 planning/execution/lifecycle/update documents after their durable reasoning lessons were consolidated into the new methodology and execution-management contracts.
+
+### Migration from 1.x
+
+Do not overwrite legacy planning state blindly. Consolidate live planning truth into `PLAN.md`, convert live assignments/progress into `EXECUTION.md`, preserve material decisions, verified `done` work, real dependencies and blockers, then remove process-only V1 state/machinery after checking the replacement for completeness. Git history remains the audit trail for old review/process history.
+
 ## 1.1.1 — 2026-10-07
 
 Upgrade-preservation hardening release.
