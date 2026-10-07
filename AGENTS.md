@@ -8,7 +8,7 @@ Keep the framework deeply reasoned, small, externally usable, and resistant to p
 
 A user working in another repository should be able to say:
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
+> תעבוד עם ST Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
 The agent should read the current framework source, understand the target repository, build a rigorous S&T plan, decompose it into implementation-ready work, and manage execution through minimal durable project state.
 
