@@ -2,14 +2,7 @@
 
 A small reusable framework that helps GPT plan meaningful work with Strategy & Tactics logic instead of producing an arbitrary checklist.
 
-The same method can plan:
-- a new system or initiative;
-- a release containing multiple capabilities;
-- one feature inside an existing system;
-- a migration or refactor;
-- an architectural or other substantial technical change.
-
-A feature/release is not a special object in the framework. It is simply the current planning scope represented with the same S&T logic.
+The same method can plan a new system, release, feature, migration, refactor, architectural change, or other substantial scope. A feature/release is not a special framework object; it is the current planning boundary expressed with the same S&T logic.
 
 > **License:** S&T Planner is proprietary, source-available software. Viewing the source for evaluation is permitted, but operational use requires a **paid commercial license** from the copyright holder. See [LICENSE](LICENSE).
 
@@ -17,116 +10,127 @@ A feature/release is not a special object in the framework. It is simply the cur
 
 The target repository does **not** need S&T Planner installed beforehand.
 
-For automatic setup, the agent needs read access to this public source repository and write access to the target repository. The bootstrap follows the target repository's own branch/PR rules.
-
-Open a chat that is working on the target repository and say:
+Open a chat working on the target repository and say:
 
 > **תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג/לבנות/לשנות>**
 
-**That is all the user needs to do.** The rest of this README explains what the framework does internally; using it does not require learning the files, lifecycle, tree schema, review gates, or execution machinery.
+That is the normal user interface. The agent reads `BOOTSTRAP.md`, installs/reuses the framework safely, investigates the repository, plans deeply, reviews/freezes the plan, allocates executor chats, validates the handoff, and explicitly authorizes implementation.
 
-After S&T Planner is already installed in that repository, later planning requests can be even shorter, for example:
+After S&T Planner is installed, later requests can be shorter:
 
 > **תכנן לי עם S&T Planner לפי הריפו: <הפיצ'ר / הריליס / השינוי הבא>**
 
-By default, the planner investigates the repository, evaluates tradeoffs, and makes responsible planner-owned product/technical choices itself. The user does **not** need to add "decide yourself" or approve every alternative. The planner asks only when a genuinely user-owned material preference/constraint is missing or no responsible choice can be derived from the available evidence; when it must ask, it minimizes and batches the question and gives a recommendation when useful.
+The planner defaults to informed autonomy: it investigates, evaluates alternatives, and makes responsible planner-owned product/technical choices without asking the user to approve every valid option. It asks only when a genuinely user-owned material preference/constraint is missing or no responsible choice can be derived from available evidence.
 
-That single request is the normal user interface.
+A requested feature/tool/technology/architecture is normally a **candidate tactic**, not automatically the goal. Unless explicitly fixed by the user or an existing durable target-project contract, the planner identifies the outcome it is meant to achieve and challenges the choice before decomposing it.
 
-Examples:
+## Installed framework freshness and updates
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו את הפיצ'ר Saved Searches.
+S&T Planner is copied into target repositories, so installed projects can drift from the source framework. The framework therefore has a deliberately small update mechanism:
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו את Release 3 עם Alerts, Watchlists ו-Import improvements.
+- `FRAMEWORK_RELEASE.json` — current source version, update policy, protected state, and framework-managed paths;
+- `CHANGELOG.md` — what changed;
+- target `.planning/ST_PLANNER_INSTALL.json` — installed version/provenance;
+- target `.planning/check-framework-update.mjs` — zero-dependency freshness checker;
+- `docs/FRAMEWORK-UPDATES.md` — explicit safe upgrade contract.
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו מעבר מ-polling ל-WebSocket.
+At the start of S&T planning or executor bootstrap, an installed project runs:
 
-> תעבוד עם S&T Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו הוספת Redis כדי להוריד עומס מה-DB.
+```text
+node .planning/check-framework-update.mjs
+```
 
-The user does not need to classify the request as `feature`, `release`, `migration`, etc. The planner determines the planning boundary from the request and repository context.
+Behavior:
 
-A requested feature/tool/technology/architecture is not automatically accepted as the goal. Unless it is explicitly fixed by the user or an existing durable project contract, the planner treats it as a candidate tactic, identifies the outcome it is meant to achieve, and challenges the choice before building the tree.
+- current — continue;
+- newer `recommended` release — surface it to the user, upgrade optionally;
+- newer `required` release — explicitly upgrade before new S&T planning/execution;
+- network unavailable — report that freshness could not be verified and continue from the installed framework without pretending it is current.
 
-The agent should:
+Repositories installed before this versioning mechanism are legacy unversioned installations. They need one explicit upgrade; afterward later releases can be detected automatically.
 
-1. fetch `LirazShay/st-planner/BOOTSTRAP.md`;
-2. follow its bootstrap contract;
-3. install the required `.planning/` framework files only for a permitted fresh install;
-4. merge the S&T rules into target `AGENTS.md` without deleting existing project rules;
-5. on an existing installation, inspect the current planning-cycle state rather than reinstalling or overwriting active planning;
-6. continue immediately into planning in the same chat;
-7. determine the current planning scope and desired outcome from the user's request plus repository reality;
-8. challenge material product/technical tactics before accepting them;
-9. build the complete S&T tree to implementation-ready leaves;
-10. review, freeze, allocate, handoff-check, explicitly authorize implementation, execute, and close the cycle only after integrated outcome verification.
+### Upgrade safety
 
-You do not manually install files and you do not need to paste the framework workflow.
+A framework upgrade may refresh only framework-owned instruction/tooling paths declared in `FRAMEWORK_RELEASE.json`.
 
-After planning is frozen, allocated, handoff-checked, and explicitly authorized, executor chats in the target repository can simply say:
+It must **never overwrite current-cycle project state**:
 
-> **אני צ'אט מספר 1**
+```text
+.planning/GOAL.md
+.planning/TREE.yaml
+.planning/DECISIONS.md
+.planning/REVIEWS.md
+.planning/STATUS.yaml
+.planning/EXECUTION.yaml
+```
 
-### Already installed?
+Root `AGENTS.md` is also not framework-owned wholesale. Upgrade only the S&T rules block while preserving target-native instructions.
 
-Bootstrap is idempotent. If the target already has a recognizable S&T Planner installation, ordinary continuation/reuse does not reinstall framework files or append a second S&T rules block to `AGENTS.md`.
+For exact behavior, `BOOTSTRAP.md` and `docs/FRAMEWORK-UPDATES.md` are authoritative.
 
-An active cycle is never erased merely because another request arrived. A later independent scope starts a new cycle only after the previous cycle is completed or explicitly abandoned with terminal evidence preserved.
+## Mandatory CI warning/error RCA
 
-If the target already uses `.planning/` for something else, S&T Planner preserves it. It installs alongside unrelated files only when none of the eleven S&T destination filenames conflict; otherwise bootstrap stops rather than overwriting target data.
+Every CI warning or error is a mandatory investigation gate before implementation may continue.
 
-## What it does
+A local symptom fix or a green rerun alone is not closure. The executor must establish:
 
-The framework guides GPT through:
+1. what happened;
+2. the causal root;
+3. why prevention/detection allowed it to reach CI;
+4. the smallest reusable prevention/detection improvement;
+5. materially analogous areas that may share the same weakness;
+6. evidence closing the original signal and analogous findings.
+
+The user-facing incident message must explicitly say that progression is paused for RCA and that a local fix alone is not considered closure. The installed policy is `.planning/CI-RCA-POLICY.md`.
+
+## What the framework does
 
 ```text
 Planning scope / desired outcome
 → separate outcome from proposed solution
 → establish relevant current reality
-→ challenge material candidate tactics
-→ S&T tree
+→ structural map for orientation
+→ deep S&T reasoning in coherent slices
+→ challenge material tactics and alternatives
 → necessity / sufficiency checks
-→ repeated critique at business/product/technical levels
+→ implementation-ready leaves
 → final whole-plan review
+→ reviewed-baseline no-drift verification
 → frozen implementation-ready plan
 → execution allocation
 → mechanical allocation validation
-→ fresh-chat handoff verification
+→ repository-only handoff verification
 → explicit implementation authorization
 → numbered execution chats directly from S&T node IDs
+→ CI RCA gate on any warning/error
 → integrated root-outcome verification
 → cycle closure
 ```
 
-The **planning is the product**. Passing final review and freezing closes the planning baseline; execution starts only after post-freeze handoff is complete and implementation is explicitly authorized. Freeze is not cycle completion.
+The **planning is the product**. Freeze closes the reviewed planning baseline; it does not authorize implementation by itself and it is not cycle completion.
 
-## Feature and release planning
+## One S&T model at every scale
 
 S&T Planner deliberately does not add `Feature`, `Release`, `Epic`, or `Task` schema types.
 
-A feature may be a complete subtree. A release may contain several feature subtrees when they are genuinely necessary for a shared outcome or explicit committed release scope.
+Every material node has:
 
-Release membership alone is not causality. The planner must not create a fake hierarchy merely because unrelated changes share a version label.
-
-Likewise, feature decomposition does not default to:
-
-```text
-Frontend
-Backend
-Database
-Tests
-```
-
-Children emerge from necessity and sufficiency. Technical structure follows required outcomes rather than defining the tree in advance.
+- **Strategy** — required objective/outcome;
+- **Tactic** — selected way to achieve it;
+- assumptions that justify tactic validity, necessity, and sufficiency;
+- objective success evidence;
+- implementation dependency information when the leaf requires it.
 
 At every material level the planner challenges both:
+
 - **horizontal choice** — why this Tactic for this Strategy, and why not a materially stronger alternative?
 - **vertical decomposition** — why is each child necessary, and why are the children sufficient together?
 
-This same reasoning continues from business/product choices down through architecture, components, and technical design.
+Architecture and technical structure emerge from required outcomes rather than from default `Frontend / Backend / Database / Tests` folders.
 
 ## Reuse throughout a repository's lifetime
 
-S&T Planner is installed once and can be reused sequentially for later scopes.
+S&T Planner is installed once and reused sequentially for later scopes.
 
 `.planning/STATUS.yaml` separates:
 
@@ -138,15 +142,11 @@ implementation_authorized: false | true
 
 V1 allows **one active S&T cycle per repository**.
 
-- `active` — the current project/release/feature/change is still being planned, executed, or verified.
-- `completed` — Cycle Closure Review proved the integrated root/current-scope outcome.
-- `abandoned` — the scope was intentionally closed without claiming the root outcome succeeded.
+- `active` — current scope is still being planned, executed, or verified;
+- `completed` — Cycle Closure Review proved the integrated root/current-scope outcome;
+- `abandoned` — scope was intentionally closed without claiming root success.
 
-A completed/abandoned cycle always has `implementation_authorized: false`.
-
-Before completion, all required leaves must be done **and** the root outcome must be verified after integration. Material decisions that future work must obey are promoted into the target project's durable product/architecture/API/data/test/instruction contracts; cycle-local `DECISIONS.md` is not a permanent architecture registry.
-
-When a later independent scope begins, the framework/tooling stays installed. Only current-cycle state is reinitialized:
+When a later independent scope begins after a terminal cycle, installed framework/tooling stays in place and only these six current-cycle state files are reset:
 
 ```text
 GOAL.md
@@ -157,65 +157,63 @@ STATUS.yaml
 EXECUTION.yaml
 ```
 
-Previous-cycle reasoning remains in Git/repository history. No `.planning/archive/`, plan-version registry, or parallel active scope directories are required by default.
+Previous-cycle reasoning remains in Git/repository history. Durable cross-cycle product/architecture/API/data/test contracts are promoted into the target project's normal source of truth before closure.
 
-## KISS operating model
+## Execution authority
 
-Default:
-- use one planning chat from start to finish;
-- use one active planning/execution cycle per repository;
-- persist the plan in the repository while working;
-- move to another planning chat only if needed;
-- use one S&T tree model at every scope/depth;
-- keep ordinary reasoning in TREE assumptions and only material choices/unknowns in DECISIONS;
-- after the plan is final, freeze it with implementation still unauthorized;
-- allocate implementation-ready leaves directly to numbered execution chats in `.planning/EXECUTION.yaml`;
-- mechanically validate allocation with `.planning/validate-allocation.mjs`;
-- run and record the mandatory repository-only fresh-chat handoff verification, then explicitly authorize implementation;
-- execution chats work directly from their assigned S&T node IDs;
-- close the cycle only after integrated outcome verification, then reuse the same installed framework for a later scope.
+After freeze:
 
-No server, database, plugin runtime, feature registry, release registry, alternative graph, multi-cycle engine, or second task system is required.
+- `.planning/EXECUTION.yaml` is authoritative for numbered-chat allocation and node execution state;
+- `TREE.yaml -> depends_on` is authoritative for prerequisites;
+- `.planning/STATUS.yaml` is authoritative for cycle/planning/implementation authorization.
+
+Target-owned `STATUS.yaml`, `current_chat`, `current_node`, phase pointers, dashboards, and similar fields are projections/navigation aids only. Projection drift should be diagnosed/repaired but must not by itself become a generic hard CI blocker or silently change executor identity.
+
+A numbered executor is activated only by explicit startup such as:
+
+> **אני צאט N תתחיל**
+
+A target pointer, `NEXT_CHAT_PROMPT`, generic `תמשיך לשלב הבא`, or newly runnable allocation never activates another Chat N implicitly.
 
 ## Core project files
 
-The external bootstrap copies these from `templates/project/.planning/` into the target repository:
+The external bootstrap installs these files from `templates/project/.planning/`:
 
-- `README.md` — target-installed planning read order, state ownership, and cycle reuse map
-- `FRAMEWORK.md` — portable S&T planning/execution/cycle rules
-- `GOAL.md` — stable boundary of the current planning scope
-- `TREE.yaml` — S&T plan
-- `DECISIONS.md` — material open questions and decisions for the current cycle
-- `REVIEWS.md` — planning/replanning/handoff/closure reviews for the current cycle
-- `.planning/STATUS.yaml` — S&T Planner-owned cycle state, planning state/resume pointer, and implementation-authorization gate
-- `EXECUTION.yaml` — after freeze, maps numbered executor chats directly to S&T leaves and tracks execution state
-- `EXECUTOR_HANDOFF.md` — portable fresh-executor read order, context routing, dependency behavior, and mandatory handoff-verification contract
-- `validate-allocation.mjs` — zero-dependency mechanical validator for TREE/EXECUTION allocation invariants
-- `verify-freeze-baseline.mjs` — verifies that the baseline being frozen is the baseline that passed Final Planning Review
+### Framework-managed instruction/tooling
 
-The bootstrap also merges `templates/project/AGENTS.snippet.md` into the target project's `AGENTS.md`.
+- `README.md` — installed read order, ownership, lifecycle, update behavior
+- `FRAMEWORK.md` — portable S&T planning/execution/cycle contract
+- `EXECUTOR_HANDOFF.md` — executor bootstrap and handoff contract
+- `CI-RCA-POLICY.md` — mandatory CI RCA procedure
+- `executor-authority.mjs` — explicit activation/re-bootstrap semantics
+- `execution-guidance.mjs` — canonical runnable-work derivation
+- `validate-allocation.mjs` — TREE/EXECUTION allocation validation
+- `verify-freeze-baseline.mjs` — reviewed-baseline no-drift verification
+- `check-framework-update.mjs` — framework freshness detection
+- `ST_PLANNER_INSTALL.json` — installed release provenance
 
-A target repository may independently own a root `STATUS.yaml`, phase file, release state, or workstream status. S&T Planner does not treat those as aliases for `.planning/STATUS.yaml` and does not mutate them unless the target's own contract explicitly requires integration.
+### Current-cycle state — never overwritten by framework upgrade
 
-For exact external installation/reuse behavior, `BOOTSTRAP.md` is authoritative.
+- `GOAL.md`
+- `TREE.yaml`
+- `DECISIONS.md`
+- `REVIEWS.md`
+- `STATUS.yaml`
+- `EXECUTION.yaml`
 
-## When planning is complete
+The bootstrap also merges `templates/project/AGENTS.snippet.md` into the target project's root `AGENTS.md` without replacing project-native instructions.
 
-The entire intended planning scope must be implementation-ready and pass Final Planning Review.
+## When planning is ready for execution
 
-Only then:
-1. record the reviewed baseline evidence in `.planning/REVIEWS.md`;
-2. verify no material planning drift with `node .planning/verify-freeze-baseline.mjs --reviewed-ref <ref>` (or equivalent reproducible evidence when a stable ref is unavailable);
-3. if material drift exists, keep planning active and review the changed baseline again;
-4. freeze the verified baseline while keeping `cycle_state: active` and `implementation_authorized: false`;
-5. if merge/rebase/integration later creates a different frozen ref, verify it again with `--frozen-ref <ref>`;
-6. collect every implementation-ready leaf;
-7. group those leaf node IDs into numbered chats in `.planning/EXECUTION.yaml` based on coherent implementation context, dependencies, and workload—not blindly by feature boundaries;
-8. initialize each assigned node as `pending`;
-9. run `node .planning/validate-allocation.mjs --initial` and fix any failure;
-10. if numbered chats are explicitly serial, also validate with `--serial-chats`;
-11. simulate the required repository-only fresh executor cases from `.planning/EXECUTOR_HANDOFF.md`, record the verification in `.planning/REVIEWS.md`, and fix/rerun any failed case;
-12. explicitly set `.planning/STATUS.yaml -> implementation_authorized: true` only after all gates pass.
+Only after the complete intended scope passes Final Planning Review:
+
+1. record the reviewed baseline evidence;
+2. verify no material GOAL/TREE/DECISIONS drift;
+3. freeze while keeping implementation unauthorized;
+4. allocate every implementation-ready leaf exactly once to numbered executor chats;
+5. run `node .planning/validate-allocation.mjs --initial` (plus `--serial-chats` only when explicitly serial);
+6. run and record the mandatory repository-only handoff verification;
+7. explicitly set `implementation_authorized: true` only after all gates pass.
 
 Execution is allowed only when STATUS contains:
 
@@ -225,20 +223,18 @@ plan_state: frozen
 implementation_authorized: true
 ```
 
-Then a new executor chat can say, for example, **"I am chat 1"** and immediately discover the S&T nodes it owns without the user re-explaining the project, feature, or release.
-
-If execution later discovers a real planning defect, revoke implementation authorization, return that defect to planning, and reopen only the affected part of the same active cycle.
-
-After execution, run Cycle Closure Review before setting `cycle_state: completed`.
+If execution later proves the plan materially wrong, revoke authorization and reopen only the affected S&T area. After all required execution leaves are done, Cycle Closure Review must still prove the integrated root outcome before `cycle_state: completed`.
 
 ## Main documentation
 
-- `docs/SNT-GOLDRATT-GUIDE.html` — מדריך HTML חזותי בעברית למאמר המקורי ולמיפוי שלו ל-S&T Planner
+- `BOOTSTRAP.md` — authoritative external install/reuse/upgrade entry contract
+- `docs/FRAMEWORK-UPDATES.md` — framework release/freshness/upgrade protocol
+- `docs/SNT-GOLDRATT-GUIDE.html` — Hebrew visual guide to the original S&T idea and framework mapping
 - `docs/SNT-METHODOLOGY.md` — expanded S&T method
 - `docs/AI-PLANNING-PROTOCOL.md` — how GPT plans
 - `docs/QUALITY-GATES.md` — how GPT critiques the plan
 - `docs/FRAMEWORK-LIFECYCLE.md` — planning/execution/cycle lifecycle
-- `docs/EXECUTION-HANDOFF.md` — minimal frozen-plan → execution allocation
+- `docs/EXECUTION-HANDOFF.md` — frozen-plan → execution allocation/handoff
 - `docs/CHAT-EXECUTION.md` — numbered executor-chat workflow
 - `docs/PLANNER-SNT.md` — S&T of this framework itself
 - `docs/USAGE.md` — how to use it in another project
@@ -247,12 +243,14 @@ After execution, run Cycle Closure Review before setting `cycle_state: completed
 
 - Logic before tooling.
 - Outcome before proposed solution.
+- Deep reasoning without repetitive ceremony.
 - Material tactics are challenged, not merely stated.
 - Necessary individually, sufficient together.
-- The tree determines the number of steps.
 - One source of truth per fact.
 - One active cycle and one planning chat by default.
 - Git is durable memory, not workflow bureaucracy.
-- Execution is downstream of a completed plan.
+- Execution is downstream of a reviewed/frozen/authorized plan.
+- Any CI warning/error becomes a learning/prevention gate, not a local-fix exercise.
+- Framework updates are explicit, versioned, detectable, and never overwrite project cycle state.
 - Cycle closure is evidence-based, not inferred from commits alone.
 - Prefer KISS.
