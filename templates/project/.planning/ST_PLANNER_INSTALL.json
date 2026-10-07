@@ -4,8 +4,19 @@
   "source_repo": "LirazShay/st-planner",
   "source_commit": null,
   "installed_at": null,
+  "managed_integrity": {
+    ".planning/README.md": "fd5cde8b6ffea92c4f3c1221b46c9ed408daedc2",
+    ".planning/FRAMEWORK.md": "1b5dcccf73720ca90dc0526bd273662efd8b80f4",
+    ".planning/EXECUTOR_HANDOFF.md": "4e82e44280e598a65f4a76d3ec0559be695eb0c0",
+    ".planning/CI-RCA-POLICY.md": "59a17ae46a1b20228c4691f630c0403b01fdc51c",
+    ".planning/executor-authority.mjs": "1edd8751621ace0d4876abc647463caf5315f521",
+    ".planning/execution-guidance.mjs": "8c58e7bb69b037ec33862e78934f3956e2dcd055",
+    ".planning/validate-allocation.mjs": "19eac7236c9f8c4552be67ec8687a3fadfd17058",
+    ".planning/verify-freeze-baseline.mjs": "e2361382959abc6db6b232f3c452fc2b772f8e49",
+    ".planning/check-framework-update.mjs": "1e8b5149bfb0bcf5deb52a6e868cd24dcc1059b5"
+  },
   "critical_integrity": {
-    "checker_git_blob_sha": "7cc3b31536b0d44099af83eda015180a1656edb0",
+    "checker_git_blob_sha": "1e8b5149bfb0bcf5deb52a6e868cd24dcc1059b5",
     "agents_rules_git_blob_sha": "42bd735770b5846e413f969595c7347d086e4f10",
     "agents_rules_begin_marker": "<!-- st-planner:rules:v3:begin -->",
     "agents_rules_end_marker": "<!-- st-planner:rules:v3:end -->"
