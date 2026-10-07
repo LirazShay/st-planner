@@ -25,12 +25,25 @@ function gitBlobSha(file) {
   return crypto.createHash("sha1").update(header).update(bytes).digest("hex");
 }
 
+function walkTextFiles(dir, output = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if ([".git", "node_modules"].includes(entry.name)) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walkTextFiles(full, output);
+    else if (/\.(?:md|mjs|json|ya?ml)$/i.test(entry.name)) output.push(full);
+  }
+  return output;
+}
+
 test("template install metadata matches the current source release", () => {
   assert.equal(release.schema_version, 2);
   assert.equal(install.schema_version, 2);
   assert.equal(install.framework_version, release.version);
   assert.equal(install.source_repo, "LirazShay/st-planner");
+  assert.equal(release.install_metadata_path, ".planning/ST_PLANNER_INSTALL.json");
+  assert.equal(release.framework_managed_paths.includes(release.install_metadata_path), false);
   assert.match(release.version, /^\d+\.\d+\.\d+$/);
+  assert.deepEqual(install.managed_integrity, release.managed_integrity);
   assert.deepEqual(install.critical_integrity, {
     checker_git_blob_sha: release.critical_integrity.checker_git_blob_sha,
     agents_rules_git_blob_sha: release.critical_integrity.agents_rules_git_blob_sha,
@@ -39,11 +52,18 @@ test("template install metadata matches the current source release", () => {
   });
 });
 
-test("critical freshness-path integrity metadata matches source bytes", () => {
+test("all framework-managed integrity metadata matches source bytes", () => {
+  assert.deepEqual(Object.keys(release.managed_integrity).sort(), [...release.framework_managed_paths].sort());
+
+  for (const managedPath of release.framework_managed_paths) {
+    const source = path.join(repoRoot, "templates", "project", managedPath);
+    assert.equal(release.managed_integrity[managedPath], gitBlobSha(source), `${managedPath} integrity is stale`);
+  }
+
   const checker = path.join(planningDir, "check-framework-update.mjs");
   const agentsRules = path.join(repoRoot, release.agents_rules.source_path);
-
   assert.equal(release.critical_integrity.checker_git_blob_sha, gitBlobSha(checker));
+  assert.equal(release.critical_integrity.checker_git_blob_sha, release.managed_integrity[".planning/check-framework-update.mjs"]);
   assert.equal(release.critical_integrity.agents_rules_git_blob_sha, gitBlobSha(agentsRules));
   assert.equal(release.agents_rules.git_blob_sha, gitBlobSha(agentsRules));
 
@@ -58,11 +78,8 @@ test("framework upgrades can never classify cycle state as framework-managed", (
   assert.deepEqual(release.state_paths_never_overwrite, protectedState);
 
   for (const statePath of protectedState) {
-    assert.equal(
-      release.framework_managed_paths.includes(statePath),
-      false,
-      `${statePath} must never be framework-managed`,
-    );
+    assert.equal(release.framework_managed_paths.includes(statePath), false, `${statePath} must never be framework-managed`);
+    assert.equal(Object.hasOwn(release.managed_integrity, statePath), false, `${statePath} must never have framework integrity ownership`);
   }
 });
 
@@ -70,12 +87,9 @@ test("every framework-managed .planning path exists in the installation template
   for (const managedPath of release.framework_managed_paths) {
     assert.match(managedPath, /^\.planning\//);
     const name = managedPath.slice(".planning/".length);
-    assert.equal(
-      fs.existsSync(path.join(planningDir, name)),
-      true,
-      `${managedPath} is declared framework-managed but missing from templates/project/.planning`,
-    );
+    assert.equal(fs.existsSync(path.join(planningDir, name)), true, `${managedPath} is declared framework-managed but missing from templates/project/.planning`);
   }
+  assert.equal(fs.existsSync(path.join(planningDir, "ST_PLANNER_INSTALL.json")), true);
 });
 
 test("freshness and mandatory CI RCA contracts are wired into entry points", () => {
@@ -107,6 +121,26 @@ test("source CI enforces release discipline for distributed framework changes", 
   assert.match(workflow, /verify-release-discipline\.mjs/);
   assert.match(verifier, /distributed framework changed without a forward version bump/);
   assert.match(verifier, /CHANGELOG\.md/);
+});
+
+test("superseded unbounded AGENTS snippet is referenced only as historical migration evidence", () => {
+  const legacyName = "AGENTS" + ".snippet.md";
+  assert.equal(fs.existsSync(path.join(repoRoot, "templates", "project", legacyName)), false);
+
+  const allowed = new Set([
+    "BOOTSTRAP.md",
+    "CHANGELOG.md",
+    "docs/FRAMEWORK-UPDATES.md",
+    "scripts/verify-release-discipline.mjs",
+  ]);
+
+  const offenders = [];
+  for (const file of walkTextFiles(repoRoot)) {
+    const relative = path.relative(repoRoot, file).replaceAll(path.sep, "/");
+    if (allowed.has(relative) || relative === "tests/framework-update.test.mjs") continue;
+    if (fs.readFileSync(file, "utf8").includes(legacyName)) offenders.push(relative);
+  }
+  assert.deepEqual(offenders, []);
 });
 
 test("changelog contains the current release", () => {
