@@ -89,6 +89,36 @@ Before upgrading:
 3. Resolve one target source commit and read `FRAMEWORK_RELEASE.json`, `CHANGELOG.md`, and `docs/FRAMEWORK-UPDATES.md` from that commit.
 4. Tell the user installed → target framework versions and summarize material changes.
 5. Snapshot/hash the six protected cycle-state files so preservation can be proved after the upgrade.
+6. **Audit the existing installed framework before replacing any managed file.** The purpose is to distinguish framework bytes from target-owned customization so an upgrade cannot silently delete project behavior.
+
+### Mandatory pre-upgrade customization/drift audit
+
+Do this before the first managed-file overwrite:
+
+**For installations with `managed_integrity`:**
+
+- verify every currently installed framework-managed file against the installed integrity metadata;
+- if any managed file differs, do not overwrite it blindly;
+- inspect the difference and classify it as either target-owned customization that must be preserved/migrated, known framework drift/repair, or unresolved conflict;
+- an unresolved conflict blocks the upgrade.
+
+**For older versioned installations without `managed_integrity` (including 1.0.0):**
+
+1. require installed `source_commit`;
+2. fetch the historical `FRAMEWORK_RELEASE.json` and historical framework-managed template files from that exact source commit;
+3. compare every existing target framework-managed file with the exact historical source file it was based on, using canonical LF text comparison so ordinary CRLF checkout conversion is ignored;
+4. exclude instance-specific install metadata from byte-equality comparison;
+5. any difference is pre-existing local divergence and must be classified before overwrite.
+
+If historical source cannot be resolved, or a divergence cannot be understood safely, stop and report the conflict instead of guessing.
+
+**When divergence is legitimate target-owned customization:**
+
+- move the target-owned rule/routing/contract to a target-owned durable location first (for example target `AGENTS.md` outside the bounded S&T block, or a target-owned docs/routing file referenced from it);
+- verify the moved contract still routes/behaves equivalently;
+- only then replace the framework-managed file with the exact target-release source file.
+
+After 1.1.x integrity metadata is installed, target-owned customization must stay outside framework-managed files. Future local edits to managed files are intentionally detected as drift rather than silently carried forward.
 
 Upgrade only paths listed in `FRAMEWORK_RELEASE.json -> framework_managed_paths`, from that same resolved source commit.
 
@@ -130,7 +160,8 @@ Then require:
 3. every managed installed file matches release integrity;
 4. the bounded S&T rules block occurs exactly once and matches release integrity;
 5. the six protected state files match the pre-upgrade snapshots byte-for-byte;
-6. target-native `AGENTS.md` text outside the bounded block is unchanged.
+6. target-native `AGENTS.md` text outside the bounded block is unchanged except for explicitly reviewed migration of pre-existing target customization out of managed framework files;
+7. every pre-upgrade managed-file divergence has a recorded disposition: migrated target-owned contract, repaired framework drift, or explicit blocker resolved before completion.
 
 If upgrade/CI emits any warning or error, the mandatory `.planning/CI-RCA-POLICY.md` gate applies before further progress.
 

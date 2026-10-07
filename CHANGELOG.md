@@ -1,5 +1,24 @@
 # S&T Planner Changelog
 
+## 1.1.1 — 2026-10-07
+
+Upgrade-preservation hardening release.
+
+### Added
+
+- Mandatory pre-upgrade divergence/customization audit before replacing any framework-managed target file.
+- Older versioned installations without `managed_integrity` use their exact installed `source_commit` as the historical baseline; current target managed files are compared with the source files they originally came from before overwrite.
+- Explicit migration rule for legitimate target-owned customization found inside an old managed file: move it first into target-owned durable routing/contracts, verify equivalent behavior, then restore the framework-managed file to exact release bytes.
+- `release_sensitive_source_paths` in `FRAMEWORK_RELEASE.json` so source upgrade contracts such as `BOOTSTRAP.md` and `docs/FRAMEWORK-UPDATES.md` cannot materially change without a forward framework version and changelog entry.
+
+### Why this release exists
+
+A real external-project pilot found that an older target had intentionally preserved a project-specific routing appendix inside `.planning/EXECUTOR_HANDOFF.md`. Blindly replacing that managed file during the 1.1.0 upgrade would have deleted valid target behavior. Version 1.1.1 makes that class of loss a pre-upgrade blocker instead of relying on the upgrader to notice it manually.
+
+### Upgrade note
+
+Upgrade is **required**. Before managed-file replacement, audit the current installation against its installed integrity metadata or, for 1.0.0-style metadata, against the exact historical source commit. Preserve/migrate every legitimate target customization first. The six current-cycle state files remain byte-for-byte protected, and `ST_PLANNER_INSTALL.json` is still written last.
+
 ## 1.1.0 — 2026-10-07
 
 Update-path hardening release.
@@ -22,7 +41,7 @@ Update-path hardening release.
 
 ### Upgrade note from 1.0.0
 
-Upgrade is **required**. Preserve all six current-cycle state files byte-for-byte. Replace framework-managed `.planning` files from one resolved source commit, migrate the old `st-planner:rules:v2` block to the bounded v3 block using the exact prior source snippet when possible, then write `ST_PLANNER_INSTALL.json` last with the new managed-integrity/provenance data. Require `node .planning/check-framework-update.mjs` to exit `0` and report current before continuing S&T work.
+Upgrade is **required**. Preserve all six current-cycle state files byte-for-byte. Before replacing framework-managed files, follow the latest upgrade contract and audit pre-existing local divergence/customization against the installed historical source. Migrate the old `st-planner:rules:v2` block to the bounded v3 block using the exact prior source snippet, then write `ST_PLANNER_INSTALL.json` last with the new managed-integrity/provenance data. Require `node .planning/check-framework-update.mjs` to exit `0` and report current before continuing S&T work.
 
 ## 1.0.0 — 2026-10-07
 

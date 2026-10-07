@@ -1,94 +1,103 @@
 # Framework Updates
 
-S&T Planner is copied into target repositories. The update design therefore has to solve three problems without becoming a package manager:
+S&T Planner is copied into target repositories. The update design solves four problems without becoming a package manager:
 
 1. **source drift** — a newer framework exists;
-2. **installed framework drift** — a framework-managed local file was accidentally changed/missing;
-3. **entry-path drift** — the checker or bounded root S&T rules needed to discover future updates were damaged.
+2. **installed framework drift** — framework-managed local bytes changed or disappeared;
+3. **entry-path drift** — the checker or bounded root S&T rules were damaged;
+4. **pre-existing target customization inside a managed file** — an upgrade must not silently erase project behavior that older installations embedded there.
 
 ## KISS model
 
 The mechanism remains small:
 
-- source `FRAMEWORK_RELEASE.json` — release version/policy, protected state, managed paths, Git blob integrity, bounded root-rules metadata;
-- source `CHANGELOG.md` — material changes and upgrade notes;
-- target `.planning/ST_PLANNER_INSTALL.json` — installed version, exact source commit, managed-file integrity and root-rules integrity;
+- source `FRAMEWORK_RELEASE.json` — release version/policy, protected state, managed paths, integrity, bounded root-rules metadata, and release-sensitive source contracts;
+- source `CHANGELOG.md` — release/upgrade notes;
+- target `.planning/ST_PLANNER_INSTALL.json` — installed version, exact source commit, managed-file/root-rules integrity;
 - target `.planning/check-framework-update.mjs` — zero-dependency local integrity + source freshness checker;
-- bounded root `AGENTS.md` S&T rules — repository entry point requiring freshness before planning/execution;
-- source CI release-discipline gate — distributed framework changes cannot merge without a forward version and changelog entry.
+- bounded root `AGENTS.md` S&T rules — repository entry gate;
+- source CI release-discipline gate — distributed framework bytes and update-contract source files cannot change without a forward version/changelog.
 
 No daemon, registry, database, background service, or package manager is required.
 
 ## Source release discipline
 
-A target checker can discover a new release only if the source identifies it as new. Source CI therefore treats every distributed framework path as release-sensitive.
+The source must version not only copied target files but also source contracts that materially control install/upgrade behavior.
 
-If distributed framework content changes, CI requires:
+`FRAMEWORK_RELEASE.json -> release_sensitive_source_paths` names those additional source files (currently `BOOTSTRAP.md` and `docs/FRAMEWORK-UPDATES.md`). If a distributed path, install metadata template, bounded rules source, or release-sensitive source contract changes, CI requires:
 
-- `FRAMEWORK_RELEASE.json -> version` advances;
-- `CHANGELOG.md` changes and contains that version heading;
-- every `.planning` template file has exactly one ownership class: protected cycle state, framework-managed, or install metadata;
-- `managed_integrity` keys exactly match `framework_managed_paths`;
-- every recorded Git blob ID matches the actual source bytes;
-- bounded root-rules integrity matches its actual source bytes.
+- a forward framework version;
+- a matching `CHANGELOG.md` release entry;
+- valid ownership classification;
+- truthful managed/root-rules integrity metadata.
 
-This prevents the normal failure mode where source behavior changes while installed projects still report the old release as current.
+This prevents an upgrade rule from changing silently while installed projects keep seeing the same release number.
 
-The installed checker also compares same-version source integrity metadata to the installed metadata. Therefore even if source release discipline were bypassed accidentally, changed source content under the same version becomes a required reconciliation rather than a false `current` result.
+## Installed integrity and freshness
 
-## Installed integrity
+Before contacting the source, the installed checker verifies every managed file plus the bounded root rules against installed integrity metadata. Working-tree CRLF is canonicalized to LF for comparison.
 
-Before contacting the source, the installed checker validates locally:
-
-1. every path in installed `managed_integrity` exists and matches its recorded Git blob ID;
-2. the update checker itself is among those managed paths and matches its expected bytes;
-3. the bounded S&T Planner rules block inside root `AGENTS.md` occurs exactly once and matches its expected bytes;
-4. install provenance is internally coherent.
-
-This verification is local/offline. It catches missing or modified framework files even when source/network access is unavailable.
-
-Target-native `AGENTS.md` instructions are intentionally not hashed. Only the text inside the framework begin/end markers is framework-owned.
-
-Current-cycle project state is also intentionally not hashed as framework content: it is expected to change as planning/execution progresses and is protected from framework overwrite by ownership rules instead.
-
-## Freshness command and exit contract
-
-Run at the start of new S&T planning and every numbered executor bootstrap:
+Run before new S&T planning and every numbered executor bootstrap:
 
 ```text
 node .planning/check-framework-update.mjs
 ```
 
-Results:
+- exit `0`, current — installed integrity passed and source release matches;
+- exit `0`, recommended update — surface it; upgrade optional;
+- exit `2` — required source update/reconciliation;
+- exit `3` — installed provenance/framework integrity invalid;
+- exit `0`, source unavailable — installed integrity passed but source freshness is **unverified**, never current.
 
-- exit `0`, current — installed framework integrity passed and source release matches;
-- exit `0`, recommended update — installed integrity passed; surface newer release and continue unless upgrade is chosen;
-- exit `2` — required source update/reconciliation; do not start new S&T planning/execution;
-- exit `3` — installed provenance/framework integrity is invalid; repair/upgrade before S&T work;
-- exit `0`, source unavailable — installed integrity passed but source freshness is **unverified**; continue only from the installed framework and never claim it is current.
+## Mandatory pre-upgrade divergence audit
 
-Required updates return non-zero in local/interactive use as well as GitHub Actions. The behavioral contract does not depend on CI-specific environment variables.
+**Do not overwrite managed files merely because a newer release exists.** First prove what the currently installed managed files contain relative to the release they came from.
+
+### Installations with `managed_integrity`
+
+Compare every current managed file with installed `managed_integrity`. Any mismatch is local divergence. Before overwrite, classify it as:
+
+- target-owned customization that must be migrated out of the managed file;
+- known framework drift/repair that may be replaced;
+- unresolved conflict — blocks upgrade.
+
+### Older versioned installations without `managed_integrity` (for example 1.0.0)
+
+Use installed `source_commit` as the immutable baseline:
+
+1. fetch historical `FRAMEWORK_RELEASE.json` at that exact commit;
+2. fetch each historical framework-managed template file at that exact commit;
+3. compare current target file vs historical source using canonical LF text comparison;
+4. exclude instance-specific install metadata from byte-equality comparison;
+5. classify every difference before overwrite.
+
+If the historical source cannot be resolved or a difference cannot be safely classified, stop. Never guess that a differing managed file is disposable.
+
+### Legitimate target-owned customization
+
+Move it first to a **target-owned durable location** — e.g. root `AGENTS.md` outside the bounded S&T block or a target-owned routing/spec file referenced there. Verify equivalent routing/behavior, then replace the managed framework file with exact release bytes.
+
+From integrity-enabled releases onward, target-owned customizations must remain outside managed framework files. Local edits to managed files are intentionally reported as drift.
 
 ## Safe explicit upgrade
-
-Framework upgrades are explicit. Never silently replace target project data merely because a newer source exists.
 
 Before upgrading:
 
 1. read target repository workflow/routing rules;
-2. read installed `.planning/ST_PLANNER_INSTALL.json`;
-3. resolve source default-branch HEAD to one exact commit;
-4. read `FRAMEWORK_RELEASE.json`, `CHANGELOG.md`, and upgrade instructions from that commit;
-5. report installed → target versions and material changes;
-6. snapshot/hash protected current-cycle state.
+2. read installed metadata;
+3. resolve target source release to one exact commit;
+4. report installed → target versions/material changes;
+5. snapshot/hash the six protected cycle-state files;
+6. complete the divergence/customization audit above;
+7. migrate any legitimate target-owned customization out of managed files before overwrite.
 
-Refresh only `FRAMEWORK_RELEASE.json -> framework_managed_paths`, using matching files from that same resolved source commit.
+Then refresh only `framework_managed_paths` from the one resolved source commit.
 
-`.planning/ST_PLANNER_INSTALL.json` is **not** an ordinary framework-managed replacement path. It is the special `install_metadata_path` and must be written last after the framework files and root rules are successfully updated.
+`.planning/ST_PLANNER_INSTALL.json` is special `install_metadata_path`, not an ordinary managed replacement file; write it **last**.
 
 ### Protected state
 
-A framework upgrade must preserve these byte-for-byte:
+Never overwrite during framework upgrade:
 
 ```text
 .planning/GOAL.md
@@ -99,13 +108,11 @@ A framework upgrade must preserve these byte-for-byte:
 .planning/EXECUTION.yaml
 ```
 
-Those files are target-project cycle state, not framework distribution files.
-
 ## Root AGENTS.md ownership
 
-Root `AGENTS.md` is a merge surface, never a framework-owned file.
+Root `AGENTS.md` is a merge surface, never framework-owned wholesale.
 
-Current releases use a bounded block declared by the release manifest:
+Current releases own only:
 
 ```text
 <!-- st-planner:rules:v3:begin -->
@@ -113,42 +120,29 @@ Current releases use a bounded block declared by the release manifest:
 <!-- st-planner:rules:v3:end -->
 ```
 
-An upgrade replaces only that bounded substring and preserves all target-native text before and after it byte-for-byte.
+Replace that bounded substring only; preserve target-native text outside it.
 
-### v2 → v3 migration
-
-The 1.0.0 v2 block had only a start marker. Do **not** infer its end from headings or position.
-
-Use installed `source_commit` to fetch the exact historical `templates/project/AGENTS.snippet.md` that produced the v2 block, locate that exact byte sequence inside target `AGENTS.md`, and replace exactly that sequence with the bounded v3 rules source. If the historical sequence is not present exactly, stop and report a repair conflict rather than risking target-native text.
-
-After v3 is installed, future replacements are deterministic from markers alone.
+For 1.0.0/v2, use installed `source_commit` to fetch the exact historical `templates/project/AGENTS.snippet.md`; replace that exact sequence only. If it is not present exactly, stop rather than guessing where target-native text begins.
 
 ## Write provenance last
 
-`.planning/ST_PLANNER_INSTALL.json` is written last. It records:
-
-- installed framework version;
-- `source_repo`;
-- exact resolved `source_commit`;
-- installation timestamp when available;
-- `managed_integrity` for every framework-managed `.planning` path;
-- critical checker/root-rules integrity and the root-rules begin/end markers.
-
-Writing provenance last prevents a partially applied upgrade from falsely identifying itself as complete.
+After managed files and root rules are successfully updated, write `ST_PLANNER_INSTALL.json` last with version, exact source commit, install timestamp, managed integrity, and root-rules integrity/markers.
 
 ## Upgrade verification
 
-Before further S&T work:
+Before further S&T work require:
 
-1. run the checker and require exit `0` + current;
-2. run materially affected framework/tooling validators;
-3. prove all six protected state files match their pre-upgrade snapshots;
-4. prove the bounded root S&T block occurs exactly once;
-5. prove target-native `AGENTS.md` text outside the block is unchanged;
-6. if any CI warning/error occurred, close the mandatory CI RCA including analogous-area review.
+1. checker exit `0` + current;
+2. materially affected validators green;
+3. every managed file matches release integrity;
+4. bounded root rules occur exactly once and match release integrity;
+5. all six protected state files are byte-identical to pre-upgrade snapshots;
+6. target-native root rules remain intact except explicitly reviewed migration of pre-existing target customization;
+7. every pre-upgrade divergence has a disposition: migrated target contract, repaired framework drift, or resolved blocker;
+8. any CI warning/error has completed mandatory RCA.
 
-## Legacy installations
+## Legacy/version history
 
-Installations from before version/provenance support cannot discover updates by themselves. They need one explicit upgrade. This is unavoidable: code that was never installed cannot execute itself.
+Unversioned installations need one explicit upgrade because they cannot execute a checker that was never installed.
 
-Version 1.0.0 installations can discover 1.1.0 through their existing checker/rules. Upgrading to 1.1.0 installs bounded root rules and full managed-file integrity; subsequent releases are both discoverable and locally integrity-checked at every S&T planning/executor entry point.
+Version 1.0.0 installations can discover 1.1.x through their existing checker. The 1.1.x upgrade adds bounded root rules, full managed-file integrity, and the mandatory pre-upgrade divergence audit needed to preserve older target customizations safely.
