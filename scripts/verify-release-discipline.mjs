@@ -57,30 +57,40 @@ function targetTemplatePath(relative, label) {
   return `templates/project/${relative}`;
 }
 
-function distributedPaths(release, legacy = false) {
+function safeRepoPath(relative, label) {
+  if (!relative || path.isAbsolute(relative) || relative.split(/[\\/]/).includes("..") || relative.startsWith(".git/")) {
+    fail(`unsupported ${label} path: ${relative}`);
+  }
+  return relative.replaceAll("\\", "/");
+}
+
+function releaseSensitivePaths(release, legacy = false) {
   const paths = new Set(
     (release.framework_managed_paths ?? []).map((managed) => targetTemplatePath(managed, "managed")),
   );
   if (release.install_metadata_path) paths.add(targetTemplatePath(release.install_metadata_path, "install metadata"));
-  if (release.agents_rules?.source_path) paths.add(release.agents_rules.source_path);
+  if (release.agents_rules?.source_path) paths.add(safeRepoPath(release.agents_rules.source_path, "agents rules"));
+  for (const sourcePath of release.release_sensitive_source_paths ?? []) {
+    paths.add(safeRepoPath(sourcePath, "release-sensitive source"));
+  }
   if (legacy) paths.add("templates/project/AGENTS.snippet.md");
   return paths;
 }
 
-const distributed = new Set([
-  ...distributedPaths(previous, previous.schema_version < 2),
-  ...distributedPaths(current),
+const releaseSensitive = new Set([
+  ...releaseSensitivePaths(previous, previous.schema_version < 2),
+  ...releaseSensitivePaths(current),
   "FRAMEWORK_RELEASE.json",
 ]);
-const distributedChanges = [...changed].filter((file) => distributed.has(file));
+const sensitiveChanges = [...changed].filter((file) => releaseSensitive.has(file));
 
-if (distributedChanges.length === 0) {
-  console.log("release-discipline: no distributed framework changes.");
+if (sensitiveChanges.length === 0) {
+  console.log("release-discipline: no release-sensitive framework changes.");
   process.exit(0);
 }
 
 if (compareSemver(current.version, previous.version) <= 0) {
-  fail(`distributed framework changed without a forward version bump (${previous.version} -> ${current.version}). Changed: ${distributedChanges.join(", ")}`);
+  fail(`release-sensitive framework content changed without a forward version bump (${previous.version} -> ${current.version}). Changed: ${sensitiveChanges.join(", ")}`);
 }
 
 if (!changed.has("CHANGELOG.md")) {
@@ -97,4 +107,4 @@ if (!["recommended", "required"].includes(current.update_policy)) {
   fail(`invalid update_policy ${current.update_policy}; expected recommended|required.`);
 }
 
-console.log(`release-discipline: ${previous.version} -> ${current.version}; distributed changes are versioned and documented.`);
+console.log(`release-discipline: ${previous.version} -> ${current.version}; release-sensitive changes are versioned and documented.`);
