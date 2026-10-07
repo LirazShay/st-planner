@@ -34,8 +34,8 @@ Exit contract:
 - `0` + current — continue;
 - `0` + recommended update — surface it; upgrade is optional;
 - `2` — required framework update/reconciliation; do not start new S&T work;
-- `3` — the installed freshness path is damaged/drifted; repair/upgrade before S&T work;
-- network/source unavailable with exit `0` — freshness is **unverified**; continue only from the installed framework and never claim it is current.
+- `3` — installed framework/provenance is missing, damaged, or drifted; repair/upgrade before S&T work;
+- network/source unavailable with exit `0` — installed integrity passed but source freshness is **unverified**; continue only from the installed framework and never claim it is current.
 
 ## Fresh install
 
@@ -62,7 +62,7 @@ For a permitted fresh install:
 
 1. Copy all sixteen files from `templates/project/.planning/` at the resolved source commit.
 2. Merge `templates/project/AGENTS.rules.md` exactly once into root `AGENTS.md` while preserving all target-native text.
-3. Populate `.planning/ST_PLANNER_INSTALL.json` from the same release: version, source repo, exact source commit, install timestamp when available, and `critical_integrity` copied from `FRAMEWORK_RELEASE.json`.
+3. Populate `.planning/ST_PLANNER_INSTALL.json` from the same release: version, source repo, exact source commit, install timestamp when available, `managed_integrity`, and `critical_integrity`/root-rules markers from `FRAMEWORK_RELEASE.json`.
 4. Do not change target product/runtime files merely to install the planner.
 
 ### Fresh install verification
@@ -70,8 +70,9 @@ For a permitted fresh install:
 Require all of the following before planning:
 
 - all sixteen `.planning` files exist;
-- the bounded S&T rules block appears exactly once in root `AGENTS.md`;
-- the block uses the manifest's exact begin/end markers;
+- every `.planning` file matches its declared ownership class;
+- every framework-managed installed file matches the release `managed_integrity` value;
+- the bounded S&T rules block appears exactly once in root `AGENTS.md` and matches the release integrity;
 - installed framework/tooling came from one resolved source commit;
 - install metadata version/integrity matches that release manifest;
 - `node .planning/check-framework-update.mjs` exits `0` and reports current when source access is available;
@@ -90,6 +91,8 @@ Before upgrading:
 5. Snapshot/hash the six protected cycle-state files so preservation can be proved after the upgrade.
 
 Upgrade only paths listed in `FRAMEWORK_RELEASE.json -> framework_managed_paths`, from that same resolved source commit.
+
+`.planning/ST_PLANNER_INSTALL.json` is the special `install_metadata_path`; do **not** treat it as a normal managed-file copy during upgrade. Write it last after all managed files and root rules have been updated successfully.
 
 **Never overwrite current-cycle state:**
 
@@ -118,15 +121,16 @@ This makes the v2 → v3 migration deterministic even when target-native rules e
 
 ### Upgrade completion
 
-Write `.planning/ST_PLANNER_INSTALL.json` **last**, with the new version, exact source commit, install timestamp, and current release integrity metadata.
+Write `.planning/ST_PLANNER_INSTALL.json` **last**, with the new version, exact source commit, install timestamp, `managed_integrity`, and current critical/root-rules integrity metadata.
 
 Then require:
 
 1. `node .planning/check-framework-update.mjs` exits `0` and reports current;
 2. framework/tooling validations affected by the release pass;
-3. the bounded S&T rules block occurs exactly once;
-4. the six protected state files match the pre-upgrade snapshots byte-for-byte;
-5. target-native `AGENTS.md` text outside the bounded block is unchanged.
+3. every managed installed file matches release integrity;
+4. the bounded S&T rules block occurs exactly once and matches release integrity;
+5. the six protected state files match the pre-upgrade snapshots byte-for-byte;
+6. target-native `AGENTS.md` text outside the bounded block is unchanged.
 
 If upgrade/CI emits any warning or error, the mandatory `.planning/CI-RCA-POLICY.md` gate applies before further progress.
 
