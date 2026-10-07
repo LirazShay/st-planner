@@ -50,13 +50,18 @@ const changed = new Set(
     .filter(Boolean),
 );
 
+function targetTemplatePath(relative, label) {
+  if (!relative?.startsWith(".planning/") || relative.split("/").includes("..")) {
+    fail(`unsupported ${label} path: ${relative}`);
+  }
+  return `templates/project/${relative}`;
+}
+
 function distributedPaths(release, legacy = false) {
   const paths = new Set(
-    (release.framework_managed_paths ?? []).map((managed) => {
-      if (!managed.startsWith(".planning/")) fail(`unsupported managed path: ${managed}`);
-      return `templates/project/${managed}`;
-    }),
+    (release.framework_managed_paths ?? []).map((managed) => targetTemplatePath(managed, "managed")),
   );
+  if (release.install_metadata_path) paths.add(targetTemplatePath(release.install_metadata_path, "install metadata"));
   if (release.agents_rules?.source_path) paths.add(release.agents_rules.source_path);
   if (legacy) paths.add("templates/project/AGENTS.snippet.md");
   return paths;
