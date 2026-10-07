@@ -32,7 +32,7 @@ Numbered chats are optional execution owners. A new `Chat N` becomes active only
 
 ## Replanning during execution
 
-When new information appears, use the Planning Impact Test from `docs/SNT-METHODOLOGY.md`:
+When new information appears, use the Planning Impact Test from the current ST Planner source methodology (`docs/SNT-METHODOLOGY.md` in `LirazShay/st-planner`, read from the session's pinned framework commit):
 
 - implementation defect → fix/verify without changing the plan merely for ceremony;
 - local planning correction → update the smallest affected PLAN area and affected rows here;
