@@ -20,9 +20,26 @@ function emit(kind, message) {
   writer(message);
 }
 
+function canonicalTextBytes(buffer) {
+  return Buffer.from(buffer.toString("utf8").replace(/\r\n/g, "\n"), "utf8");
+}
+
 function gitBlobSha(buffer) {
-  const header = Buffer.from(`blob ${buffer.length}\0`, "utf8");
-  return crypto.createHash("sha1").update(header).update(buffer).digest("hex");
+  const canonical = canonicalTextBytes(buffer);
+  const header = Buffer.from(`blob ${canonical.length}\0`, "utf8");
+  return crypto.createHash("sha1").update(header).update(canonical).digest("hex");
+}
+
+function isSha(value) {
+  return /^[0-9a-f]{40}$/i.test(String(value));
+}
+
+function isIntegrityMap(value) {
+  return Boolean(value)
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && Object.keys(value).length > 0
+    && Object.entries(value).every(([relative, digest]) => relative.startsWith(".planning/") && !relative.split("/").includes("..") && isSha(digest));
 }
 
 function compareSemver(left, right) {
@@ -47,18 +64,14 @@ async function readJson(file) {
 
 async function verifyManagedIntegrity(installed) {
   const managed = installed.managed_integrity;
-  if (!managed || typeof managed !== "object" || Array.isArray(managed) || Object.keys(managed).length === 0) {
-    emit("error", "Installed S&T Planner provenance lacks framework-managed integrity metadata. Run an explicit framework upgrade before S&T work.");
+  if (!isIntegrityMap(managed)) {
+    emit("error", "Installed S&T Planner provenance lacks valid framework-managed integrity metadata. Run an explicit framework upgrade before S&T work.");
     return false;
   }
 
   for (const [relative, expected] of Object.entries(managed)) {
-    if (!relative.startsWith(".planning/") || relative.split("/").includes("..") || relative === ".planning/ST_PLANNER_INSTALL.json") {
-      emit("error", `Invalid framework-managed integrity path in installed provenance: ${relative}.`);
-      return false;
-    }
-    if (!/^[0-9a-f]{40}$/i.test(String(expected))) {
-      emit("error", `Invalid integrity digest for ${relative} in installed provenance.`);
+    if (relative === ".planning/ST_PLANNER_INSTALL.json") {
+      emit("error", "Install metadata cannot classify itself as framework-managed integrity content. Repair/upgrade before S&T work.");
       return false;
     }
 
@@ -77,8 +90,7 @@ async function verifyManagedIntegrity(installed) {
     }
   }
 
-  const checkerExpected = managed[".planning/check-framework-update.mjs"];
-  if (!checkerExpected) {
+  if (!managed[".planning/check-framework-update.mjs"]) {
     emit("error", "Installed managed-integrity metadata does not include the framework update checker. Repair/upgrade before S&T work.");
     return false;
   }
@@ -114,9 +126,10 @@ async function verifyCriticalIntegrity(installed) {
   }
 
   const start = agents.indexOf(begin);
-  const secondStart = start === -1 ? -1 : agents.indexOf(begin, start + begin.length);
   const endIndex = start === -1 ? -1 : agents.indexOf(end, start + begin.length);
-  if (start === -1 || secondStart !== -1 || endIndex === -1) {
+  const uniqueStart = start !== -1 && agents.indexOf(begin, start + begin.length) === -1;
+  const uniqueEnd = endIndex !== -1 && agents.indexOf(end) === endIndex && agents.indexOf(end, endIndex + end.length) === -1;
+  if (!uniqueStart || !uniqueEnd) {
     emit("error", "The bounded S&T Planner rules block in AGENTS.md is missing, duplicated, or malformed. Repair/upgrade it before S&T work.");
     return false;
   }
@@ -132,6 +145,19 @@ async function verifyCriticalIntegrity(installed) {
   }
 
   return true;
+}
+
+function validateSourceRelease(latest) {
+  if (compareSemver(latest?.version, latest?.version) === null) return "invalid version";
+  if (!["recommended", "required"].includes(latest?.update_policy)) return "invalid update_policy";
+  if (!isIntegrityMap(latest?.managed_integrity)) return "missing/invalid managed_integrity";
+  if (!isSha(latest?.critical_integrity?.checker_git_blob_sha) || !isSha(latest?.critical_integrity?.agents_rules_git_blob_sha)) {
+    return "missing/invalid critical_integrity";
+  }
+  if (latest.critical_integrity.checker_git_blob_sha !== latest.managed_integrity[".planning/check-framework-update.mjs"]) {
+    return "inconsistent checker integrity";
+  }
+  return null;
 }
 
 async function fetchLatestRelease() {
@@ -172,17 +198,24 @@ async function main() {
     return;
   }
 
+  const sourceProblem = validateSourceRelease(latest);
+  if (sourceProblem) {
+    emit("error", `S&T Planner source release manifest is malformed (${sourceProblem}). Freshness cannot be trusted; reconcile with LirazShay/st-planner before further S&T work.`);
+    process.exitCode = 3;
+    return;
+  }
+
   const installedVersion = installed.framework_version ?? "unknown";
-  const latestVersion = latest.version ?? "unknown";
+  const latestVersion = latest.version;
   const relation = compareSemver(installedVersion, latestVersion);
   if (relation === null) {
-    emit("error", `Invalid S&T Planner version metadata: installed ${installedVersion}, latest ${latestVersion}.`);
+    emit("error", `Invalid installed S&T Planner version metadata: ${installedVersion}.`);
     process.exitCode = 3;
     return;
   }
 
   const sameManagedRelease = stableObject(latest.managed_integrity) === stableObject(installed.managed_integrity);
-  const latestCritical = latest.critical_integrity ?? {};
+  const latestCritical = latest.critical_integrity;
   const installedCritical = installed.critical_integrity ?? {};
   const sameCriticalRelease = latestCritical.checker_git_blob_sha === installedCritical.checker_git_blob_sha
     && latestCritical.agents_rules_git_blob_sha === installedCritical.agents_rules_git_blob_sha;
