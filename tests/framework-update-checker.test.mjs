@@ -63,7 +63,7 @@ function runChecker(root, releaseUrl) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [path.join(root, ".planning", "check-framework-update.mjs")], {
       cwd: root,
-      env: { ...process.env, ST_PLANNER_RELEASE_URL: releaseUrl },
+      env: { ...process.env, GITHUB_ACTIONS: "false", ST_PLANNER_RELEASE_URL: releaseUrl },
     });
     let stdout = "";
     let stderr = "";
