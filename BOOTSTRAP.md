@@ -6,7 +6,7 @@ A user request such as:
 
 > תעבוד עם ST Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
-is enough. The user does not need to restate framework mechanics.
+is enough. The user does not need to restate framework mechanics or generic repository-working rules.
 
 ## 1. Read target rules first
 
@@ -14,28 +14,31 @@ Treat the repository you are currently working on as the **target repository**.
 
 Before changing anything, read its existing:
 
-- `AGENTS.md` or equivalent agent instructions;
+- `AGENTS.md` or equivalent agent instructions when present;
 - architecture/source-of-truth/routing rules;
-- branch/PR policy;
+- target-specific branch/PR/release policy when present;
 - verification/testing rules;
 - relevant implementation and product context.
 
-Target-native rules continue to own the target repository.
+Target-native rules own target-specific constraints and explicit overrides. They do not need to duplicate generic ST Planner defaults merely to make them local.
+
+When the target is silent on a generic working rule, use the ST Planner defaults from `docs/REPOSITORY-WORKFLOW.md`.
 
 ## 2. Read the current ST Planner source
 
 At the start of the planning/execution session, resolve the current `LirazShay/st-planner` source to **one exact commit** and read the framework documents used in that session from that same commit:
 
-1. `docs/SNT-METHODOLOGY.md`;
-2. `docs/EXECUTION-MANAGEMENT.md`;
-3. this `BOOTSTRAP.md`;
-4. relevant `templates/` when a starting shape is useful.
+1. this `BOOTSTRAP.md`;
+2. `docs/REPOSITORY-WORKFLOW.md`;
+3. `docs/SNT-METHODOLOGY.md`;
+4. `docs/EXECUTION-MANAGEMENT.md`;
+5. relevant `templates/` when a starting shape is useful.
 
 This commit pin is only for **session consistency** so one session cannot accidentally mix framework revisions. It is not an installed framework version, target-repository provenance system, or upgrade gate. A later session may read a newer current source.
 
-Do not copy framework scripts or framework-owned runtime files into the target repository.
+Do not copy framework scripts, framework-owned runtime files, or generic framework policy into the target repository merely to use ST Planner.
 
-The target stores project planning **data**, not an installed copy of ST Planner.
+The target stores project planning **data** and target-specific durable contracts, not an installed copy of ST Planner.
 
 ## 3. Detect planning state
 
@@ -180,7 +183,7 @@ A generic `continue` / `תמשיך לשלב הבא`, a status pointer, or newly 
 
 On explicit Chat N startup:
 
-1. read target rules;
+1. read target rules and the framework documents required by Section 2;
 2. read `.planning/PLAN.md` and `.planning/EXECUTION.md`;
 3. locate the requested owner's assigned unfinished work;
 4. check real prerequisites and identify the owner's runnable tasks;

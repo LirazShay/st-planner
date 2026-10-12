@@ -14,7 +14,8 @@ ST Planner helps an AI or team:
 4. turn the plan into implementation-ready leaves/tasks;
 5. allocate those tasks to chats, agents, developers, or teams;
 6. track execution with minimal durable state;
-7. replan only when new evidence actually invalidates the plan.
+7. apply a strong default repository/PR/CI/RCA workflow;
+8. replan only when new evidence actually invalidates the plan.
 
 The design target is:
 
@@ -22,15 +23,32 @@ The design target is:
 
 ## Use it from another repository
 
-The target repository does **not** need ST Planner installed beforehand.
+The target repository does **not** need ST Planner installed beforehand and does not need a copied ST Planner `AGENTS.md`.
 
 In a chat working on that repository, say for example:
 
 > תעבוד עם ST Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
-The agent reads the current `BOOTSTRAP.md`, follows the current methodology, investigates the target repository, and creates only the project-owned planning artifacts that the work actually needs.
+That request is enough. The agent reads the current `BOOTSTRAP.md`, resolves one exact framework commit for the session, then loads the generic repository workflow, S&T methodology and execution-management rules from that same commit.
 
-No framework scripts, hashes, release manifest, validators, or copied framework runtime are required in the target repository.
+The target repository keeps only its own rules and explicit overrides. If it has `AGENTS.md` or equivalent instructions, those remain authoritative for target-specific constraints. Generic ST Planner policy should not be copied into every target merely to make it local.
+
+No framework scripts, hashes, release manifest, validators, copied framework runtime, or duplicated generic framework policy are required in the target repository.
+
+## Default repository workflow
+
+ST Planner supplies default engineering behavior for targets that do not explicitly override it, including:
+
+- repository/default-branch truth over chat/local cache;
+- focused feature branches for ordinary implementation;
+- local/targeted verification before relying on CI when practical;
+- PR + required green CI before merge;
+- CI as verification rather than a code-editing transport;
+- RCA before progressing past meaningful failures/warnings;
+- recovery from repository truth after interruption/context loss;
+- safe handling of temporary sandbox/connector limitations without inventing ad-hoc transports.
+
+See `docs/REPOSITORY-WORKFLOW.md`.
 
 ## Default project artifacts
 
@@ -140,6 +158,7 @@ Before adding any planner file, state, validator, script, gate, marker, workflow
 ## Main documents
 
 - `BOOTSTRAP.md` — authoritative external entry contract
+- `docs/REPOSITORY-WORKFLOW.md` — generic target-repository engineering workflow defaults
 - `docs/SNT-METHODOLOGY.md` — planning/reasoning method
 - `docs/EXECUTION-MANAGEMENT.md` — task allocation and lightweight execution method
 - `templates/` — optional starting shapes for project artifacts
@@ -152,6 +171,7 @@ Before adding any planner file, state, validator, script, gate, marker, workflow
 - Necessary individually, sufficient together.
 - Material alternatives, not artificial option lists.
 - One source of truth per fact.
+- Framework defaults live in ST Planner; target repositories store only project-owned state and explicit overrides.
 - S&T leaves become executable work.
 - Execution tracking stays minimal.
 - Local defects stay local unless they invalidate the plan.

@@ -10,11 +10,14 @@ A user working in another repository should be able to say:
 
 > תעבוד עם ST Planner מ-`LirazShay/st-planner` ותתכנן לי לפי הריפו: <מה אני רוצה להשיג>
 
-The agent should read the current framework source, understand the target repository, build a rigorous S&T plan, decompose it into implementation-ready work, and manage execution through minimal durable project state.
+The agent should read the current framework source, understand the target repository, apply the generic repository workflow, build a rigorous S&T plan, decompose it into implementation-ready work, and manage execution through minimal durable project state.
+
+The target repository should not need copied generic ST Planner policy. It owns only its project-specific rules, durable contracts, planning data, and explicit overrides.
 
 ## Source-of-truth hierarchy
 
 - `BOOTSTRAP.md` — authoritative external entry contract.
+- `docs/REPOSITORY-WORKFLOW.md` — authoritative generic repository-working defaults used when the target does not explicitly override them.
 - `docs/SNT-METHODOLOGY.md` — authoritative reasoning/planning method.
 - `docs/EXECUTION-MANAGEMENT.md` — authoritative lightweight execution-management method.
 - `templates/` — optional starting shapes for project-owned planning artifacts.
@@ -22,6 +25,8 @@ The agent should read the current framework source, understand the target reposi
 - `CHANGELOG.md` — human-readable framework history; it is not an execution gate.
 
 Do not create duplicate authorities for the same rule.
+
+Target-native rules own target-specific constraints and explicit overrides. Do not copy generic framework policy into a target merely so it is locally present.
 
 ## Core planning rule
 
