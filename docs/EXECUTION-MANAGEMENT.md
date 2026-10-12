@@ -113,7 +113,7 @@ This is normally a review, not a validator script.
 
 ## 3.3 Allocation is adaptive, not frozen
 
-The initial execution grouping is the best judgment available at planning time, not a promise to preserve the original chat/task grouping after reality changes.
+The initial execution grouping is the best judgment available at planning time, not a promise to preserve the original grouping after reality changes.
 
 During execution, stay alert to new facts such as:
 
@@ -121,22 +121,21 @@ During execution, stay alert to new facts such as:
 - newly discovered blockers or dependencies;
 - a task that has become too broad for focused execution;
 - changed risk, uncertainty, or verification cost;
-- context growth that makes a fresh execution conversation materially safer or clearer;
 - evidence that the original owner/task grouping no longer reflects the most coherent work boundary.
 
 When this happens, stop at a safe checkpoint and assess the impact before continuing. Adapt the smallest affected execution mapping when doing so improves correctness, focus, recoverability, or verification.
 
 Possible outcomes include:
 
-- keep the same task and owner but continue in a fresh conversation;
+- keep the same task and `Chat N` owner, but continue in a new physical conversation as `Chat N Part K+1` after writing a durable checkpoint to the target repository;
 - split one oversized task into smaller implementation-ready tasks without inventing fake product decisions;
-- redistribute not-yet-started work to different owners;
+- redistribute not-yet-started work to different numbered chats/owners;
 - repair real execution dependencies that changed;
 - reopen the smallest affected planning area when the new fact also invalidates S&T reasoning or a durable contract.
 
 Do not preserve an obsolete allocation merely because it was written earlier. Equally, do not churn assignments for cosmetic balance or ordinary implementation detail.
 
-Execution replanning does not require a new framework state such as `replan_mode`. Update the actual PLAN/EXECUTION facts that changed and continue from the corrected truth.
+Execution replanning does not require a new framework state such as `replan_mode`. Update only the actual PLAN/EXECUTION facts that changed and continue from the corrected truth.
 
 ---
 
@@ -170,11 +169,11 @@ An explicit startup such as:
 
 > אני צאט 12 תתחיל
 
-or:
+or, for a later physical conversation of the same assigned execution owner:
 
-> I am chat 12.
+> אני צאט 12 חלק 2 תתחיל
 
-activates that executor identity.
+activates that executor identity/part.
 
 A generic message such as:
 
@@ -184,7 +183,7 @@ must not silently activate a different Chat N just because repository state show
 
 This prevents accidental executor rollover without requiring an authority script.
 
-## 5.1 Starting a chat
+## 5.1 Starting a chat or part
 
 On explicit Chat N startup:
 
@@ -199,6 +198,8 @@ On explicit Chat N startup:
 9. execute the planned Tactic without inventing new material scope;
 10. verify success evidence;
 11. mark `done` with a short result/evidence reference, or `blocked` with a factual reason.
+
+For `Chat N Part K` startup, apply the same flow and additionally recover the exact current checkpoint from repository truth. Do not rely on the prior physical conversation transcript for correctness-critical context.
 
 If Chat N does not exist, do not invent work.
 
@@ -217,15 +218,23 @@ The new context should be able to recover from repository state rather than rely
 
 Fresh-chat recoverability is a design property, not a mandatory simulation gate.
 
-## 5.3 Chat identity is not a conversation boundary
+## 5.3 Conversation parts under one Chat owner
 
-`Chat N` identifies an execution owner. It does **not** require all work owned by Chat N to stay inside one physical chat conversation.
+`Chat N` identifies the execution owner assigned in `EXECUTION.md`. A long execution may span multiple physical conversations, but each new physical conversation must use an explicit sequential part label: `Chat N Part 1`, `Chat N Part 2`, and so on.
 
-When the current conversation becomes materially large, fragmented, stale, or difficult to recover from, prefer a safe checkpoint followed by a fresh conversation using the **same Chat N identity** when the ownership and task remain unchanged.
+Before ending one part and moving to the next:
 
-Changing conversation alone does not require changing `.planning/EXECUTION.md` ownership. Changing owner/task allocation does.
+1. stop at a safe, meaningful checkpoint;
+2. finish and verify the current segment rather than abandoning half-applied work;
+3. persist all correctness-critical current truth outside the conversation in the target repository: implementation state, tests/evidence, blockers/discoveries, PR/CI state when material, and the exact next pointer;
+4. ensure a fresh executor can reconstruct what to do from repository truth alone;
+5. start the next physical conversation explicitly as `Chat N Part K+1`.
 
-Conversely, do not keep using one conversation merely to preserve the original allocation if a fresh context would materially improve execution quality. The repository must contain enough durable truth for the fresh conversation to reconstruct the work.
+A part label is a conversation boundary only. It does not create a new task owner and does not require changing `.planning/EXECUTION.md` when task ownership/dependencies remain the same.
+
+If execution reality changes materially enough that the task/owner allocation itself is no longer coherent, do not hide that change behind another Part. Reassess the smallest affected execution mapping and assign new `Chat N` owners/tasks where appropriate.
+
+Do not keep one physical conversation open merely to preserve the original allocation, and do not create a new Chat number merely because context became large when the same owner/task remains coherent.
 
 ---
 
