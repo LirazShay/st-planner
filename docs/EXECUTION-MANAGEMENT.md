@@ -111,6 +111,33 @@ Before execution begins, perform a simple reasoning check:
 
 This is normally a review, not a validator script.
 
+## 3.3 Allocation is adaptive, not frozen
+
+The initial execution grouping is the best judgment available at planning time, not a promise to preserve the original chat/task grouping after reality changes.
+
+During execution, stay alert to new facts such as:
+
+- materially larger or smaller scope than expected;
+- newly discovered blockers or dependencies;
+- a task that has become too broad for focused execution;
+- changed risk, uncertainty, or verification cost;
+- context growth that makes a fresh execution conversation materially safer or clearer;
+- evidence that the original owner/task grouping no longer reflects the most coherent work boundary.
+
+When this happens, stop at a safe checkpoint and assess the impact before continuing. Adapt the smallest affected execution mapping when doing so improves correctness, focus, recoverability, or verification.
+
+Possible outcomes include:
+
+- keep the same task and owner but continue in a fresh conversation;
+- split one oversized task into smaller implementation-ready tasks without inventing fake product decisions;
+- redistribute not-yet-started work to different owners;
+- repair real execution dependencies that changed;
+- reopen the smallest affected planning area when the new fact also invalidates S&T reasoning or a durable contract.
+
+Do not preserve an obsolete allocation merely because it was written earlier. Equally, do not churn assignments for cosmetic balance or ordinary implementation detail.
+
+Execution replanning does not require a new framework state such as `replan_mode`. Update the actual PLAN/EXECUTION facts that changed and continue from the corrected truth.
+
 ---
 
 # 4. Dependencies
@@ -189,6 +216,16 @@ When an execution unit finishes:
 The new context should be able to recover from repository state rather than relying on the previous conversation transcript.
 
 Fresh-chat recoverability is a design property, not a mandatory simulation gate.
+
+## 5.3 Chat identity is not a conversation boundary
+
+`Chat N` identifies an execution owner. It does **not** require all work owned by Chat N to stay inside one physical chat conversation.
+
+When the current conversation becomes materially large, fragmented, stale, or difficult to recover from, prefer a safe checkpoint followed by a fresh conversation using the **same Chat N identity** when the ownership and task remain unchanged.
+
+Changing conversation alone does not require changing `.planning/EXECUTION.md` ownership. Changing owner/task allocation does.
+
+Conversely, do not keep using one conversation merely to preserve the original allocation if a fresh context would materially improve execution quality. The repository must contain enough durable truth for the fresh conversation to reconstruct the work.
 
 ---
 
