@@ -312,13 +312,13 @@ If it drifts, correct or remove the convenience summary. Do not halt safe work s
 
 ---
 
-# 11. PRs and branches
+# 11. Repository branches, PRs and CI
 
-ST Planner may record a branch/PR reference when it materially helps execution tracking, but it should not prescribe a universal Git workflow.
+Use the default engineering workflow in `REPOSITORY-WORKFLOW.md` unless the target repository explicitly overrides it.
 
-The target repository's own Git/PR policy remains authoritative.
+Target-specific Git/PR/release rules remain authoritative deltas, but the target does not need to copy the generic ST Planner workflow merely to make it local.
 
-Do not pre-create PR state in the planner simply because PRs will eventually exist.
+`EXECUTION.md` may record a branch/PR reference when it materially helps execution tracking, but do not duplicate repository workflow state into planner state and do not pre-create PR state merely because a PR will eventually exist.
 
 ---
 
