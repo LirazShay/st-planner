@@ -178,7 +178,7 @@ Reason deeply about a coherent area, review it, and then continue.
 
 Do not repeat a full planning ceremony after every small text edit.
 
-Once a material decision is justified and recorded, reopen it only when new evidence, contradiction, changed assumptions, or review findings can materially change it.
+Once a material decision is justified and recorded, reopen it only when new evidence, contradiction, changed assumptions, or review findings can change it materially.
 
 ## 5.3 Gather evidence that can change the plan
 
@@ -303,6 +303,19 @@ Stronger:
 
 For larger scopes, higher-level evidence must prove the intended integrated outcome, not only that each component changed.
 
+When some evidence can only be produced by the user or another external environment, distinguish it explicitly from executor-owned implementation proof. Do not make external/user acceptance an intermediate implementation dependency merely because it appears chronologically desirable.
+
+Unless remaining implementation or a material design decision genuinely depends on that external fact, plan for:
+
+```text
+executor-owned implementation + exhaustive available verification + repository closure
+→ separate post-merge external/user acceptance
+```
+
+The implementation scope must still prepare the acceptance path itself: deterministic preflight/verifier tooling where useful and a durable runbook/checklist that lets the user later execute the external proof without reconstructing chat history.
+
+External evidence may remain `PENDING`/`BLOCKED` honestly; synthetic/CI evidence must never be relabeled as external PASS.
+
 ---
 
 # 9. Logical decomposition is not execution order
@@ -339,6 +352,7 @@ Ask:
 10. Are real execution dependencies identifiable without distorting the reasoning tree?
 11. Is anything duplicated or over-engineered?
 12. Is there a simpler plan that achieves the same outcome with comparable confidence?
+13. Is any user/target-machine/external acceptance accidentally blocking implementation that can continue independently, and if so has it been split into an explicit post-merge acceptance item with a planned runbook?
 
 Correct the plan directly when review finds a defect.
 
@@ -465,10 +479,12 @@ Future durable product/architecture truths belong in the target repository's nor
 
 # 15. Completion
 
-An individual execution task is complete when its relevant success evidence is verified.
+An individual execution task is complete when its relevant executor-owned success evidence is verified.
 
-The planning scope is complete only when the intended root outcome is verified after integration.
+The implementation/repository scope may be complete when the integrated implementation outcome is verified, all executor-owned verification is exhausted as required, durable contracts/runbooks are in place, the required PR is merged, the default branch is green, and repository/open-PR state is reconciled — even when a genuinely external/user acceptance item remains separately pending.
+
+The broader real-world acceptance outcome is not claimed complete until that external evidence actually exists. Keep the two facts distinct rather than holding implementation artificially open or fabricating PASS.
 
 A set of `done` tasks is evidence, not proof by itself.
 
-If the delivered work establishes a contract future work must obey, promote that contract into the target repository's durable source of truth before treating the scope as fully closed.
+If the delivered work establishes a contract future work must obey, promote that contract into the target repository's durable source of truth before treating the implementation scope as fully closed.
