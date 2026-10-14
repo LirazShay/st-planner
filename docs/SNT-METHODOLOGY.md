@@ -178,7 +178,7 @@ Reason deeply about a coherent area, review it, and then continue.
 
 Do not repeat a full planning ceremony after every small text edit.
 
-Once a material decision is justified and recorded, reopen it only when new evidence, contradiction, changed assumptions, or review findings can change it materially.
+Once a material decision is justified and recorded, reopen it only when new evidence, contradiction, changed assumptions, or review findings can materially change it.
 
 ## 5.3 Gather evidence that can change the plan
 
