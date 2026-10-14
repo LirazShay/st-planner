@@ -378,6 +378,43 @@ The overall planning scope is complete when the integrated root outcome is verif
 
 Do not add a separate lifecycle state machine to express these facts.
 
+## 12.1 External/user acceptance is post-merge by default
+
+Distinguish **executor-owned verification** from **external/user acceptance**.
+
+External/user acceptance is evidence that the executor cannot honestly produce itself because it requires something such as:
+
+- the user's target machine;
+- private credentials, authenticated provider/session state, or hardware the executor does not possess;
+- a user-only manual or business judgment;
+- another genuinely external environment or permission boundary.
+
+Unless that external evidence is a real prerequisite for making a remaining implementation/design decision, it must not interrupt or serialize otherwise independent implementation work.
+
+The default completion sequence is:
+
+```text
+finish all implementation the executor can perform
+→ run all relevant automated/local/adversarial/browser/workload/security verification the executor can perform
+→ review the final diff
+→ PR + required CI green
+→ merge
+→ verify default-branch/main CI green
+→ reconcile open-PR/repository state
+→ leave only genuinely external/user acceptance as a separate post-merge task
+```
+
+When **only** that external/user acceptance remains:
+
+- the implementation task/execution group/chat may be marked `done` if its executor-owned success evidence and repository closure are complete;
+- the executor may report the implementation work as finished rather than repeatedly waiting for the user to say “continue”;
+- the remaining acceptance must stay explicit as a separate `pending`/`blocked` external task or durable acceptance record;
+- the executor must never fabricate external PASS, infer it from CI/synthetic evidence, or silently weaken its criteria.
+
+A target repository may intentionally require external acceptance before merge only when it is a **real implementation prerequisite** or a deliberate product/release policy. In that case the dependency must be explicit in the target plan/execution truth rather than emerging accidentally from conversational sequencing.
+
+If later external acceptance finds a defect, reopen the smallest affected implementation/planning area and apply the normal RCA/fix/regression/reclosure workflow.
+
 ---
 
 # 13. Anti-overengineering test
