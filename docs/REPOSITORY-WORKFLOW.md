@@ -132,3 +132,62 @@ This repository workflow complements, rather than duplicates, S&T planning and l
 - this file owns default repository engineering workflow.
 
 Target repositories store their project planning data and target-specific contracts. They do not need copied framework runtime or duplicated generic ST Planner policy.
+
+## 10. External/user acceptance comes after executor-owned closure by default
+
+User/target-machine/provider acceptance must not become an accidental mid-development gate.
+
+If acceptance requires the user's machine, private credentials/session state, provider permission, hardware, or user-only judgment, continue all independent implementation and verification that the executor can honestly perform without that evidence.
+
+Before asking the user to test, exhaust the relevant executor-owned proof as far as practical, including whichever families apply:
+
+```text
+focused/unit proof
+→ service/integration proof
+→ deterministic fake/synthetic proof
+→ adversarial/fault/security proof
+→ Browser/UI composition
+→ bounded workload/performance sanity
+→ regression/reclosure suites
+→ final diff review
+→ PR + required CI green
+→ merge
+→ default-branch/main CI green
+→ open-PR/repository audit
+```
+
+Synthetic/fake/CI proof never masquerades as real external PASS, but missing external PASS also does not freeze independent implementation work.
+
+### 10.1 Prepare the user's acceptance guide as part of engineering completion
+
+When external/user acceptance will remain after merge, the executor must prepare a durable target-repository acceptance guide or runbook **before** declaring the implementation/repository work complete.
+
+The guide should be specific enough that the user can execute it later without reconstructing prior chats. Include, where relevant:
+
+1. **Purpose and scope** — what real-world boundary the user is proving and what the test does not prove.
+2. **Exact candidate rule** — how to identify the intended merged/default-branch commit or release; never rely on an obsolete PR head.
+3. **Prerequisites** — required software, services, credentials/session state, provider permissions, market state/timing, hardware, data, and safe defaults.
+4. **Setup/preflight** — deterministic checks that should pass before the real external action begins.
+5. **Step-by-step test journey** — explicit actions in a safe order, with dangerous or mutating actions clearly separated and requiring deliberate user initiation where applicable.
+6. **Expected observations** — what the user should see at each material checkpoint.
+7. **PASS criteria** — objective conditions that close the acceptance item.
+8. **FAIL/stop criteria** — exact symptoms that mean stop, do not continue, and return evidence for RCA.
+9. **Evidence to retain** — public-safe report/log/artifact names and the minimum information needed to bind evidence to the candidate.
+10. **Privacy/security rules** — credentials, cookies, session/auth data, account identifiers, private browser state and raw authenticated dumps must never be copied into repository evidence unless the target's security contract explicitly allows a safe derived form.
+11. **Cleanup/recovery** — how to stop/restore safely after success, failure or interruption.
+12. **Known limitations / pending families** — what remains unproven even after PASS.
+13. **Failure handoff** — what the user should provide back so the executor can perform RCA without asking them to reproduce unnecessary sensitive material.
+
+Test the runbook itself as far as possible before handoff: commands should exist, deterministic preflights/verifiers should be exercised, fake/synthetic equivalents should be green where they are meaningful, and the guide should not depend on hidden chat context.
+
+Do not ask the user to perform acceptance merely to discover defects that deterministic executor-owned tests could have found first.
+
+### 10.2 Completion semantics
+
+When implementation, executor-owned verification, diff review, merge, default-branch/main CI, repository audit, and the durable acceptance guide are complete, external/user acceptance may remain as the **only** separate post-merge item.
+
+At that point the executor may report the implementation work as finished. The user can perform the documented acceptance later at their convenience while unrelated development continues.
+
+If the current target plan accidentally embeds such external acceptance as an intermediate gate even though no remaining implementation/design decision truly depends on it, treat that as a local planning defect: split/defer the external acceptance into an explicit post-merge task and continue independent work. Do not silently bypass a real prerequisite; repair the plan/execution truth first.
+
+If later user acceptance finds a defect, reopen the smallest affected area, perform RCA → fix → regression/affected verification → reclosure, and update the acceptance guide when the failure exposed a missing/unclear check.
